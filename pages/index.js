@@ -1,65 +1,151 @@
 import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Link from 'next/link'
 
-export default function Home() {
+import styled from '@emotion/styled'
+
+import moment from 'moment';
+import { v4 as uuidv4 } from 'uuid';
+
+import fs from 'fs'
+import matter from 'gray-matter'
+import path from 'path'
+import { contentFilePaths, CONTENT_PATH } from '../utils/mdx'
+
+import { Container, Row, Col } from 'react-bootstrap';
+
+import Layout from '../components/layout'
+import { TitleLG, BodyXL } from '../components/typography'
+import Timeline from '../components/timeline'
+import Button from '../components/button'
+
+
+const Intro = styled.section`
+  padding: 8rem 0 3rem 0;
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    .prof-pic {
+      width: 15rem;
+      height: 15rem;
+      border-radius: 50%;
+      margin-bottom: 2.5rem;
+    }
+    .title-subtitle {
+      margin-bottom: 3.5rem;
+      h1 {
+        margin-bottom: 1.5rem;
+      }
+      p {
+        color: var(--foregroundMid);
+      }
+    }
+    .button-wrapper {
+      display: flex;
+      button {
+        &:not(:last-of-type) {
+          margin-right: 1rem;
+        }
+      }
+    }
+  }
+`
+
+const TimelineSection = styled.section`
+  padding: 3rem 0;
+`
+
+
+export default function Home({ content }) {
+
+  const _ = require("lodash");    
+
+  // Sorts all items by date, with most recent first (desc)
+  const sortedContent = _.sortBy(content, function(o) { return new moment(o.data.timelineDate); }).reverse();
+
+  // console.log(sortedContent)
+  
+  // Takes array item in and formats the date into a month using moment
+  const monthName = item => moment(item.data.timelineDate, 'YYYY-MM-DD').format('MMMM YYYY');
+
+  // Uses that month to group the array items together
+  const sortedMonthResult = _.groupBy(sortedContent, monthName);
+
+  // Converts arrays back to objects
+  const arrayMonths = Object.entries(sortedMonthResult)
+
+
+  const introData = {
+    img: {
+      src: '',
+      alt: '',
+    },
+    title: 'Hi, I’m Austin',
+    subtitle: 'I am a software designer and developer living in Austin, Texas. Currently, I am building the design system at Tesla and moonlighting as a front-end developer at Paper Crowns.',
+    ctas: [
+      {
+        variant: 'primary',
+        label: 'Check out my work',
+        link: 'work',
+      },
+      {
+        variant: 'secondary',
+        label: 'More about me',
+        link: 'about',
+      },
+    ]
+  }
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <Layout>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+      <Intro>
+        <Container>
+          <Row>
+            <Col xs={12} md={{ span: '8', offset: '2'}}>
+              <div className="content">
+                <img src={introData.img.src} alt={introData.img.alt} className="prof-pic"/>
+                <div className="title-subtitle">
+                  <TitleLG as="h1">{introData.title}</TitleLG>
+                  <BodyXL>{introData.subtitle}</BodyXL>
+                </div>
+                <div className="button-wrapper">
+                  {introData.ctas.map(cta => (
+                    <Link key={uuidv4()} href={cta.link}><Button variant={cta.variant}>{cta.label}</Button></Link>
+                  ))}
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </Intro>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+      <TimelineSection>
+        <Container>
+          <Row>
+            <Col xs={12} md={{ span: '10', offset: '1'}} lg={{ span: '8', offset: '2'}} xl={{ span: '6', offset: '3'}}>
+              <Timeline content={arrayMonths} />
+            </Col>
+          </Row>
+        </Container>
+      </TimelineSection>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
+    </Layout>
   )
+}
+
+export function getStaticProps() {
+  const content = contentFilePaths.map((filePath) => {
+    const source = fs.readFileSync(path.join(CONTENT_PATH, filePath))
+    const { content, data } = matter(source)
+
+    return {
+      content,
+      data,
+      filePath,
+    }
+  })
+
+  return { props: { content } }
 }
