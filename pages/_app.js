@@ -70,10 +70,10 @@ function MyApp({ Component, pageProps }) {
           }
           * {
               box-sizing: border-box;
-              &:focus {
-                  outline: none;
-                  border: 1px solid dashed currentColor;
-              }
+          }
+          *:focus {
+              outline: none;
+              border: 1px solid dashed currentColor;
           }
           body {
               margin: 0;

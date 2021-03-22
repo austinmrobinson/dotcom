@@ -40,11 +40,11 @@ const Type = styled('div')(
 
 const StyledTimelineItem = styled.div`
     display: flex;
-    gap: 1.5rem;
     .leading {
         display: flex;
         flex-direction: column;
         align-items: center;
+        margin-right: 1.5rem;
         &:after {
             content: '';
             margin-top: 0.5rem;
@@ -178,7 +178,7 @@ const Timeline = ({ content }) => {
   return (
     <StyledTimeline>
       {content.map(content => (
-        <div ley={uuidv4()} className="month">
+        <div key={uuidv4()} className="month">
           <div className="date"><TitleSM as="h2">{content[0]}</TitleSM></div>
           <div className={`items ${content[1].length === 1 ? 'single' : ''}`}>
             {content[1].map(item => (

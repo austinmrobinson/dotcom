@@ -120,15 +120,15 @@ const Layout = ({ children }) => {
 
     const navItems = [
         {
-            href: '',
+            href: 'work',
             label: 'Work',
         },
         {
-            href: '',
+            href: 'blog',
             label: 'Blog',
         },
         {
-            href: '',
+            href: 'about',
             label: 'About Me',
         },
     ]
@@ -157,9 +157,9 @@ const Layout = ({ children }) => {
             <StyledMain>
                 {children}
             </StyledMain>
-            <footer>
+            {/* <footer>
                 Footer
-            </footer>
+            </footer> */}
         </>
     )
 }
