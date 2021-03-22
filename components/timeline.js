@@ -66,8 +66,17 @@ const StyledTimelineItem = styled.div`
             h2 {
                 margin-bottom: 0.25rem;
             }
-            p {
+            .project-date {
+              display: flex;
+              p {
                 color: var(--transparent50);
+                display: flex;
+                align-items: center;
+              }
+              span {
+                font-size: 0.625rem;
+                margin: 0 0.25rem;
+              }
             }
         }
         .info-card {
@@ -119,7 +128,12 @@ const TimelineItem = ({ content, className }) => {
       <div className="trailing">
         <div className="top">
           <TitleXS as="h3">{content.data.timelineTitle}</TitleXS>
-          <Caption as="p">{date}</Caption>
+          <div className="project-date">
+            {content.data.timelineProject && (
+              <Caption as="p">{content.data.timelineProject}<span>•</span></Caption>
+            )}
+            <Caption as="p">{date}</Caption>
+          </div>
         </div>
         {content.data.title && (
           <div className="info-card">

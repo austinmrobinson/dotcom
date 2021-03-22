@@ -27,6 +27,7 @@ function MyApp({ Component, pageProps }) {
 
             /* Misc */
             --headerHeight: 4.5rem;
+            --topSectionPadding: 8rem;
           }
           .theme-light {
             --bg: #EBEBEB;
@@ -71,9 +72,9 @@ function MyApp({ Component, pageProps }) {
           * {
               box-sizing: border-box;
           }
-          *:focus {
+          :focus-visible {
               outline: none;
-              border: 1px solid dashed currentColor;
+              box-shadow: 0 0 0 0.125rem var(--transparent50);
           }
           body {
               margin: 0;

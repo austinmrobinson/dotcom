@@ -2,6 +2,7 @@ import { useContext } from "react"
 
 import Link from 'next/link'
 import Head from 'next/head'
+import { useRouter } from "next/router";
 import styled from '@emotion/styled'
 
 import { ThemeContext } from 'use-theme-switcher';
@@ -27,10 +28,39 @@ const StyledHeader = styled.header`
         align-items: center;
         justify-content: space-between;
         .leading {
+            display: flex;
+            align-items: center;
             .logo {
-                width: 2.5rem;
-                height: 2.5rem;
-                object-fit: cover;
+                padding: 0.25rem;
+                border-radius: 0.25rem;
+                svg {
+                    width: 2rem;
+                    height: 2rem;
+                    fill: var(--transparent50);
+                    transition: fill var(--transitionFast), opacity var(--transitionFast);
+                }
+                &:hover {
+                    svg {
+                        opacity: 0.75;
+                    }
+                }
+            }
+            .skip-nav {
+                margin-left: 1rem;
+                transform: translateY(-5rem);
+                opacity: 0;
+                color: var(--foregroundMid);
+                padding: 0.5rem 0.75rem;
+                border-radius: 0.5rem;
+                transition: color var(--transitionFast), background var(--transitionFast);
+                &:hover {
+                    background: var(--bgLight);
+                    color: var(--foreground);
+                }
+                &:focus {
+                    transform: unset;
+                    opacity: 1;
+                }
             }
         }
         .trailing {
@@ -55,6 +85,10 @@ const StyledHeader = styled.header`
                         border-radius: 0.5rem;
                         transition: color var(--transitionFast), background var(--transitionFast);
                         &:hover {
+                            background: var(--bgLight);
+                        }
+                        &.active {
+                            color: var(--foreground);
                             background: var(--bgLight);
                         }
                     }
@@ -116,6 +150,8 @@ const ThemePicker = ({ theme, setTheme }) => {
 
 const Layout = ({ children }) => {
 
+    const router = useRouter();
+
     const { theme, switchTheme } = useContext(ThemeContext);
 
     const navItems = [
@@ -142,19 +178,20 @@ const Layout = ({ children }) => {
             <StyledHeader>
                 <nav>
                     <div className="leading">
-                        <Link href="/"><img src="" alt="" className="logo"/></Link>
+                        <Link href="/" passHref><a className="logo"><svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M26.75 0H2C0.89543 0 0 0.89543 0 2V26.5625H26.75C34.0625 26.5625 40 20.625 40 13.3125C40 6 34.0625 0 26.75 0Z"></path><path d="M0 2.85723V38.0001C0 39.1046 0.895431 40.0001 2 40.0001H36.9822C38.0959 40.0001 38.6536 38.6536 37.8661 37.8662L20 20.0001L0.58 0.590088V0.590088C0.209346 0.947905 0 1.44098 0 1.95616V2.85723Z"></path></svg></a></Link>
+                        {/* <Link href="#main-content" passHref><a className="skip-nav">Skip to navigation</a></Link> */}
                     </div>
                     <div className="trailing">
                         <ul>
                             {navItems.map(item => (
-                                <li key={uuidv4()}><Link href={item.href} passHref><a>{item.label}</a></Link></li>
+                                <li key={uuidv4()}><Link href={item.href} passHref><a className={router.pathname == `/${item.href}` ? "active" : ""}>{item.label}</a></Link></li>
                             ))}
                             <li><ThemePicker theme={theme ? theme : 'theme-light'} setTheme={switchTheme} /></li>
                         </ul>
                     </div>
                 </nav>
             </StyledHeader>
-            <StyledMain>
+            <StyledMain tabIndex="-1" id="main-content">
                 {children}
             </StyledMain>
             {/* <footer>
