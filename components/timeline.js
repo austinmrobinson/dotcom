@@ -1,10 +1,11 @@
+import Image from 'next/image'
 import { variant } from 'styled-system'
 import styled from '@emotion/styled'
 
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Star, Briefcase, Plus } from 'react-feather';
+import { Star, Briefcase, Plus, Link } from 'react-feather';
 
 import { TitleSM, TitleXS, Caption } from '../components/typography'
 
@@ -86,6 +87,7 @@ const StyledTimelineItem = styled.div`
             display: flex;
             align-items: center;
             .card-leading {
+                position: relative;
                 flex-shrink: 0;
                 width: 9.25rem;
                 height: 9.25rem;
@@ -93,6 +95,41 @@ const StyledTimelineItem = styled.div`
                 background: var(--bg3);
                 box-shadow: 0 0.25rem 1.25rem rgba(15,15,15,0.05);
                 margin-right: 1.25rem;
+                overflow: hidden;
+                img {
+                  object-position: top center: ;;
+                  object-fit: cover;
+                }
+            }
+            .card-trailing {
+                .card-trailing-top {
+                  margin-bottom: 0.75rem;
+                  h4 {
+                    margin-bottom: 0.5rem;
+                  }
+                  p {
+                    color: var(--foregroundMid);
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;  
+                    overflow: hidden;
+                    margin-bottom: 0;
+                  }
+                }
+                .card-trailing-bottom {
+                  a {
+                    color: var(--foreground);
+                    transition: color var(--transitionFast);
+                    display: flex;
+                    align-items: center;
+                    svg {
+                      margin-right: 0.25rem;
+                    }
+                    &:hover {
+                      color: var(--foregroundMid);
+                    }
+                  }
+                }
             }
         }
     }
@@ -139,7 +176,7 @@ const TimelineItem = ({ content, className }) => {
           <div className="info-card">
             {content.data.image && (
               <div className="card-leading">
-                <img src={content.data.image} alt={content.data.imageAlt}/>
+                <Image layout="fill" src={content.data.image} alt={content.data.imageAlt}/>
               </div>
             )}
             <div className="card-trailing">
@@ -149,7 +186,7 @@ const TimelineItem = ({ content, className }) => {
               </div>
               {content.data.link && (
                 <div className="card-trailing-bottom">
-                  <a href={content.data.link}>Link to something</a>
+                  <a href={content.data.link}><Link size={16} />Website</a>
                 </div>
               )}
             </div>
