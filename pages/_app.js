@@ -35,7 +35,7 @@ function MyApp({ Component, pageProps }) {
             --bg3: #FFFFFF;
             --bgLight: rgba(15,15,15,0.075);
             --bgLighter: rgba(15,15,15,0.125);
-            --bgTransparent: rgba(background: 235,235,235,0.9);
+            --bgTransparent: rgba(235,235,235,0.9);
             
             --foregroundLight: #ABABAB;
             --foregroundMid: #505050;
@@ -55,7 +55,7 @@ function MyApp({ Component, pageProps }) {
             --bg3: #1E1E1E;
             --bgLight: rgba(255,255,255,0.075);
             --bgLighter: rgba(255,255,255,0.125);
-            --bgTransparent: rgba(15,15,15,0.9);
+            --bgTransparent: rgba(15,15,15,0.8);
             
             --foregroundLight: #737373;
             --foregroundMid: #919191;

@@ -19,6 +19,14 @@ const Type = styled('div')(
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: '0',
+        '@media screen and (max-width: 576px)': {
+          width: '3rem',
+          height: '3rem',
+          'svg': {
+            width: '1.25rem',
+            height: '1.25rem',
+          }
+        }
     },
     variant({
         prop: 'type',
@@ -97,13 +105,12 @@ const StyledTimelineItem = styled.div`
                 margin-right: 1.25rem;
                 overflow: hidden;
                 img {
-                  object-position: top center: ;;
+                  object-position: top center;
                   object-fit: cover;
                 }
             }
             .card-trailing {
                 .card-trailing-top {
-                  margin-bottom: 0.75rem;
                   h4 {
                     margin-bottom: 0.5rem;
                   }
@@ -117,6 +124,7 @@ const StyledTimelineItem = styled.div`
                   }
                 }
                 .card-trailing-bottom {
+                  margin-top: 0.75rem;
                   a {
                     color: var(--foreground);
                     transition: color var(--transitionFast);
@@ -141,6 +149,65 @@ const StyledTimelineItem = styled.div`
       }
       .trailing {
         margin-bottom: unset;
+      }
+    }
+    @media screen and (max-width: 576px) {
+      flex-direction: column;
+      .leading {
+        margin: unset;
+        position: relative;
+        &:after {
+          height: 1rem;
+          margin-bottom: 0;
+        }
+      }
+      .trailing {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0.5rem;
+        .top {
+          text-align: center;
+          margin-top: 0.5rem;
+          .project-date {
+            justify-content: center;
+          }
+        }
+        .info-card {
+          flex-direction: column;
+          .card-leading {
+            width: 100%;
+            margin: unset;
+            margin-bottom: 1.25rem;
+          }
+          .card-trailing {
+            .card-trailing-top {
+              h4 {
+                margin-bottom: 0.25rem;
+              }
+            }
+          }
+        }
+        &:after {
+            align-self: center;
+            content: '';
+            margin-top: 0.5rem;
+            width: 0.125rem;
+            height: 1.75rem;
+            background: var(--bgLight);
+            border-radius: 1px;
+        }
+      }
+    }
+    &:last-of-type {
+      .leading {
+        &:after {
+          display: block;
+        }
+      }
+      .trailing {
+        &:after {
+          display: none;
+        }
       }
     }
 `
@@ -217,6 +284,34 @@ const StyledTimeline = styled.div`
           }
           .trailing {
             margin-bottom: unset;
+          }
+        }
+      }
+    }
+  }
+  @media screen and (max-width: 576px) {
+    .month {
+      &:not(:last-of-type) {
+        margin-bottom: 1.5rem;
+      }
+      .date {
+        h2 {
+          text-align: center;
+        }
+      }
+      .items {
+        &.single {
+          .timeline-item {
+            .leading {
+              &:after {
+                display: block;
+              }
+            }
+            .trailing {
+              &:after {
+                display: none;
+              }
+            }
           }
         }
       }

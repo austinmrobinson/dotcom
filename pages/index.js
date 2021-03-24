@@ -50,6 +50,32 @@ const Intro = styled.section`
       }
     }
   }
+  @media screen and (max-width: 576px) {
+    padding: 4rem 0 2rem 0;
+    .content {
+      .prof-pic {
+        width: 7.5rem;
+        height: 7.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .title-subtitle {
+        margin-bottom: 2rem;
+        h1 {
+          margin-bottom: 0.75rem;
+        }
+      }
+      .button-wrapper {
+        flex-direction: column;
+        width: 100%;
+        button {
+          &:not(:last-of-type) {
+            margin-right: unset;
+            margin-bottom: 0.75rem;
+          }
+        }
+      }
+    }
+  }
 `
 
 const TimelineSection = styled.section`
