@@ -12,11 +12,11 @@ import path from 'path'
 import { contentFilePaths, CONTENT_PATH } from '../utils/mdx'
 
 import { Container, Row, Col } from 'react-bootstrap';
+import { Globe, Twitter } from 'react-feather';
 
 import Layout from '../components/layout';
-import { TitleMD, TitleSM, TitleXS, Body } from '../components/typography'
+import { TitleMD, TitleSM, TitleXS, Body, Caption } from '../components/typography'
 import Button from '../components/button';
-import { Globe, Twitter } from 'react-feather';
 
 
 const WorkSection = styled.section`
@@ -69,6 +69,21 @@ const WorkSection = styled.section`
                             }
                             p {
                                 color: var(--foregroundMid);
+                            }
+                            .role-date-wrapper {
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                margin: 0.5rem 0 0.75rem 0;
+                                p {
+                                    padding: 0.25rem 0.5rem;
+                                    border-radius: 0.25rem;
+                                    color: var(--foregroundMid);
+                                    border: 1px solid var(--bgLighter);
+                                    &:nth-of-type(2) {
+                                        margin-left: 0.25rem;
+                                    }
+                                }
                             }
                         }
                         .button-wrapper {
@@ -131,7 +146,7 @@ export default function Work ({ content }) {
     // console.log(arrayMonths)
 
     return (
-        <Layout>
+        <Layout title="Work gallery">
             <WorkSection>
                 <Container>
                     <Row>
@@ -154,6 +169,10 @@ export default function Work ({ content }) {
                                                     <div className="item-bottom">
                                                         <div className="title-subtitle">
                                                             <TitleXS as="h3">{item.data.title}</TitleXS>
+                                                            <div className="role-date-wrapper">
+                                                                {item.data.timelineProject && <Caption as="p">{item.data.timelineProject}</Caption>}
+                                                                {item.data.role && <Caption as="p">{item.data.role}</Caption>}
+                                                            </div>
                                                             <Body>{item.data.description}</Body>
                                                         </div>
                                                         <div className="button-wrapper">

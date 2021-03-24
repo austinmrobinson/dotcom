@@ -29,11 +29,9 @@ function MyApp({ Component, pageProps }) {
             --headerHeight: 4.5rem;
             --topSectionPadding: 8rem;
             @media screen and (max-width: 576px) {
+              --headerHeight: 4rem;
               --topSectionPadding: 4rem;
             }
-          }
-          @media screen and (max-width: 576px) {
-            --topSectionPadding: 4rem;
           }
           .theme-light {
             --bg: #EBEBEB;

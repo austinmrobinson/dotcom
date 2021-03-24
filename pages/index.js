@@ -104,8 +104,8 @@ export default function Home({ content }) {
 
   const introData = {
     img: {
-      src: '',
-      alt: '',
+      src: '/images/prof-pic.jpg',
+      alt: 'Austin smiling at you, albeit a bit awkwardly. Poor guy.',
     },
     title: 'Hi, I’m Austin',
     subtitle: 'I am a software designer and developer living in Austin, Texas. Currently, I am building the design system at Tesla and moonlighting as a front-end developer at Paper Crowns.',
@@ -124,7 +124,7 @@ export default function Home({ content }) {
   }
 
   return (
-    <Layout>
+    <Layout title="Home">
 
       <Intro>
         <Container>

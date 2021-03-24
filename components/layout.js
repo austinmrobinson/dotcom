@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Head from 'next/head'
 import { useRouter } from "next/router";
 import styled from '@emotion/styled'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 import { ThemeContext } from 'use-theme-switcher';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,6 +24,7 @@ const StyledHeader = styled.header`
     background: var(--bgTransparent);
     backdrop-filter: blur(var(--blurSmall));
     z-index: var(--zFixed);
+    transition: color var(--transitionFast) background var(--transitionFast);
     nav {
         display: flex;
         align-items: center;
@@ -68,6 +69,24 @@ const StyledHeader = styled.header`
             display: flex;
             align-items: center;
             ul {
+                list-style-type: none;
+                padding: unset;
+                margin: unset;
+                display: flex;
+                align-items: center;
+                li {
+                    margin-right: 1rem;
+                    a {
+                        color: var(--foregroundMid);
+                        padding: 0.5rem 0.75rem;
+                        border-radius: 0.5rem;
+                        transition: color var(--transitionFast), background var(--transitionFast);
+                        &:hover, &.active {
+                            color: var(--foreground);
+                            background: var(--bgLight);
+                        }
+                    }
+                }
             }
             button {
                 padding: 0.5rem;
@@ -89,10 +108,21 @@ const StyledHeader = styled.header`
         }
     }
     @media screen and (max-width: 576px) {
-        padding: 1rem 1rem 1rem 0.75rem;
+        padding: 0.75rem 1rem 0.75rem 0.75rem;
         nav {
+            .leading {
+                .logo {
+                    svg {
+                        width: 1.75rem;
+                        height: 1.75rem;
+                    }
+                }
+            }
             .trailing {
                 position: relative;
+                ul:first-of-type {
+                    display: none;
+                }
                 .hamburger-menu {
                     margin-left: 0.5rem;
                     display: flex;
@@ -107,26 +137,16 @@ const StyledMain = styled(motion.main)`
     position: relative;
 `
 
-const NavLinks = styled.ul`
+const MobileNavLinks = styled(motion.ul)`
+    display: none;
     list-style-type: none;
     padding: unset;
     margin: unset;
     display: flex;
     align-items: center;
-    li {
-        margin-right: 1rem;
-        a {
-            color: var(--foregroundMid);
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            transition: color var(--transitionFast), background var(--transitionFast);
-            &:hover, &.active {
-                color: var(--foreground);
-                background: var(--bgLight);
-            }
-        }
-    }
     @media screen and (max-width: 576px) {
+        display: flex;
+        overflow-y: hidden;
         flex-direction: column;
         align-items: center;
         z-index: var(--zFixed);
@@ -137,12 +157,12 @@ const NavLinks = styled.ul`
         bottom: 0;
         width: 100vw;
         height: calc(100vh - var(--headerHeight));
-        /* backdrop-filter: blur(3rem); */
         background: var(--bg);
+        /* backdrop-filter: blur(3rem) !important; */
         padding: 1rem 1rem 4.5rem 1rem;
         align-items: center;
         justify-content: center;
-        display: ${props => props.open ? 'flex' : 'none'};
+        /* display: ${props => props.open ? 'flex' : 'none'}; */
         li {
             margin: unset;
             display: flex;
@@ -150,11 +170,19 @@ const NavLinks = styled.ul`
                 margin-bottom: 0.75rem;
             }
             a {
+                color: var(--foregroundMid);
+                border-radius: 0.5rem;
                 font-size: 1.25rem;
-                padding: 0.75rem 1rem;
+                transition: color var(--transitionFast), background var(--transitionFast);
+                padding: 0.75rem 1.5rem;
+                &:hover, &.active {
+                    color: var(--foreground);
+                    background: var(--bgLight);
+                }
             }
         }
     }
+
 `
 
 
@@ -190,10 +218,12 @@ const ThemePicker = ({ theme, setTheme }) => {
                         variant="tertiary"
                         onClick={() => setTheme(nextTheme)}
                     >
-                        {item.name === 'Light'
-                            ? <motion.span variants={variants} initial="initial" animate="animate" exit="exit"><Moon size={20} /></motion.span>
-                            : <motion.span variants={variants} initial="initial" animate="animate" exit="exit"><Sun size={20} /></motion.span>
-                        }
+                        <AnimatePresence>
+                            {item.name === 'Light'
+                                ? <motion.span variants={variants} initial="initial" animate="animate" exit="exit"><Moon size={20} /></motion.span>
+                                : <motion.span variants={variants} initial="initial" animate="animate" exit="exit"><Sun size={20} /></motion.span>
+                            }
+                        </AnimatePresence>
                     </Button>
                     </div>
                 ) : null;
@@ -227,14 +257,14 @@ const Layout = ({ children, title, description, currentURL }) => {
             href: 'work',
             label: 'Work',
         },
-        {
-            href: 'blog',
-            label: 'Blog',
-        },
-        {
-            href: 'about',
-            label: 'About Me',
-        },
+        // {
+        //     href: 'blog',
+        //     label: 'Blog',
+        // },
+        // {
+        //     href: 'about',
+        //     label: 'About Me',
+        // },
     ]
 
     const fadeInUp = {
@@ -258,12 +288,12 @@ const Layout = ({ children, title, description, currentURL }) => {
 
                 {/* General */}
                 <meta name="description" content={description} />
-                <title>{title ?? "Page"} | Spectra Salon Suites</title>
+                <title>{title ?? "Page"} | Austin Robinson</title>
 
                 {/* Open Graph */}
                 <meta property="og:url" content={`https://www.spectrasalonsuites.com/${currentURL}`} key="ogurl" />
                 {/* <meta property="og:image" content={previewImage} key="ogimage" /> */}
-                <meta property="og:site_name" content="Spectra Salon Suites" key="ogsitename" />
+                <meta property="og:site_name" content="Austin Robinson" key="ogsitename" />
                 <meta property="og:title" content={title} key="ogtitle" />
                 <meta property="og:description" content={description} key="ogdesc" />
 
@@ -279,21 +309,33 @@ const Layout = ({ children, title, description, currentURL }) => {
                         {/* <Link href="#main-content" passHref><a className="skip-nav">Skip to navigation</a></Link> */}
                     </div>
                     <div className="trailing">
-                        <NavLinks open={open}>
+                        <ul>
                             {navItems.map(item => (
                                 <li key={uuidv4()}><Link href={item.href} passHref><a className={router.pathname == `/${item.href}` ? "active" : ""}>{item.label}</a></Link></li>
                             ))}
-                        </NavLinks>
+                        </ul>
                         <ThemePicker theme={theme ? theme : 'theme-light'} setTheme={switchTheme} />
                         <div className="hamburger-menu">
                             <Button variant="tertiary" open={open} onClick={() => setOpen(!open)}>
-                                {open
-                                    ? <motion.span variants={variants} initial="initial" animate="animate" exit="exit"><X /></motion.span>
-                                    : <motion.span variants={variants} initial="initial" animate="animate" exit="exit"><Menu /></motion.span>
-                                }
+                                <AnimatePresence>
+                                    {open
+                                        ? <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}><X /></motion.span>
+                                        : <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}><Menu /></motion.span>
+                                    }
+                                </AnimatePresence>
                             </Button>
                         </div>
+                        <AnimatePresence>
+                            {open && (
+                                <MobileNavLinks key="menu" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                    {navItems.map(item => (
+                                        <li key={uuidv4()}><Link href={item.href} passHref><a className={router.pathname == `/${item.href}` ? "active" : ""}>{item.label}</a></Link></li>
+                                    ))}
+                                </MobileNavLinks>
+                            )}
+                        </AnimatePresence>
                     </div>
+
                 </nav>
             </StyledHeader>
             <StyledMain variants={fadeInUp} transition={{ ease: 'easeInOut', duration: 0.5 }} initial="initial" animate="animate" exit="exit" tabIndex="-1" id="main-content">

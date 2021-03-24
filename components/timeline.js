@@ -197,16 +197,16 @@ const StyledTimelineItem = styled.div`
             border-radius: 1px;
         }
       }
-    }
-    &:last-of-type {
-      .leading {
-        &:after {
-          display: block;
+      &:last-of-type {
+        .leading {
+          &:after {
+            display: block;
+          }
         }
-      }
-      .trailing {
-        &:after {
-          display: none;
+        .trailing {
+          &:after {
+            display: none;
+          }
         }
       }
     }
