@@ -6,6 +6,8 @@ import { useRouter } from "next/router";
 import styled from '@emotion/styled'
 import { motion, AnimatePresence } from 'framer-motion'
 
+import useSystemTheme from 'react-use-system-theme';
+
 import { ThemeContext } from 'use-theme-switcher';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -237,6 +239,8 @@ const ThemePicker = ({ theme, setTheme }) => {
 
 const Layout = ({ children, title, description, currentURL }) => {
 
+    const systemTheme = useSystemTheme();
+
     const router = useRouter();
 
     const [open, setOpen] = useState(false);
@@ -295,12 +299,12 @@ const Layout = ({ children, title, description, currentURL }) => {
                 {/* <meta property="og:image" content={previewImage} key="ogimage" /> */}
                 <meta property="og:site_name" content="Austin Robinson" key="ogsitename" />
                 <meta property="og:title" content={title} key="ogtitle" />
-                <meta property="og:description" content={description} key="ogdesc" />
+                <meta property="og:description" content={description ?? "Austin Robinson's website, showing a timeline of his work, a gallery of his work, and not much else. Check it out if you want to learn more about him or if you need someone who builds apps, websites, or specializes in design systems."} key="ogdesc" />
 
-                {/* Favicon */}
-                {/* <link rel="icon" type="image/jpg" href="/static/images/spectra-favicon-16.jpg" sizes="16x16" />
-                <link rel="icon" type="image/jpg" href="/static/images/spectra-favicon-32.jpg" sizes="32x32" />
-                <link rel="icon" type="image/jpg" href="/static/images/spectra-favicon-96.jpg" sizes="96x96" /> */}
+                {/* Favicons */}
+                <link rel="icon" type="image/png" href="/images/meta/favicon-16.png" sizes="16x16" />
+                <link rel="icon" type="image/png" href="/images/meta/favicon-32.png" sizes="32x32" />
+                <link rel="icon" type="image/png" href="/images/meta/favicon-96.png" sizes="96x96" />
             </Head>
             <StyledHeader>
                 <nav>
