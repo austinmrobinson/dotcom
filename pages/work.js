@@ -88,6 +88,23 @@ const WorkSection = styled.section`
             }
         }
     }
+    @media screen and (max-width: 576px) {
+        .top {
+            margin-bottom: 2rem;
+        }
+        .items {
+            .year {
+                &:not(:last-of-type) {
+                    margin-bottom: 2rem;
+                }
+                .date {
+                    h2 {
+                        text-align: center;
+                    }
+                }
+            }
+        }
+    }
 `
 
 export default function Work ({ content }) {

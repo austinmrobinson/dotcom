@@ -89,6 +89,7 @@ const StyledHeader = styled.header`
         }
     }
     @media screen and (max-width: 576px) {
+        padding: 1rem 1rem 1rem 0.75rem;
         nav {
             .trailing {
                 position: relative;

@@ -28,6 +28,12 @@ function MyApp({ Component, pageProps }) {
             /* Misc */
             --headerHeight: 4.5rem;
             --topSectionPadding: 8rem;
+            @media screen and (max-width: 576px) {
+              --topSectionPadding: 4rem;
+            }
+          }
+          @media screen and (max-width: 576px) {
+            --topSectionPadding: 4rem;
           }
           .theme-light {
             --bg: #EBEBEB;
