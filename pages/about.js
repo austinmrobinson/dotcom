@@ -15,6 +15,10 @@ const AboutSection = styled.section`
     .top {
         margin-bottom: 4.5rem;
         .selfie {
+            width: 12rem;
+            height: 12rem;
+            border-radius: 0.75rem;
+            overflow: hidden;
             position: relative;
             margin-bottom: 3rem;
         }
@@ -78,14 +82,19 @@ const AboutSection = styled.section`
 
 const About = () => {
 
+    var birthdate = new Date("1995/12/27");
+    var cur = new Date();
+    var diff = cur-birthdate;
+    var age = Math.floor(diff/31536000000);
+
     const aboutData = {
         intro: {
             img: {
-                src: '/images/prof-pic.jpg',
-                alt: 'Austin smiling at you, albeit a bit awkwardly. Poor guy.',
+                src: '/images/austin-erin-prof-pic.jpg',
+                alt: 'Austin and Erin (his lovely other half) smiling at you. Erin looks so sweet, while Austin looks a tad maniacal.',
             },
             title: 'About me',
-            bio: <BodyLG>I am a 25 year old dude who loves creating things. As cliche as that is, it is what sums up my passions and hobbies. My 9 to 5 hours are spent at HP in Houston, Texas working on our design system. I also work as a freelance front-end developer for Paper Crowns, an agency in the gaming space. <br/><br/> I’ve been designing all sorts of things for 10 years now, starting out with logos and graphics for a gaming team that my friend and I started. <br/><br/> My hobbies outside of design include more creative pursuits; I have been into photography for a few years now. I am still in search of the perfect chocolate shake and I regularly rant about how The Lord of the Rings (book and film) series is the greatest creative work of all time.</BodyLG>,    
+            bio: <BodyLG>I am a {age} year old dude who loves creating things. As cliche as that is, it is what sums up my passions and hobbies. My 9 to 5 hours are spent at HP in Houston, Texas working on our design system. I also work as a freelance front-end developer for Paper Crowns, an agency in the gaming space. <br/><br/> I’ve been designing all sorts of things for 10 years now, starting out with logos and graphics for a gaming team that my friend and I started. <br/><br/> My hobbies outside of design include more creative pursuits; I have been into photography for a few years now. I am still in search of the perfect chocolate shake and I regularly rant about how The Lord of the Rings (book and film) series is the greatest creative work of all time.</BodyLG>,    
         },
         contact: {
             title: 'Contact',
@@ -117,7 +126,7 @@ const About = () => {
                         <Col xs={12} md={{ span: 8, offset: 2 }} lg={{ span: 6, offset: 3 }}>
                             <div className="top">
                                 <div className="selfie">
-                                    <Image width="96" height="96" src={aboutData.intro.img.src} alt={aboutData.intro.img.alt} />
+                                    <Image layout="fill" src={aboutData.intro.img.src} alt={aboutData.intro.img.alt} />
                                 </div>
                                 <div className="title-bio">
                                     <TitleMD as="h1">{aboutData.intro.title}</TitleMD>
