@@ -294,13 +294,21 @@ const Layout = ({ children, title, description, currentURL }) => {
                 <meta name="description" content={description} />
                 <title>{title ?? "Page"} | Austin Robinson</title>
 
-                {/* Open Graph */}
+                {/* General Open Graph */}
                 <meta property="og:url" content={`https://www.austinmrobinson.com/${currentURL}`} key="ogurl" />
+                <meta property="og:type" content="website" />
                 <meta property="og:image" content="/images/meta/og-image.jpg" key="ogimage" />
                 <meta property="og:site_name" content="Austin Robinson" key="ogsitename" />
                 <meta property="og:title" content={title} key="ogtitle" />
                 <meta property="og:description" content={description ?? "Austin Robinson's website, showing a timeline of his work, a gallery of his work, and not much else. Check it out if you want to learn more about him or if you need someone who builds apps, websites, or specializes in design systems."} key="ogdesc" />
-
+                {/* Twitter Open Graph */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta property="twitter:domain" content="https://www.austinmrobinson.com" />
+                <meta property="twitter:url" content={`https://www.austinmrobinson.com/${currentURL}`} />
+                <meta name="twitter:title" content={title} />
+                <meta name="twitter:description" content={description ?? "Austin Robinson's website, showing a timeline of his work, a gallery of his work, and not much else. Check it out if you want to learn more about him or if you need someone who builds apps, websites, or specializes in design systems."} />
+                <meta name="twitter:image" content="/images/meta/og-image.jpg" />
+                
                 {/* Favicons */}
                 <link rel="icon" type="image/png" href="/images/meta/favicon-16.png" sizes="16x16" />
                 <link rel="icon" type="image/png" href="/images/meta/favicon-32.png" sizes="32x32" />
