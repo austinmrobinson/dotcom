@@ -161,7 +161,7 @@ const MobileNavLinks = styled(motion.ul)`
         height: calc(100vh - var(--headerHeight));
         background: var(--bg);
         /* backdrop-filter: blur(3rem) !important; */
-        padding: 1rem 1rem 4.5rem 1rem;
+        padding: 1rem 1rem 6.5rem 1rem;
         align-items: center;
         justify-content: center;
         /* display: ${props => props.open ? 'flex' : 'none'}; */
