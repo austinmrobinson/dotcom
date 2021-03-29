@@ -1,5 +1,5 @@
-import Head from 'next/head'
 import Link from 'next/link'
+import Image from 'next/image'
 
 import styled from '@emotion/styled'
 
@@ -31,6 +31,8 @@ const Intro = styled.section`
       height: 15rem;
       border-radius: 50%;
       margin-bottom: 2.5rem;
+      position: relative;
+      overflow: hidden;
     }
     .title-subtitle {
       margin-bottom: 3.5rem;
@@ -120,11 +122,11 @@ export default function Home({ content }) {
         label: 'Check out my work',
         link: 'work',
       },
-      // {
-      //   variant: 'secondary',
-      //   label: 'More about me',
-      //   link: 'about',
-      // },
+      {
+        variant: 'secondary',
+        label: 'More about me',
+        link: 'about',
+      },
     ]
   }
 
@@ -136,7 +138,9 @@ export default function Home({ content }) {
           <Row>
             <Col xs={12} md={{ span: '8', offset: '2'}}>
               <div className="content">
-                <img src={introData.img.src} alt={introData.img.alt} className="prof-pic"/>
+                <div className="prof-pic">
+                  <Image layout="fill" src={introData.img.src} alt={introData.img.alt} />
+                </div>
                 <div className="title-subtitle">
                   <TitleLG as="h1">{introData.title}</TitleLG>
                   <BodyXL>{introData.subtitle}</BodyXL>

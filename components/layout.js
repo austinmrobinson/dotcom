@@ -265,10 +265,10 @@ const Layout = ({ children, title, description, currentURL }) => {
         //     href: 'blog',
         //     label: 'Blog',
         // },
-        // {
-        //     href: 'about',
-        //     label: 'About Me',
-        // },
+        {
+            href: 'about',
+            label: 'About Me',
+        },
     ]
 
     const fadeInUp = {
