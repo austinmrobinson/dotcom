@@ -130,7 +130,7 @@ export default function Work ({ content }) {
     // const sortedContent = _.sortBy(content, function(o) { return new moment(o.data.timelineDate); }).reverse();
 
     const filteredContent = content.filter(function(item){
-        return item.data.timelineType == 'Project';
+        return item.data.timelineType == 'Project' && item.data.published === true;
     });
     
     // Takes array item in and formats the date into a year using moment

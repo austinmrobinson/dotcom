@@ -70,7 +70,7 @@ const StyledHeader = styled.header`
         .trailing {
             display: flex;
             align-items: center;
-            ul {
+            .nav-links {
                 list-style-type: none;
                 padding: unset;
                 margin: unset;
@@ -295,8 +295,8 @@ const Layout = ({ children, title, description, currentURL }) => {
                 <title>{title ?? "Page"} | Austin Robinson</title>
 
                 {/* Open Graph */}
-                <meta property="og:url" content={`https://www.spectrasalonsuites.com/${currentURL}`} key="ogurl" />
-                {/* <meta property="og:image" content={previewImage} key="ogimage" /> */}
+                <meta property="og:url" content={`https://www.austinmrobinson.com/${currentURL}`} key="ogurl" />
+                <meta property="og:image" content="/images/meta/og-image.jpg" key="ogimage" />
                 <meta property="og:site_name" content="Austin Robinson" key="ogsitename" />
                 <meta property="og:title" content={title} key="ogtitle" />
                 <meta property="og:description" content={description ?? "Austin Robinson's website, showing a timeline of his work, a gallery of his work, and not much else. Check it out if you want to learn more about him or if you need someone who builds apps, websites, or specializes in design systems."} key="ogdesc" />
@@ -313,7 +313,7 @@ const Layout = ({ children, title, description, currentURL }) => {
                         {/* <Link href="#main-content" passHref><a className="skip-nav">Skip to navigation</a></Link> */}
                     </div>
                     <div className="trailing">
-                        <ul>
+                        <ul className="nav-links">
                             {navItems.map(item => (
                                 <li key={uuidv4()}><Link href={item.href} passHref><a className={router.pathname == `/${item.href}` ? "active" : ""}>{item.label}</a></Link></li>
                             ))}
