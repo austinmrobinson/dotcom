@@ -1,11 +1,14 @@
+import { useState } from 'react'
+
 import Image from 'next/image'
 import { variant } from 'styled-system'
+import { AnimatePresence, motion } from "framer-motion"
 import styled from '@emotion/styled'
 
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Star, Briefcase, Plus, Link } from 'react-feather';
+import { Star, Briefcase, Plus, Link, ChevronDown } from 'react-feather';
 
 import { TitleSM, TitleXS, Caption } from '../components/typography'
 
@@ -68,7 +71,7 @@ const StyledTimelineItem = styled.div`
         margin-bottom: 2rem;
         .top {
             margin-top: 0.75rem;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1rem;
             h2, p {
                 margin: 0;
             }
@@ -89,7 +92,8 @@ const StyledTimelineItem = styled.div`
             }
         }
         .info-card {
-            background: var(--bg2);
+            background: var(--bg3);
+            transition: background var(--transitionFast);
             padding: 1.25rem;
             border-radius: 1rem;
             display: flex;
@@ -100,7 +104,7 @@ const StyledTimelineItem = styled.div`
                 width: 9.25rem;
                 height: 9.25rem;
                 border-radius: 0.75rem;
-                background: var(--bg3);
+                background: var(--bg2);
                 box-shadow: 0 0.25rem 1.25rem rgba(15,15,15,0.05);
                 margin-right: 1.25rem;
                 overflow: hidden;
@@ -121,6 +125,7 @@ const StyledTimelineItem = styled.div`
                     -webkit-box-orient: vertical;  
                     overflow: hidden;
                     margin-bottom: 0;
+                    transition: color var(--transitionFast);
                   }
                 }
                 .card-trailing-bottom {
@@ -130,6 +135,7 @@ const StyledTimelineItem = styled.div`
                     transition: color var(--transitionFast);
                     display: flex;
                     align-items: center;
+                    border-radius: 0.5rem;
                     svg {
                       margin-right: 0.25rem;
                     }
@@ -143,12 +149,12 @@ const StyledTimelineItem = styled.div`
     }
     &:last-of-type {
       .leading {
-        &:after {
+        /* &:after {
           display: none;
-        }
+        } */
       }
       .trailing {
-        margin-bottom: unset;
+        margin-bottom: 0.5rem;
       }
     }
     @media screen and (max-width: 576px) {
@@ -264,26 +270,73 @@ const TimelineItem = ({ content, className }) => {
   )
 }
 
+const Date = styled.button`
+  width: 100%;
+  border: unset;
+  background: unset;
+  padding: 0.75rem 0.5rem 0.75rem 0.5rem;
+  border-bottom: ${props => props.isOpen === true ? '1px solid var(--bgLight)' : 'none'};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  transition: border var(--transitionFast);
+  cursor: pointer;
+  h2, svg {
+    position: relative;
+    z-index: 1;
+    color: var(--foreground);
+  }
+  svg {
+    transition: all var(--transitionFast);
+    transform: ${props => props.isOpen === true ? 'rotate(0deg)' : 'rotate(180deg)'};
+  }
+  &:after {
+    z-index: 0;
+    content: '';
+    position: absolute;
+    left: -0.5rem;
+    right: -0.5rem;
+    top: 0;
+    bottom: 0;
+    border-radius: 1rem;
+    background: transparent;
+    transition: background var(--transitionFast);
+  }
+  &:hover {
+    &:after {
+      background: var(--bg);
+    }
+    border-bottom-color: transparent;
+  }
+  &:focus-visible {
+    box-shadow: unset;
+    &:after {
+      box-shadow: 0 0 0 0.125rem var(--transparent50);
+    }
+  }
+`
+
 const StyledTimeline = styled.div`
   .month {
+    padding: 0.75rem 1.25rem;
+    border-radius: 1.25rem;
+    background: var(--bg2);
+    transition: background var(--transitionFast);
     &:not(:last-of-type) {
-      margin-bottom: 1rem;
-    }
-    .date {
-      padding: 0.75rem 0.25rem;
-      border-bottom: 1px solid var(--bgLight);
-      margin-bottom: 1.75rem;
+      margin-bottom: 1.5rem;
     }
     .items {
+      margin-top: 1.75rem;
       &.single {
         .timeline-item {
           .leading {
-            &:after {
+            /* &:after {
               display: none;
-            }
+            } */
           }
           .trailing {
-            margin-bottom: unset;
+            /* margin-bottom: unset; */
           }
         }
       }
@@ -291,6 +344,7 @@ const StyledTimeline = styled.div`
   }
   @media screen and (max-width: 576px) {
     .month {
+      padding: 0.325rem 0.75rem;
       &:not(:last-of-type) {
         margin-bottom: 1.5rem;
       }
@@ -319,19 +373,45 @@ const StyledTimeline = styled.div`
   }
 `
 
+const Month = ({ content }) => {
+
+  const [isOpen, setIsOpen] = useState(true);
+
+  return (
+    <div className="month">
+      <Date onClick={() => setIsOpen(!isOpen)} isOpen={isOpen}>
+        <TitleSM as="h2">{content[0]}</TitleSM>
+        <ChevronDown />
+      </Date>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            key="child"
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={{
+                open: { opacity: 1, height: "auto" },
+                closed: { opacity: 0, height: 0 }
+            }}
+            transition={{ duration: 0.5 }}
+            className={`items ${content[1].length === 1 ? 'single' : ''}`}>
+              {content[1].map(item => (
+                <TimelineItem key={item.filePath} className="timeline-item" content={item} />
+              ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 const Timeline = ({ content }) => {
 
   return (
     <StyledTimeline>
       {content.map(content => (
-        <div key={uuidv4()} className="month">
-          <div className="date"><TitleSM as="h2">{content[0]}</TitleSM></div>
-          <div className={`items ${content[1].length === 1 ? 'single' : ''}`}>
-            {content[1].map(item => (
-              <TimelineItem key={item.filePath} className="timeline-item" content={item} />
-            ))}
-          </div>
-        </div>
+        <Month content={content} key={uuidv4()} />
       ))}
     </StyledTimeline>
   )
