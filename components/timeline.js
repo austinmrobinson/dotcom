@@ -394,7 +394,7 @@ const Month = ({ content }) => {
                 open: { opacity: 1, height: "auto" },
                 closed: { opacity: 0, height: 0 }
             }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }}
             className={`items ${content[1].length === 1 ? 'single' : ''}`}>
               {content[1].map(item => (
                 <TimelineItem key={item.filePath} className="timeline-item" content={item} />
