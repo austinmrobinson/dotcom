@@ -323,6 +323,7 @@ const StyledTimeline = styled.div`
     border-radius: 1.25rem;
     background: var(--bg2);
     transition: background var(--transitionFast);
+    overflow: hidden;
     &:not(:last-of-type) {
       margin-bottom: 1.5rem;
     }
