@@ -3,34 +3,40 @@ interface HeadingProps {
   as?: string;
   children: React.ReactNode;
   className?: string;
+  skeleton?: boolean;
 }
 
-export function Heading({ size, as, children }: HeadingProps) {
+export function Heading({ size, as, children, skeleton }: HeadingProps) {
   const Tag: any = as ?? size;
+
+  let sizeClass;
 
   switch (size) {
     case "h1":
-      size = "text-3xl lg:text-4xl";
+      sizeClass = "text-3xl lg:text-4xl";
       break;
     case "h2":
-      size = "text-2xl lg:text-3xl";
+      sizeClass = "text-2xl lg:text-3xl";
       break;
     case "h3":
-      size = "text-lg sm:text-xl lg:text-2xl";
+      sizeClass = "text-lg sm:text-xl lg:text-2xl";
       break;
     case "h4":
-      size = "text-lg sm:text-lg lg:text-xl";
+      sizeClass = "text-lg sm:text-lg lg:text-xl";
       break;
     case "h5":
-      size = "text-sm lg:text-lg";
+      sizeClass = "text-sm lg:text-lg";
       break;
     case "h6":
-      size = "text-sm";
+      sizeClass = "text-sm";
       break;
   }
 
+  if (skeleton) return <span className="animate-pulse " />;
   return (
-    <Tag className={`font-medium text-neutral-900 dark:text-white ${size}`}>
+    <Tag
+      className={`font-medium text-neutral-900 dark:text-white ${sizeClass}`}
+    >
       {children}
     </Tag>
   );
