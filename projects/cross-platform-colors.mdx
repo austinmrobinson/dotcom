@@ -7,7 +7,30 @@ company: Tesla
 role: Staff UX Designer
 thumbnail: {src: '/cross-platform-color_01.jpg', alt: "testing"}
 categories: ['test', 'test']
-images: [{src: '', alt: "testing"}, {src: '', alt: "testing"}, {src: '', alt: "testing"}]
+images: [{src: "/placeholder-image.jpg", alt: "testing"}, {src: "/placeholder-image.jpg", alt: "testing"}, {src: "/placeholder-image.jpg", alt: "testing"}]
 ---
 
-Testing
+## Context
+
+Tesla's digital experiences are fractured visually across reporting structures and platforms. This began with the vehicle UI team shipping a redesign to the software with the refreshed Model S and X. The design system was started in one of the main 3 software organizations and the team still sits in that organization. 
+
+The vehicle UI team does not consume anything from the design system outside of icons (see case study), so when they ship these changes it means that the rest of the digital experiences need to pivot to match.
+
+## Problems
+
+- All major platforms at Tesla are misaligned in color usage: web, native, vehicle, kiosk and factory
+- Only some of the platforms are using a single source of truth for tokens - creating tech debt & making global updates painful
+
+## Goals
+
+- Create a single palette that aligns to vehicle & accounts for each platform's needs
+- Align entire Tesla ecosystem to new palette, minimizing breaking changes
+- Ensure palette is scalable and built for future use cases
+- Make sure all colors are accessible when paired together appropriately
+- Create more design and engineering efficiency by using one set of tokens
+
+## Process
+
+### Audit & Research
+
+Leaning on my previous experience creating a brand-new color palette at HP, I began to audit all digital experiences at Tesla and get an updated perspective on industry-standard best practices, in case anything had changed in the three years since I did this at HP.

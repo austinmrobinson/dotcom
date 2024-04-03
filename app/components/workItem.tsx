@@ -48,8 +48,11 @@ export default function WorkItem({ item, type, skeleton }: WorkItemProps) {
               width="216"
               height="120"
               className="w-full object-cover aspect-[16/9] rounded-xl bg-neutral-900/10 dark:bg-white/10"
-              src={item.thumbnail.src ?? null}
-              alt={item.thumbnail.alt ?? null}
+              src={item.thumbnail.src ?? "/placeholder-image.jpg"}
+              alt={
+                item.thumbnail.alt ??
+                "Placeholder backup with a photo landscape icon in the middle"
+              }
             />
           </figure>
           <header className="flex flex-col gap-1">

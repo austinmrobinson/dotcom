@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 interface HeadingProps {
   size?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "caption" | undefined;
   as?: string;
@@ -176,10 +178,12 @@ export function SkeletonMultilineText({
   lines,
   className,
 }: SkeletonMultilineTextProps) {
+  const id = useId();
+
   return (
     <div className={`flex flex-col gap-0 min-w-40 ${className}`}>
-      {[...Array(lines)].map((index) => (
-        <Text className="w-full" skeleton />
+      {[...Array(lines)].map(() => (
+        <Text key={id} className="w-full" skeleton />
       ))}
       <Text className="w-[60%]" skeleton />
     </div>

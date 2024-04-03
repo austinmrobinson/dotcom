@@ -10,14 +10,14 @@ interface TopOfPageProps {
 
 export default function TopOfPage({ back, title, children }: TopOfPageProps) {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-2 items-center relative">
+    <div className="flex flex-col gap-3">
+      <div className="flex gap-1 items-center relative">
         {back && (
           <IconButton
             href={back}
             variant="text"
             size="medium"
-            className="absolute -left-10"
+            className="relative left-0 -ml-2 md:absolute md:-left-8"
             absolute
             label="Back"
           >
