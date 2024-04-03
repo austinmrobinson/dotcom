@@ -1,7 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { MDXComponents } from "mdx/types";
+import { Heading } from "@/app/components/text";
 
 export const mdxComponents: MDXComponents = {
+  h1: ({ children }) => <Heading size="h1">{children}</Heading>,
+  h2: ({ children }) => <Heading size="h2">{children}</Heading>,
+  h3: ({ children }) => <Heading size="h3">{children}</Heading>,
+  h4: ({ children }) => <Heading size="h4">{children}</Heading>,
+  h5: ({ children }) => <Heading size="h5">{children}</Heading>,
   a: ({ children, ...props }) => {
     return (
       <Link {...props} href={props.href || ""}>
@@ -9,10 +16,8 @@ export const mdxComponents: MDXComponents = {
       </Link>
     );
   },
-  img: ({ children, props }) => {
-    // You need to do some work here to get the width and height of the image.
-    // See the details below for my solution.
-    return <Image {...props} />;
-  },
-  // any other components you want to use in your markdown
+  img: ({ children, ...props }) => (
+    // @ts-expect-error
+    <Image sizes="100vw" style={{ width: "100%", height: "auto" }} {...props} />
+  ),
 };

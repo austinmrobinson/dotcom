@@ -1,74 +1,113 @@
 import Image from "next/image";
-import Button, { IconButton } from "./components/button";
-import { Filter } from "react-feather";
-import TextInput from "./components/input";
+import Button from "./components/button";
+import { Heading, Text } from "./components/text";
+import Link from "next/link";
+import AustinLink from "./components/link";
+import IconTesla from "./components/icons/tesla";
+import IconHP from "./components/icons/hp";
+import { Mail, Twitter } from "react-feather";
+
+interface LinkItemProps {
+  href: string;
+  icon: React.ReactNode;
+  leading: string;
+  caption?: string;
+  trailing: string;
+}
+
+function LinkItem({ href, icon, leading, caption, trailing }: LinkItemProps) {
+  return (
+    <Link
+      href={href}
+      className="flex gap-12 items-center rounded-xl relative hover:before:bg-neutral-900/10 dark:hover:before:bg-white/10
+        before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-xl"
+    >
+      <div className="flex grow gap-3 items-center">
+        <span className="w-10 h-10 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+          {icon}
+        </span>
+        <Heading size="h6" as="h4">
+          {leading}
+        </Heading>
+      </div>
+      <div className="flex gap-3">
+        {caption && <Text weight="medium">{caption}</Text>}
+        <Text className="tabular-nums min-w-[64px]">{trailing}</Text>
+      </div>
+    </Link>
+  );
+}
 
 export default function Home() {
   return (
-    <div>
-      test
-      <TextInput id="2" label="Blah" />
-      <Button>Test</Button>
-      <Button variant="secondary" size="medium">
-        Test
-      </Button>
-      <Button variant="tertiary" size="small">
-        Test
-      </Button>
-      <Button variant="text">Test</Button>
-      <IconButton>
-        <Filter size="16" />
-      </IconButton>
-      <IconButton variant="secondary" size="medium">
-        <Filter size="16" />
-      </IconButton>
-      <IconButton variant="tertiary" size="small">
-        <Filter />
-      </IconButton>
-      <IconButton variant="text">
-        <Filter size="16" />
-      </IconButton>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque non
-      est quis metus mollis rutrum viverra dignissim lacus. Nulla eu fermentum
-      massa, nec auctor dolor. Etiam at maximus orci. Sed sit amet scelerisque
-      felis. Quisque facilisis elit et finibus dictum. Quisque blandit arcu id
-      libero auctor interdum. Nullam ut magna nec enim tempus tincidunt. Fusce
-      commodo at mi a auctor. Curabitur id nisl convallis, eleifend lorem ac,
-      dictum enim. Cras ex neque, fermentum in ipsum et, maximus pulvinar
-      libero. Fusce eu suscipit velit. Morbi interdum tincidunt justo, sed
-      pulvinar enim. In auctor, leo sed tempor gravida, nisi quam ultricies
-      dolor, et tristique sem nibh non massa. Pellentesque habitant morbi
-      tristique senectus et netus et malesuada fames ac turpis egestas. Maecenas
-      fermentum ante ipsum, in venenatis velit semper ut. Pellentesque molestie
-      lectus non varius commodo. Ut non erat quis dolor porta accumsan. Nullam
-      iaculis ultrices ultricies. Etiam ut leo arcu. Donec vitae massa at est
-      viverra condimentum ut vel metus. Sed nulla dolor, commodo nec lacus
-      vitae, mattis placerat risus. Lorem ipsum dolor sit amet, consectetur
-      adipiscing elit. In ac rhoncus turpis. Proin a ultricies elit. Cras
-      elementum metus nec pellentesque placerat. Quisque nec magna vulputate
-      enim volutpat fermentum eget a orci. Pellentesque sed lorem nisl. Integer
-      non libero id nunc lacinia venenatis. In cursus purus laoreet urna
-      tristique accumsan. Maecenas nec feugiat eros, eu dignissim nisi. Nullam
-      porta sapien in pretium suscipit. Vestibulum ut est auctor, tristique
-      ipsum vel, maximus neque. Donec cursus dui et nisl scelerisque ultricies.
-      Ut mollis justo non consectetur consectetur. Sed suscipit in erat sed
-      dictum. Pellentesque habitant morbi tristique senectus et netus et
-      malesuada fames ac turpis egestas. Curabitur mauris quam, hendrerit
-      rhoncus quam eget, mattis efficitur mi. Suspendisse potenti. In hac
-      habitasse platea dictumst. Praesent ac aliquet nibh. Nulla tempus mattis
-      mollis. In varius consequat vehicula. Etiam quis suscipit metus. Lorem
-      ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel lorem
-      ut dui imperdiet placerat. Cras ut sollicitudin nunc, a tincidunt purus.
-      Integer accumsan metus vulputate vulputate placerat. Sed quam eros,
-      vulputate vitae pellentesque vel, gravida eget magna. Cras auctor ligula
-      sit amet pellentesque molestie. Vivamus purus turpis, laoreet eget
-      eleifend nec, semper quis leo. Aenean vel lacus aliquet, tempor dui a,
-      egestas magna. Suspendisse quis magna rhoncus, luctus risus eu, imperdiet
-      ipsum. Donec accumsan urna non neque pharetra, at ullamcorper tellus
-      ornare. Phasellus pulvinar suscipit semper. In eget augue quis velit
-      placerat ullamcorper. Vivamus nec nulla vehicula, volutpat libero rutrum,
-      suscipit neque. Maecenas at ligula arcu. Vivamus tristique rhoncus sapien
-      vitae vestibulum. Donec ut tempus nunc.
+    <div className="flex flex-col gap-16">
+      <section id="introduction" className="flex flex-col gap-5">
+        <Heading size="h1">Austin Robinson</Heading>
+        <Text>
+          Hi, I am Austin. I am a self-taught software designer and engineer
+          living in Austin, Texas. Currently, I am building the design system at{" "}
+          <AustinLink href="https://tesla.com">Tesla</AustinLink>.
+        </Text>
+        <Text>
+          Before my time at Tesla, I led design for the design system at{" "}
+          <AustinLink href="https://hp.com">HP</AustinLink>. Our team worked on
+          a ground-up redesign that scaled the system across the company and to
+          multiple platforms.
+        </Text>
+        <Text>
+          For a long time, I moonlighted as a designer and front-end developer
+          for{" "}
+          <AustinLink href="https://papercrowns.com/">Paper Crowns</AustinLink>{" "}
+          and my own company, working on projects for companies like Activision
+          and Supercell.
+        </Text>
+      </section>
+      <section id="history" className="flex flex-col gap-5">
+        <div className="flex gap-2 justify-between items-center">
+          <Heading size="h3">Work History</Heading>
+          <Button
+            variant="text"
+            size="small"
+            href="/projects"
+            className="-mr-3"
+          >
+            View Work
+          </Button>
+        </div>
+        <div className="flex flex-col gap-4">
+          <LinkItem
+            href="/projects"
+            icon={<IconTesla />}
+            leading="Tesla"
+            caption="Staff UX Designer, Design Systems"
+            trailing="2021–"
+          />
+          <LinkItem
+            href="/projects"
+            icon={<IconHP />}
+            leading="HP"
+            caption="Design Lead, Design Systems"
+            trailing="2017–21"
+          />
+        </div>
+      </section>
+      <section id="contact" className="flex flex-col gap-5">
+        <Heading size="h3">Contact</Heading>
+        <div className="flex flex-col gap-4">
+          <LinkItem
+            href="https://twitter.com/austinmrobinson"
+            icon={<Twitter size={16} />}
+            leading="Twitter"
+            trailing="@austinmrobinson"
+          />
+          <LinkItem
+            href="mailto:austinrobinsondesign@gmail.com"
+            icon={<Mail size={16} />}
+            leading="Email"
+            trailing="austinrobinsondesign@gmail.com"
+          />
+        </div>
+      </section>
     </div>
   );
 }

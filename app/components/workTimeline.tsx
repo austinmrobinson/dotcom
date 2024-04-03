@@ -24,7 +24,7 @@ const WorkYear = ({ year, items }: WorkYearProps) => {
       </div>
       <div className="mt-14 mb-9 grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-6">
         {items.map((item, index) => (
-          <WorkItem key={index} item={item} type="post" />
+          <WorkItem key={index} item={item} type="project" />
         ))}
       </div>
     </div>

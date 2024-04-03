@@ -61,6 +61,8 @@ export function PasswordInput(props: any) {
         <IconButton
           variant="text"
           size="medium"
+          type="button"
+          label={show ? "Hide Password" : "Show Password"}
           onClick={(e: React.MouseEvent) => {
             e.preventDefault();
             setShow(!show);

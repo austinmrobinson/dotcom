@@ -1,14 +1,20 @@
+import Tooltip from "./tooltip";
+
 const { default: Link } = require("next/link");
 
 interface ButtonProps {
-  variant?: string;
-  size?: string;
+  variant?: "primary" | "secondary" | "tertiary" | "text";
+  size?: "large" | "medium" | "small";
   href?: string;
   children: React.ReactNode;
   className?: string;
   absolute?: boolean;
-  type?: string;
+  type?: "submit" | "reset" | "button" | undefined;
   onClick?: any;
+}
+
+interface IconButtonProps extends ButtonProps {
+  label: string;
 }
 
 export const IconButton = ({
@@ -19,34 +25,40 @@ export const IconButton = ({
   className,
   absolute,
   onClick,
-}: ButtonProps) => {
+  type,
+  label,
+}: IconButtonProps) => {
+  let variantClass;
+  let sizeClass;
+
   switch (variant) {
     case "secondary":
-      variant =
+      variantClass =
         "text-neutral-900 bg-neutral-900/10 hover:before:bg-neutral-900/20 dark:text-white dark:bg-white/10 dark:hover:before:bg-white/20";
       break;
     case "tertiary":
-      variant =
+      variantClass =
         "text-neutral-700 border border-neutral-900/20 hover:text-neutral-900 hover:before:bg-neutral-900/10 hover:border-neutral-900/30 dark:text-neutral-300 dark:border-white/20 dark:hover:text-white dark:hover:before:bg-white/10 dark:hover:border-white/30";
       break;
     case "text":
-      variant =
+      variantClass =
         "text-neutral-700 hover:text-neutral-900 hover:before:bg-neutral-900/10 dark:text-neutral-300 dark:hover:text-white dark:hover:before:bg-white/10";
       break;
     default:
-      variant =
+      variantClass =
         "text-white bg-neutral-900 hover:before:bg-white/20 dark:text-neutral-900 dark:bg-white dark:hover:before:bg-neutral-900/20";
       break;
   }
 
   switch (size) {
     case "medium":
-      size = "h-8 w-8";
+      sizeClass = "h-8 w-8";
       break;
     case "small":
-      size = "h-7 w-7";
+      sizeClass = "h-7 w-7";
+      break;
     default:
-      size = "h-10 w-10";
+      sizeClass = "h-10 w-10";
   }
 
   const baseStyles =
@@ -56,41 +68,46 @@ export const IconButton = ({
 
   if (href) {
     return (
-      <Link
-        href={href}
-        className={
-          baseStyles +
-          " " +
-          variant +
-          " " +
-          size +
-          " " +
-          className +
-          " " +
-          position
-        }
-      >
-        {children}
-      </Link>
+      <Tooltip label={label}>
+        <Link
+          href={href}
+          className={
+            baseStyles +
+            " " +
+            variantClass +
+            " " +
+            sizeClass +
+            " " +
+            className +
+            " " +
+            position
+          }
+        >
+          {children}
+        </Link>
+      </Tooltip>
     );
   } else {
     return (
-      <button
-        onClick={onClick}
-        className={
-          baseStyles +
-          " " +
-          variant +
-          " " +
-          size +
-          " " +
-          className +
-          " " +
-          position
-        }
-      >
-        {children}
-      </button>
+      <Tooltip label={label}>
+        <button
+          onClick={onClick}
+          type={type}
+          className={
+            baseStyles +
+            " " +
+            variantClass +
+            " " +
+            sizeClass +
+            " " +
+            className +
+            " " +
+            position
+          }
+        >
+          {children}
+        </button>
+      </Tooltip>
     );
   }
 };
@@ -104,33 +121,37 @@ export default function Button({
   absolute,
   type,
 }: ButtonProps) {
+  let variantClass;
+  let sizeClass;
+
   switch (variant) {
     case "secondary":
-      variant =
+      variantClass =
         "text-neutral-900 bg-neutral-900/10 hover:before:bg-neutral-900/20 dark:text-white dark:bg-white/10 dark:hover:before:bg-white/20";
       break;
     case "tertiary":
-      variant =
+      variantClass =
         "text-neutral-700 border border-neutral-900/20 hover:text-neutral-900 hover:before:bg-neutral-900/10 hover:border-neutral-900/30 dark:text-neutral-300 dark:border-white/20 dark:hover:text-white dark:hover:before:bg-white/10 dark:hover:border-white/30";
       break;
     case "text":
-      variant =
+      variantClass =
         "text-neutral-700 hover:text-neutral-900 hover:before:bg-neutral-900/10 dark:text-neutral-300 dark:hover:text-white dark:hover:before:bg-white/10";
       break;
     default:
-      variant =
+      variantClass =
         "text-white bg-neutral-900 hover:before:bg-white/20 dark:text-neutral-900 dark:bg-white dark:hover:before:bg-neutral-900/20";
       break;
   }
 
   switch (size) {
     case "medium":
-      size = "h-8 px-4";
+      sizeClass = "h-8 px-4";
       break;
     case "small":
-      size = "h-7 px-3";
+      sizeClass = "h-7 px-3";
+      break;
     default:
-      size = "h-10 px-5";
+      sizeClass = "h-10 px-5";
   }
 
   const baseStyles =
@@ -145,9 +166,9 @@ export default function Button({
         className={
           baseStyles +
           " " +
-          variant +
+          variantClass +
           " " +
-          size +
+          sizeClass +
           " " +
           className +
           " " +
@@ -160,12 +181,13 @@ export default function Button({
   } else {
     return (
       <button
+        type={type}
         className={
           baseStyles +
           " " +
-          variant +
+          variantClass +
           " " +
-          size +
+          sizeClass +
           " " +
           className +
           " " +

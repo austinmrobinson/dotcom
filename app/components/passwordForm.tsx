@@ -5,6 +5,7 @@ import TextInput, { PasswordInput } from "./input";
 import Button from "./button";
 import { Heading } from "./text";
 import { Lock } from "react-feather";
+import Animate from "./animate";
 
 export default function PasswordForm() {
   const [password, setPassword] = useState("");
@@ -29,7 +30,7 @@ export default function PasswordForm() {
   }
 
   return (
-    <div className="flex flex-col gap-10 justify-stretch max-w-[264px] m-auto">
+    <Animate className="flex flex-col justify-center gap-10 max-w-[264px] grow mx-auto mb-32">
       <div className="flex flex-col gap-4 items-center">
         <div className="p-3 w-12 h-12 rounded-full bg-neutral-900/10 dark:bg-white/10">
           <Lock />
@@ -54,6 +55,9 @@ export default function PasswordForm() {
         />
         <Button type="submit">Submit</Button>
       </form>
-    </div>
+      <Button href="mailto:austinrobinsondesign@gmail.com" variant="text">
+        Request Access
+      </Button>
+    </Animate>
   );
 }

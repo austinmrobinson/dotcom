@@ -10,7 +10,7 @@ import { useState } from "react";
 
 const NavLogo = () => {
   return (
-    <IconButton href="/" variant="text" size="medium">
+    <IconButton href="/" variant="text" size="medium" label="Home">
       <Logo />
     </IconButton>
   );
@@ -32,7 +32,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="fixed flex gap-3 px-4 py-3 h-14 items-center bg-neutral-100/90 backdrop-blur-xl md:bg-transparent md:backdrop-filter-none left-0 top-0 right-0 z-10 dark:bg-neutral-900/90">
+    <header className="fixed flex gap-3 px-4 py-3 h-14 items-center bg-neutral-100/80 backdrop-blur-md md:bg-transparent md:backdrop-filter-none left-0 top-0 right-0 z-10 dark:bg-neutral-900/80">
       <div className="flex-grow">
         <NavLogo />
       </div>
@@ -74,11 +74,11 @@ export default function Header() {
           ))}
         </ul>
       </nav> */}
-      <div className="flex flex-grow justify-end">
+      {/* <div className="flex flex-grow justify-end">
         <IconButton variant="text" size="medium">
           <Sun size="16" strokeWidth="2.5" />
         </IconButton>
-      </div>
+      </div> */}
     </header>
   );
 }

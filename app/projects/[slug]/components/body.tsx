@@ -5,7 +5,6 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import remarkToc from "remark-toc";
 import { mdxComponents } from "./mdxComponents";
-import { Heading } from "@/app/components/text";
 
 export function PostBody({ children }: { children: string }) {
   return (
