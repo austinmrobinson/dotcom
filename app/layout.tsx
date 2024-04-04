@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s | Austin Robinson",
     default: "Austin Robinson",
   },
-  description: "Full-stack developer.",
+  description: `Austin Robinson's website, showing his work history. Contact if you need someone who builds apps, websites, or specializes in design systems.`,
   openGraph: {
     title: "Austin Robinson",
     description: `Austin Robinson's website, showing his work history. Contact if you need someone who builds apps, websites, or specializes in design systems.`,

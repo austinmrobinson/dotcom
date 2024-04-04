@@ -47,7 +47,8 @@ export async function getProject(slug: string) {
   }
 
   if (projects) {
-    return projects.filter((project: Project) => project.slug === slug)[0];
+    const project = projects.find((project: Project) => project.slug === slug);
+    return project;
   } else {
     console.log("Project not found");
   }

@@ -28,7 +28,6 @@ export default async function ProjectPage({
 
   try {
     project = await getProject(params.slug);
-    console.log(`Slug: ` + params.slug);
   } catch (error) {
     console.error(error);
   }
