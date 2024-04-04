@@ -11,7 +11,7 @@ export const getProjects = cache(async () => {
   let projects;
 
   try {
-    projects = await fs.readdir("./app/content/");
+    projects = await fs.readdir("./content/");
   } catch (error) {
     console.error(error);
   }
@@ -21,7 +21,7 @@ export const getProjects = cache(async () => {
       projects
         .filter((file) => path.extname(file) === ".mdx")
         .map(async (file) => {
-          const filePath = `./app/content/${file}`;
+          const filePath = `./content/${file}`;
           const postContent = await fs.readFile(filePath, "utf8");
           const { data, content } = matter(postContent);
 
@@ -33,7 +33,7 @@ export const getProjects = cache(async () => {
         })
     );
   } else {
-    console.log("Error finding item");
+    console.log("Projects not found");
   }
 });
 
@@ -47,9 +47,9 @@ export async function getProject(slug: string) {
   }
 
   if (projects) {
-    return projects.find((project: Project) => project.slug === slug);
+    return projects.filter((project: Project) => project.slug === slug)[0];
   } else {
-    console.log("Projects not found");
+    console.log("Project not found");
   }
 }
 

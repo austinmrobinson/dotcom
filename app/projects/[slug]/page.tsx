@@ -11,6 +11,11 @@ import { Suspense } from "react";
 import ProjectPageLoading from "./loading";
 import Animate from "@/app/components/animate";
 import ImageZoom, { ImageZoomGallery } from "@/app/components/image";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Projects",
+};
 
 export default async function ProjectPage({
   params,
@@ -19,10 +24,11 @@ export default async function ProjectPage({
     slug: string;
   };
 }) {
-  let post;
+  let project;
 
   try {
-    post = await getProject(params.slug);
+    project = await getProject(params.slug);
+    console.log(`Slug: ` + params.slug);
   } catch (error) {
     console.error(error);
   }
@@ -40,40 +46,40 @@ export default async function ProjectPage({
   if (!isLoggedIn) {
     return <PasswordForm />;
   } else {
-    if (!post) return notFound();
+    if (!project) return notFound();
     return (
       <Suspense
         fallback={!isLoggedIn ? <PasswordForm /> : <ProjectPageLoading />}
       >
         <Animate className="flex flex-col gap-12">
-          <TopOfPage title={post.title} back="/projects">
-            <Text>{`${formatDateMonth(post.date)} • ${post.company} • ${
-              post.role
+          <TopOfPage title={project.title} back="/projects">
+            <Text>{`${formatDateMonth(project.date)} • ${project.company} • ${
+              project.role
             }`}</Text>
           </TopOfPage>
           <ImageZoom
-            src={post.thumbnail.src}
-            alt={post.thumbnail.alt}
+            src={project.thumbnail.src}
+            alt={project.thumbnail.alt}
             className="w-full rounded-none md:rounded-xl bg-neutral-900/10 dark:bg-white/10"
             buttonClassName="max-w-[767px] w-[100vw] self-center"
           />
-          <PostBody>{post?.body}</PostBody>
-          {post.images && (
+          <PostBody>{project?.body}</PostBody>
+          {project.images && (
             <section className="flex flex-col gap-4">
               <Heading size="h3" as="h2">
                 Gallery
               </Heading>
-              <ImageZoomGallery images={post.images} />
+              <ImageZoomGallery images={project.images} />
             </section>
           )}
-          {post.categories && (
+          {project.categories && (
             <div className="flex flex-col gap-2">
               <Heading size="h5" as="h2">
                 Categories
               </Heading>
-              {post.categories && (
+              {project.categories && (
                 <ul className="flex gap-2">
-                  {post.categories.map((category: string, index: number) => (
+                  {project.categories.map((category: string, index: number) => (
                     <li
                       className="flex items-center justify-center px-3 py-1 rounded-full bg-neutral-100 border border-neutral-900/5 dark:bg-neutral-100/10 dark:border-neutral-100/5"
                       key={index}

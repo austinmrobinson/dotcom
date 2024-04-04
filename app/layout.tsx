@@ -6,9 +6,39 @@ import Header from "./components/header";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Austin Robinson",
-  description:
-    "Austin Robinson's website, showing his work history. Contact if you need someone who builds apps, websites, or specializes in design systems.",
+  title: {
+    template: "%s | Austin Robinson",
+    default: "Austin Robinson",
+  },
+  description: "Full-stack developer.",
+  openGraph: {
+    title: "Austin Robinson",
+    description: `Austin Robinson's website, showing his work history. Contact if you need someone who builds apps, websites, or specializes in design systems.`,
+    url: "https://austinmrobinson.com",
+    siteName: "Austin Robinsons's site",
+    locale: "en_US",
+    type: "website",
+    // To use your own endpoint, refer to https://vercel.com/docs/concepts/functions/edge-functions/og-image-generation
+    // Note that an official `app/` solution is coming soon.
+    images: [
+      {
+        url: `/og-image.jpg
+          "Austin Robinsons's site"
+        )}`,
+        width: 1200,
+        height: 630,
+        alt: "",
+      },
+    ],
+  },
+  twitter: {
+    title: "Austin Robinson",
+    card: "summary_large_image",
+    creator: "@austinmrobinson",
+  },
+  icons: {
+    shortcut: "/favicon-96.png",
+  },
 };
 
 export default function RootLayout({
