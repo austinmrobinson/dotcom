@@ -6,6 +6,7 @@ import AustinLink from "./components/link";
 import IconTesla from "./components/icons/tesla";
 import IconHP from "./components/icons/hp";
 import { Mail, Twitter } from "react-feather";
+import ImageZoom from "./components/image";
 
 interface LinkItemProps {
   href: string;

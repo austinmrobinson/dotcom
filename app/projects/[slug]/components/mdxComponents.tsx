@@ -1,7 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
 import type { MDXComponents } from "mdx/types";
 import { Heading } from "@/app/components/text";
+import ImageZoom from "@/app/components/image";
+import Video from "./video";
 
 export const mdxComponents: MDXComponents = {
   h1: ({ children }) => (
@@ -36,8 +37,14 @@ export const mdxComponents: MDXComponents = {
       </Link>
     );
   },
-  img: ({ children, ...props }) => (
-    // @ts-expect-error
-    <Image sizes="100vw" style={{ width: "100%", height: "auto" }} {...props} />
+  img: ({ children, ...props }: any) => (
+    <ImageZoom
+      width="480"
+      height="270"
+      buttonClassName="my-6"
+      className="w-full object-cover aspect-[16/9] rounded-xl bg-neutral-900/10 dark:bg-white/10"
+      {...props}
+    />
   ),
+  Video,
 };

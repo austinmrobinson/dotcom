@@ -45,8 +45,8 @@ export default function WorkItem({ item, type, skeleton }: WorkItemProps) {
         <article className="flex flex-col gap-4 h-full" key={item.slug}>
           <figure>
             <Image
-              width="216"
-              height="120"
+              width="640"
+              height="360"
               className="w-full object-cover aspect-[16/9] rounded-xl bg-neutral-900/10 dark:bg-white/10"
               src={item.thumbnail.src ?? "/placeholder-image.jpg"}
               alt={

@@ -140,7 +140,7 @@ export function Text({
     return (
       <div
         className={`flex flex-col justify-center animate-pulse ${
-          characters ?? `w-[${skeletonWidth}px]`
+          characters && `w-[${skeletonWidth}px]`
         } ${lineHeightClass} ${className}`}
       >
         <span
