@@ -11,7 +11,7 @@ export const getProjects = cache(async () => {
   let projects;
 
   try {
-    projects = await fs.readdir("./projects/");
+    projects = await fs.readdir("./app/content/");
   } catch (error) {
     console.error(error);
   }
@@ -21,7 +21,7 @@ export const getProjects = cache(async () => {
       projects
         .filter((file) => path.extname(file) === ".mdx")
         .map(async (file) => {
-          const filePath = `./projects/${file}`;
+          const filePath = `./app/content/${file}`;
           const postContent = await fs.readFile(filePath, "utf8");
           const { data, content } = matter(postContent);
 
