@@ -11,6 +11,7 @@ import { Suspense } from "react";
 import ProjectPageLoading from "./loading";
 import Animate from "@/app/components/animate";
 import ImageZoom, { ImageZoomGallery } from "@/app/components/image";
+import { unstable_noStore as noStore } from "next/cache";
 
 export default async function ProjectPage({
   params,
@@ -19,6 +20,8 @@ export default async function ProjectPage({
     slug: string;
   };
 }) {
+  noStore(); // Opt into dynamic rendering
+  // These values below will be evaluated at runtime
   const post = await getProject(params.slug);
 
   const cookiesStore = cookies();
