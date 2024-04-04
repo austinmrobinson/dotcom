@@ -1,10 +1,9 @@
 import { notFound } from "next/navigation";
-import { getProject } from "@/app/utils/getProjects";
+import { getProjects } from "@/app/utils/getProjects";
 import { PostBody } from "./components/body";
 import { Heading, Text } from "@/app/components/text";
 import TopOfPage from "@/app/components/topOfPage";
 import { formatDateMonth } from "@/app/utils/formatDate";
-import Image from "next/image";
 import { cookies } from "next/headers";
 import PasswordForm from "@/app/components/passwordForm";
 import { Suspense } from "react";
@@ -17,20 +16,9 @@ export const metadata: Metadata = {
   title: "Projects",
 };
 
-export default async function ProjectPage({
-  params,
-}: {
-  params: {
-    slug: string;
-  };
-}) {
-  let project;
-
-  try {
-    project = await getProject(params.slug);
-  } catch (error) {
-    console.error(error);
-  }
+export default async function ProjectPage({ params }) {
+  let projects = await getProjects();
+  let project = projects.find((project) => project.slug === params.slug);
 
   const cookiesStore = cookies();
   const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
