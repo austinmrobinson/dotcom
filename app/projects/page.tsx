@@ -12,9 +12,7 @@ export default async function Projects() {
     <Suspense fallback={<ProjectGalleryLoading />}>
       <section className="flex flex-col gap-6">
         <TopOfPage title="Projects" />
-        <Animate>
-          <WorkGrid items={projects} />
-        </Animate>
+        <Animate>{projects && <WorkGrid items={projects} />}</Animate>
       </section>
     </Suspense>
   );
