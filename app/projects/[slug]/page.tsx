@@ -24,9 +24,15 @@ export default async function ProjectPage({
   // These values below will be evaluated at runtime
   const post = await getProject(params.slug);
 
-  const cookiesStore = cookies();
-  const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
-  const isLoggedIn = !!loginCookies?.value;
+  let isLoggedIn;
+
+  try {
+    const cookiesStore = cookies();
+    const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
+    isLoggedIn = !!loginCookies?.value;
+  } catch (error) {
+    console.log(error);
+  }
 
   if (!isLoggedIn) {
     return <PasswordForm />;

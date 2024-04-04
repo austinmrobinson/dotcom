@@ -1,12 +1,19 @@
 import { serialize } from "cookie";
 
 export async function POST(request: Request, params: { slug: string }) {
-  const data: { password: string } = await request.json();
-  const password = data.password;
-  const cookie = serialize(process.env.PASSWORD_COOKIE_NAME!, "true", {
-    httpOnly: true,
-    path: "/",
-  });
+  let password;
+  let cookie;
+
+  try {
+    const data: { password: string } = await request.json();
+    password = data.password;
+    cookie = serialize(process.env.PASSWORD_COOKIE_NAME!, "true", {
+      httpOnly: true,
+      path: "/",
+    });
+  } catch (error) {
+    return { message: "Failed to fetch cookies or validate password" };
+  }
 
   if (process.env.PAGE_PASSWORD !== password) {
     return new Response("incorrect password", {
