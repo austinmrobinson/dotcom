@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import Animate from "../components/animate";
 import ProjectGalleryLoading from "./loading";
 import { Metadata } from "next";
+import { Project } from "../types";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -13,11 +14,18 @@ export const metadata: Metadata = {
 export default async function Projects() {
   const projects = await getProjects();
 
+  let sortedProjects: Project[] | undefined;
+  sortedProjects = projects?.sort((a, b) => {
+    return +new Date(b.date) - +new Date(a.date);
+  });
+
   return (
     <Suspense fallback={<ProjectGalleryLoading />}>
       <section className="flex flex-col gap-6">
         <TopOfPage title="Projects" />
-        <Animate>{projects && <WorkGrid items={projects} />}</Animate>
+        <Animate>
+          {sortedProjects && <WorkGrid items={sortedProjects} />}
+        </Animate>
       </section>
     </Suspense>
   );
