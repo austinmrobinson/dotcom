@@ -32,8 +32,6 @@ export default async function ProjectPage({
     console.error(error);
   }
 
-  console.log(project.slug);
-
   const cookiesStore = cookies();
   const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
   const isLoggedIn = !!loginCookies?.value;
