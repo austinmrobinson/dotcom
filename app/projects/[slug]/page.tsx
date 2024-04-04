@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 export default async function ProjectPage({ params }: { params: string }) {
   let projects = await getProjects();
-  let project = projects.find((project) => project.slug === params.slug);
+  let project = projects?.find((project) => project.slug === params.slug);
 
   const cookiesStore = cookies();
   const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
