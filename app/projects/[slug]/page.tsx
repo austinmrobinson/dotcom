@@ -32,15 +32,11 @@ export default async function ProjectPage({
     console.error(error);
   }
 
-  let isLoggedIn;
+  console.log(project.slug);
 
-  try {
-    const cookiesStore = cookies();
-    const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
-    isLoggedIn = !!loginCookies?.value;
-  } catch (error) {
-    console.log(error);
-  }
+  const cookiesStore = cookies();
+  const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
+  const isLoggedIn = !!loginCookies?.value;
 
   if (!isLoggedIn) {
     return <PasswordForm />;
