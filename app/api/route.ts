@@ -12,16 +12,16 @@ export async function POST(request: Request, params: { slug: string }) {
       path: "/",
     });
   } catch (error) {
-    return { message: "Failed to fetch cookies or validate password" };
+    return new Response("Server error");
   }
 
   if (process.env.PAGE_PASSWORD !== password) {
-    return new Response("incorrect password", {
+    return new Response("Incorrect password", {
       status: 401,
     });
   }
 
-  return new Response("password correct", {
+  return new Response("Password correct", {
     status: 200,
     headers: {
       "Set-Cookie": cookie,
