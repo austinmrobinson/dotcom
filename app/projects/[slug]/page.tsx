@@ -16,7 +16,13 @@ export const metadata: Metadata = {
   title: "Projects",
 };
 
-export default async function ProjectPage({ params }: { params: string }) {
+interface ProjectPageProps {
+  params: {
+    slug: string;
+  };
+}
+
+export default async function ProjectPage({ params }: ProjectPageProps) {
   let projects = await getProjects();
   let project = projects?.find((project) => project.slug === params.slug);
 
