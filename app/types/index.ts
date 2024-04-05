@@ -29,9 +29,9 @@ export type Project = {
   date: string;
   subtitle?: string;
   slug: string;
-  company?: Company;
+  company?: string;
   role?: string;
-  categories?: Category[];
-  thumbnail: Image;
-  images?: Image[];
+  categories?: any;
+  thumbnail: any;
+  images?: any;
 };
