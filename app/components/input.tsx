@@ -34,7 +34,7 @@ export default function TextInput({
           type={type ?? "text"}
           placeholder={placeholder}
           onChange={onChange}
-          className={`w-full h-10 px-4 py-2.5 border-2 bg-neutral-900/[0.05] dark:bg-white/[0.05] flex text-md sm:text-sm rounded-full font-medium text-neutral-900 dark:text-white ${
+          className={`w-full h-10 px-4 py-2.5 border-2 bg-neutral-900/[0.05] dark:bg-white/[0.05] flex text-base sm:text-sm rounded-full font-medium text-neutral-900 dark:text-white ${
             error ? "border-red-600 dark:border-red-400" : "border-transparent"
           } ${className}`}
           data-1p-ignore
