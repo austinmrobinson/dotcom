@@ -43,7 +43,10 @@ export default function WorkItem({ item, type, skeleton }: WorkItemProps) {
         className="w-full relative before:absolute before:-inset-3 before:transition-all before:duration-300 before:opacity-0 before:scale-95 before:rounded-3xl hover:before:scale-100 hover:before:opacity-100 hover:before:bg-neutral-900/10"
       >
         <article className="flex flex-col gap-4 h-full" key={item.slug}>
-          <figure>
+          <figure className="relative">
+            <span className="absolute top-2 left-2 flex items-center text-sm justify-center text-neutral-700 px-2 py-[2px] rounded-md bg-neutral-900/5  backdrop-blur-lg">
+              {item.company}
+            </span>
             <Image
               width="640"
               height="360"

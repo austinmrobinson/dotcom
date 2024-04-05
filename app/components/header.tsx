@@ -32,7 +32,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="fixed flex gap-3 px-4 py-3 h-14 items-center bg-neutral-100/80 backdrop-blur-md md:bg-transparent md:backdrop-filter-none left-0 top-0 right-0 z-10 dark:bg-neutral-900/80">
+    <header className="fixed flex gap-3 px-4 py-3 h-14 items-center bg-neutral-100/80 backdrop-blur-md sm:bg-transparent sm:backdrop-filter-none left-0 top-0 right-0 z-10 dark:bg-neutral-900/80 sm:dark:bg-transparent">
       <div className="flex-grow">
         <NavLogo />
       </div>
