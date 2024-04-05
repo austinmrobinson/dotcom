@@ -11,7 +11,7 @@ export const getProjects = cache(async () => {
   let projects;
 
   try {
-    projects = await fs.readdir("content/");
+    projects = await fs.readdir("content");
   } catch (error) {
     console.error(error);
   }
