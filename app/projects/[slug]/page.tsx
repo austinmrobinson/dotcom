@@ -27,7 +27,7 @@ export default async function ProjectPage({ params }: any) {
   // const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
   // const isLoggedIn = !!loginCookies?.value;
 
-  return <div>{params.slug}</div>;
+  return <div>{params?.slug}</div>;
 }
 //   if (!isLoggedIn) {
 //     return <PasswordForm />;
