@@ -6,20 +6,19 @@ import Animate from "../components/animate";
 import ProjectGalleryLoading from "./loading";
 import { Metadata } from "next";
 import { Project } from "../types";
-import { newGetProjects } from "../utils/projects";
 
 export const metadata: Metadata = {
   title: "Projects",
 };
 
 export default async function Projects() {
-  const projects = await newGetProjects();
+  const projects = await getProjects();
 
   console.log(projects);
 
-  let sortedProjects: any | undefined;
+  let sortedProjects: Project[] | undefined;
   sortedProjects = projects?.sort((a, b) => {
-    return +new Date(b.metadata.date) - +new Date(a.metadata.date);
+    return +new Date(b.date) - +new Date(a.date);
   });
 
   return (

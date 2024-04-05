@@ -39,21 +39,18 @@ export default function WorkItem({ item, type, skeleton }: WorkItemProps) {
   } else {
     return (
       <Link
-        href={`/${route}/${item.metadata.slug}`}
+        href={`/${route}/${item.slug}`}
         className="w-full relative before:absolute before:-inset-3 before:transition-all before:duration-300 before:opacity-0 before:scale-95 before:rounded-3xl hover:before:scale-100 hover:before:opacity-100 hover:before:bg-neutral-900/10"
       >
-        <article
-          className="flex flex-col gap-4 h-full"
-          key={item.metadata.slug}
-        >
+        <article className="flex flex-col gap-4 h-full" key={item.slug}>
           <figure>
             <Image
               width="640"
               height="360"
               className="w-full object-cover aspect-[16/9] rounded-xl bg-neutral-900/10 dark:bg-white/10"
-              src={item.metadata.thumbnail.src ?? "/placeholder-image.jpg"}
+              src={item.thumbnail.src ?? "/placeholder-image.jpg"}
               alt={
-                item.metadata.thumbnail.alt ??
+                item.thumbnail.alt ??
                 "Placeholder backup with a photo landscape icon in the middle"
               }
             />
@@ -61,15 +58,11 @@ export default function WorkItem({ item, type, skeleton }: WorkItemProps) {
           <header className="flex flex-col gap-1">
             <div className="flex gap-3 items-center justify-between">
               <Heading size="h4" as="h3">
-                {item.metadata.title}
+                {item.title}
               </Heading>
-              <Text className="shrink-0">
-                {formatDateMonth(item.metadata.date)}
-              </Text>
+              <Text className="shrink-0">{formatDateMonth(item.date)}</Text>
             </div>
-            <Text className="max-h-10 line-clamp-2">
-              {item.metadata.subtitle}
-            </Text>
+            <Text className="max-h-10 line-clamp-2">{item.subtitle}</Text>
           </header>
         </article>
       </Link>

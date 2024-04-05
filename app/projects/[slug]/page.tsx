@@ -11,7 +11,6 @@ import ProjectPageLoading from "./loading";
 import Animate from "@/app/components/animate";
 import ImageZoom, { ImageZoomGallery } from "@/app/components/image";
 import { Metadata } from "next";
-import { newGetProjects } from "@/app/utils/projects";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -20,16 +19,14 @@ export const metadata: Metadata = {
 export default async function ProjectPage({ params }: any) {
   const { slug } = params;
 
-  let projects = await newGetProjects();
-  let project = projects?.find(
-    (project) => project.metadata.slug === params.slug
-  );
+  let projects = await getProjects();
+  let project = projects?.find((project) => project.slug === slug);
 
   // const cookiesStore = cookies();
   // const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
   // const isLoggedIn = !!loginCookies?.value;
 
-  return <div>{project?.metadata.title}</div>;
+  return <div>{project?.title}</div>;
 }
 //   if (!isLoggedIn) {
 //     return <PasswordForm />;
