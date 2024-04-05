@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function Projects() {
   const projects = await getProjects();
 
-  console.log(projects);
+  // console.log(projects);
 
   let sortedProjects: Project[] | undefined;
   sortedProjects = projects?.sort((a, b) => {
