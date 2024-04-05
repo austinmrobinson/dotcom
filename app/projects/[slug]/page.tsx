@@ -36,47 +36,45 @@ export default async function ProjectPage({ params }: any) {
         fallback={!isLoggedIn ? <PasswordForm /> : <ProjectPageLoading />}
       >
         <Animate className="flex flex-col gap-12">
-          <TopOfPage title={project.metadata.title} back="/projects">
-            <Text>{`${formatDateMonth(project.metadata.date)} • ${
-              project.metadata.company
-            } • ${project.metadata.role}`}</Text>
+          <TopOfPage title={project.title} back="/projects">
+            <Text>{`${formatDateMonth(project.date)} • ${project.company} • ${
+              project.role
+            }`}</Text>
           </TopOfPage>
           <ImageZoom
-            src={project.metadata.thumbnail.src}
-            alt={project.metadata.thumbnail.alt}
+            src={project.thumbnail.src}
+            alt={project.thumbnail.alt}
             className="w-full rounded-none md:rounded-xl bg-neutral-900/10 dark:bg-white/10"
             buttonClassName="max-w-[767px] w-[100vw] self-center"
           />
-          <PostBody>{project?.content}</PostBody>
-          {/* {project.metadata.images && (
+          <PostBody>{project?.body}</PostBody>
+          {project.images && (
             <section className="flex flex-col gap-4">
               <Heading size="h3" as="h2">
                 Gallery
               </Heading>
-              <ImageZoomGallery images={project.metadata.images} />
+              <ImageZoomGallery images={project.images} />
             </section>
-          )} */}
-          {/* {project.metadata.categories && (
+          )}
+          {project.categories && (
             <div className="flex flex-col gap-2">
               <Heading size="h5" as="h2">
                 Categories
               </Heading>
-              {project.metadata.categories && (
+              {project.categories && (
                 <ul className="flex gap-2">
-                  {project.metadata.categories.map(
-                    (category: string, index: number) => (
-                      <li
-                        className="flex items-center justify-center px-3 py-1 rounded-full bg-neutral-100 border border-neutral-900/5 dark:bg-neutral-100/10 dark:border-neutral-100/5"
-                        key={index}
-                      >
-                        {category}
-                      </li>
-                    )
-                  )}
+                  {project.categories.map((category: string, index: number) => (
+                    <li
+                      className="flex items-center justify-center px-3 py-1 rounded-full bg-neutral-100 border border-neutral-900/5 dark:bg-neutral-100/10 dark:border-neutral-100/5"
+                      key={index}
+                    >
+                      {category}
+                    </li>
+                  ))}
                 </ul>
               )}
             </div>
-          )} */}
+          )}
         </Animate>
       </Suspense>
     );
