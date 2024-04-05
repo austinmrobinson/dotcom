@@ -45,7 +45,7 @@ export default function ImageZoom({
         </button>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="data-[state=open]:animate-overlayShow bg-neutral-900/20 backdrop-blur-sm fixed inset-0 z-20 cursor-zoom-out" />
+        <Dialog.Overlay className="data-[state=open]:animate-overlayShow bg-neutral-900/20 backdrop-blur-sm fixed h-[100vh] w-[100vw] inset-0 z-20 cursor-zoom-out" />
         <Dialog.Content className="data-[state=open]:animate-contentShow flex fixed rounded-lg overflow-hidden shadow-lg bg-white dark:bg-neutral-800 z-30 top-[50%] left-[50%] max-h-[90dvh] w-[95vw] h-auto max-w-[1096px] translate-x-[-50%] translate-y-[-50%] focus:outline-none">
           <Image
             src={src}
@@ -125,7 +125,7 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
       </div>
       {image && (
         <Dialog.Portal>
-          <Dialog.Overlay className="data-[state=open]:animate-overlayShow bg-neutral-900/20 backdrop-blur-sm fixed inset-0 z-20 cursor-zoom-out" />
+          <Dialog.Overlay className="data-[state=open]:animate-overlayShow bg-neutral-900/20 backdrop-blur-sm h-[100vh] w-[100vw] fixed inset-0 z-20 cursor-zoom-out" />
           <Dialog.Content className="data-[state=open]:animate-contentShow flex fixed rounded-lg overflow-hidden shadow-lg bg-white dark:bg-neutral-800 z-30 top-[50%] left-[50%] max-h-[90dvh] w-[95vw] h-auto max-w-[1096px] translate-x-[-50%] translate-y-[-50%] focus:outline-none">
             <Image
               src={image.src}
