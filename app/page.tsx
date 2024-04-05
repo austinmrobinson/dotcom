@@ -5,11 +5,12 @@ import Link from "next/link";
 import AustinLink from "./components/link";
 import IconTesla from "./components/icons/tesla";
 import IconHP from "./components/icons/hp";
-import { Hexagon, Mail, Twitter } from "react-feather";
+import { Hexagon, Linkedin, Mail, Twitter } from "react-feather";
 import ImageZoom from "./components/image";
 import getCompanies from "./utils/getCompanies";
 import { Company } from "./types";
 import formatDate from "./utils/formatDate";
+import IconPaperCrowns from "./components/icons/paperCrowns";
 
 interface LinkItemProps {
   href?: string;
@@ -28,14 +29,20 @@ function LinkItem({ href, leading, caption, trailing }: LinkItemProps) {
     case "HP":
       icon = <IconHP />;
       break;
+    case "Paper Crowns":
+      icon = <IconPaperCrowns />;
+      break;
     case "Twitter":
       icon = <Twitter size={16} />;
       break;
     case "Email":
       icon = <Mail size={16} />;
       break;
+    case "LinkedIn":
+      icon = <Linkedin size={16} />;
+      break;
     default:
-      icon = <Hexagon />;
+      icon = <Hexagon size={16} />;
   }
 
   if (href) {
@@ -49,13 +56,9 @@ function LinkItem({ href, leading, caption, trailing }: LinkItemProps) {
           <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
             {icon}
           </span>
-          <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center">
-            <div className="flex grow sm:grow-0">
-              <Heading
-                size="h6"
-                as="h4"
-                className="grow sm:grow-0 sm:min-w-[64px]"
-              >
+          <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
+            <div className="flex grow">
+              <Heading size="h6" as="h4" className="grow sm:grow-0">
                 {leading}
               </Heading>
               {/* Mobile */}
@@ -79,13 +82,9 @@ function LinkItem({ href, leading, caption, trailing }: LinkItemProps) {
           <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
             {icon}
           </span>
-          <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center">
-            <div className="flex grow sm:grow-0">
-              <Heading
-                size="h6"
-                as="h4"
-                className="grow sm:grow-0 sm:min-w-[64px]"
-              >
+          <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
+            <div className="flex grow">
+              <Heading size="h6" as="h4" className="grow sm:grow-0">
                 {leading}
               </Heading>
               {/* Mobile */}
@@ -145,7 +144,7 @@ export default async function Home() {
       </section>
       <section id="history" className="flex flex-col gap-4 sm:gap-5">
         <div className="flex gap-2 justify-between items-center">
-          <Heading size="h3">Work History</Heading>
+          <Heading size="h3">History</Heading>
         </div>
         <ul className="flex flex-col gap-4">
           {sortedCompanies?.map((company: Company) => (
@@ -154,19 +153,24 @@ export default async function Home() {
               leading={company.title}
               caption={company.roles[company.roles.length - 1].title}
               trailing={`${formatDate(company.startingDate)}–${
-                company.endingDate ? formatDate(company.endingDate) : ""
+                company.endingDate ? formatDate(company.endingDate) : "Present"
               }`}
             />
           ))}
         </ul>
       </section>
       <section id="contact" className="flex flex-col gap-4 sm:gap-5">
-        <Heading size="h3">Contact</Heading>
+        <Heading size="h3">Connect</Heading>
         <div className="flex flex-col gap-4">
           <LinkItem
             href="https://twitter.com/austinmrobinson"
             leading="Twitter"
             trailing="@austinmrobinson"
+          />
+          <LinkItem
+            href="https://www.linkedin.com/in/robinsonaustin/"
+            leading="LinkedIn"
+            trailing="robinsonaustin"
           />
           <LinkItem
             href="mailto:austinrobinsondesign@gmail.com"
