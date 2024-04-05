@@ -30,6 +30,7 @@ export default function TextInput({
       )}
       <div className="relative">
         <input
+          id={id}
           value={value}
           type={type ?? "text"}
           placeholder={placeholder}
