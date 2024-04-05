@@ -20,16 +20,16 @@ export const metadata: Metadata = {
 export default async function ProjectPage({ params }: any) {
   const { slug } = params;
 
-  // let projects = await newGetProjects();
-  // let project = projects?.find(
-  //   (project) => project.metadata.slug === params.slug
-  // );
+  let projects = await newGetProjects();
+  let project = projects?.find(
+    (project) => project.metadata.slug === params.slug
+  );
 
   // const cookiesStore = cookies();
   // const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
   // const isLoggedIn = !!loginCookies?.value;
 
-  return <div>{slug}</div>;
+  return <div>{project?.metadata.title}</div>;
 }
 //   if (!isLoggedIn) {
 //     return <PasswordForm />;
