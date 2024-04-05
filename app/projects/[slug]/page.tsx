@@ -35,7 +35,7 @@ export default async function ProjectPage({ params }: any) {
       <Suspense
         fallback={!isLoggedIn ? <PasswordForm /> : <ProjectPageLoading />}
       >
-        <Animate className="flex flex-col gap-12">
+        <Animate className="flex flex-col gap-8 sm:gap-12">
           <TopOfPage title={project.title} back="/projects">
             <Text>{`${formatDateMonth(project.date)} • ${project.company} • ${
               project.role

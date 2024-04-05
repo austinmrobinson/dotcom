@@ -10,7 +10,7 @@ interface TopOfPageProps {
 
 export default function TopOfPage({ back, title, children }: TopOfPageProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2 sm:gap-3">
       <div className="flex gap-1 items-center relative">
         {back && (
           <IconButton
@@ -37,7 +37,7 @@ interface SkeletonTopOfPageProps {
 
 export function SkeletonTopOfPage({ children }: SkeletonTopOfPageProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3 sm:gap-4">
       <div className="flex gap-2 items-center relative">
         <Heading size="h1" skeleton />
       </div>

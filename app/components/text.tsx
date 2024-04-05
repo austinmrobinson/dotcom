@@ -15,6 +15,7 @@ export function Heading({
   children,
   skeleton,
   characters,
+  className,
 }: HeadingProps) {
   const Tag: any = as ?? size;
 
@@ -73,7 +74,7 @@ export function Heading({
     );
   return (
     <Tag
-      className={`font-medium text-neutral-900 dark:text-white ${sizeClass}`}
+      className={`font-medium text-neutral-900 dark:text-white ${sizeClass} ${className}`}
     >
       {children}
     </Tag>

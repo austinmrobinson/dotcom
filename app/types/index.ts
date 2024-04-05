@@ -8,9 +8,8 @@ export type Company = {
   subtitle: string;
   slug: string;
   startingDate: string;
-  endingDate: string;
+  endingDate?: string;
   roles: Role[];
-  thumbnail: string;
 };
 
 export type Category = {

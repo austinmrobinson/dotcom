@@ -5,44 +5,85 @@ import Link from "next/link";
 import AustinLink from "./components/link";
 import IconTesla from "./components/icons/tesla";
 import IconHP from "./components/icons/hp";
-import { Mail, Twitter } from "react-feather";
+import { Hexagon, Mail, Twitter } from "react-feather";
 import ImageZoom from "./components/image";
+import getCompanies from "./utils/getCompanies";
+import { Company } from "./types";
+import formatDate from "./utils/formatDate";
 
 interface LinkItemProps {
   href: string;
-  icon: React.ReactNode;
   leading: string;
   caption?: string;
-  trailing: string;
+  trailing?: string;
 }
 
-function LinkItem({ href, icon, leading, caption, trailing }: LinkItemProps) {
+function LinkItem({ href, leading, caption, trailing }: LinkItemProps) {
+  let icon: React.ReactNode;
+
+  switch (leading) {
+    case "Tesla":
+      icon = <IconTesla />;
+      break;
+    case "HP":
+      icon = <IconHP />;
+      break;
+    case "Twitter":
+      icon = <Twitter size={16} />;
+      break;
+    case "Email":
+      icon = <Mail size={16} />;
+      break;
+    default:
+      icon = <Hexagon />;
+  }
+
   return (
     <Link
       href={href}
-      className="flex gap-12 items-center rounded-xl relative hover:before:bg-neutral-900/10 dark:hover:before:bg-white/10
+      className="flex gap-12 items-start sm:items-center rounded-xl relative hover:before:bg-neutral-900/10 dark:hover:before:bg-white/10
         before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-xl"
     >
       <div className="flex grow gap-3 items-center">
-        <span className="w-10 h-10 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+        <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
           {icon}
         </span>
-        <Heading size="h6" as="h4">
-          {leading}
-        </Heading>
+        <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center">
+          <div className="flex grow sm:grow-0">
+            <Heading
+              size="h6"
+              as="h4"
+              className="grow sm:grow-0 sm:min-w-[48px]"
+            >
+              {leading}
+            </Heading>
+            {/* Mobile */}
+            <Text className="block sm:hidden tabular-nums min-w-[78px]">
+              {trailing}
+            </Text>
+          </div>
+          {caption && <Text>{caption}</Text>}
+        </div>
       </div>
-      <div className="flex gap-3">
-        {caption && <Text weight="medium">{caption}</Text>}
-        <Text className="tabular-nums min-w-[64px]">{trailing}</Text>
-      </div>
+      {/* Not Mobile */}
+      <Text className="hidden sm:block tabular-nums min-w-[78px]">
+        {trailing}
+      </Text>
     </Link>
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const companies = await getCompanies();
+
+  let sortedCompanies: Company[] | undefined;
+  sortedCompanies = companies?.sort((a, b) => {
+    return +new Date(b.startingDate) - +new Date(a.startingDate);
+  });
+
   return (
     <div className="flex flex-col gap-16">
-      <section id="introduction" className="flex flex-col gap-5">
+      <section id="introduction" className="flex flex-col gap-5 justify-start">
         <Heading size="h1">Austin Robinson</Heading>
         <Text>
           Hi, I am Austin. I am a self-taught software designer and engineer
@@ -62,34 +103,30 @@ export default function Home() {
           and my own company, working on projects for companies like Activision
           and Supercell.
         </Text>
+        <Button
+          href="/projects"
+          variant="secondary"
+          className="w-full h-10 px-5 xs:w-auto xs:self-start xs:h-8 xs:px-4 mt-2"
+        >
+          View Work
+        </Button>
       </section>
       <section id="history" className="flex flex-col gap-5">
         <div className="flex gap-2 justify-between items-center">
           <Heading size="h3">Work History</Heading>
-          <Button
-            variant="text"
-            size="small"
-            href="/projects"
-            className="-mr-3"
-          >
-            View Work
-          </Button>
         </div>
         <div className="flex flex-col gap-4">
-          <LinkItem
-            href="/projects"
-            icon={<IconTesla />}
-            leading="Tesla"
-            caption="Staff UX Designer, Design Systems"
-            trailing="2021–"
-          />
-          <LinkItem
-            href="/projects"
-            icon={<IconHP />}
-            leading="HP"
-            caption="Design Lead, Design Systems"
-            trailing="2017–21"
-          />
+          {sortedCompanies?.map((company: Company) => (
+            <LinkItem
+              key={company.slug}
+              href={`/companies/${company.slug}`}
+              leading={company.title}
+              caption={company.roles[company.roles.length - 1].title}
+              trailing={`${formatDate(company.startingDate)}–${
+                company.endingDate ? formatDate(company.endingDate) : ""
+              }`}
+            />
+          ))}
         </div>
       </section>
       <section id="contact" className="flex flex-col gap-5">
@@ -97,13 +134,11 @@ export default function Home() {
         <div className="flex flex-col gap-4">
           <LinkItem
             href="https://twitter.com/austinmrobinson"
-            icon={<Twitter size={16} />}
             leading="Twitter"
             trailing="@austinmrobinson"
           />
           <LinkItem
             href="mailto:austinrobinsondesign@gmail.com"
-            icon={<Mail size={16} />}
             leading="Email"
             trailing="austinrobinsondesign@gmail.com"
           />
