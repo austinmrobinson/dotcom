@@ -11,7 +11,9 @@ export const getProjects = cache(async () => {
   let projects;
 
   try {
-    projects = await fs.readdir("content/projects");
+    projects = await fs.readdir(
+      path.resolve(process.cwd(), "content", "projects")
+    );
   } catch (error) {
     console.error(error);
   }
