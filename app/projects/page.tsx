@@ -6,6 +6,8 @@ import Animate from "../components/animate";
 import ProjectGalleryLoading from "./loading";
 import { Metadata } from "next";
 import { Project } from "../types";
+import PasswordForm from "../components/passwordForm";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -21,14 +23,24 @@ export default async function Projects() {
     return +new Date(b.date) - +new Date(a.date);
   });
 
-  return (
-    <Suspense fallback={<ProjectGalleryLoading />}>
-      <section className="flex flex-col gap-6">
-        <TopOfPage title="Projects" />
-        <Animate>
-          {sortedProjects && <WorkGrid items={sortedProjects} />}
-        </Animate>
-      </section>
-    </Suspense>
-  );
+  const cookiesStore = cookies();
+  const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
+  const isLoggedIn = !!loginCookies?.value;
+
+  if (!isLoggedIn) {
+    return <PasswordForm />;
+  } else {
+    return (
+      <Suspense
+        fallback={!isLoggedIn ? <PasswordForm /> : <ProjectGalleryLoading />}
+      >
+        <section className="flex flex-col gap-6">
+          <TopOfPage title="Projects" />
+          <Animate>
+            {sortedProjects && <WorkGrid items={sortedProjects} />}
+          </Animate>
+        </section>
+      </Suspense>
+    );
+  }
 }
