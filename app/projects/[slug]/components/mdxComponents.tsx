@@ -41,7 +41,7 @@ export const mdxComponents: MDXComponents = {
     <ImageZoom
       width="480"
       height="270"
-      buttonClassName="my-6"
+      buttonClassName="my-6 w-full"
       className="w-full object-cover aspect-[16/9] rounded-xl bg-neutral-900/10 dark:bg-white/10"
       {...props}
     />

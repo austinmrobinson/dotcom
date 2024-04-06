@@ -5,9 +5,8 @@ subtitle: Rearchitecting the global primitives and semantic colors, aligning all
 slug: cross-platform-colors
 company: Tesla
 role: Staff UX Designer
-thumbnail: {src: '/cross-platform-color_01.jpg', alt: "testing"}
+thumbnail: {src: '/projects/cross-platform-color/cross-platform-color_01.jpg', alt: "An ecosystem of digital products all using the same colors"}
 categories: ['design systems', 'colors']
-images: [{src: "/og-image.jpg", alt: "testing"}, {src: '/cross-platform-color_01.jpg', alt: "testing"}, {src: "/placeholder-image.jpg", alt: "testing"}]
 ---
 
 
@@ -15,19 +14,22 @@ images: [{src: "/og-image.jpg", alt: "testing"}, {src: '/cross-platform-color_01
 
 Tesla's digital experiences are fractured visually across reporting structures and platforms. This began with the vehicle UI team shipping a redesign to the software with the refreshed Model S and X. The design system was started in one of the main 3 software organizations and the team still sits in that organization. 
 
-The vehicle UI team does not consume anything from the design system outside of icons (see case study), so when they ship these changes it means that the rest of the digital experiences need to pivot to match.
+![A diagram showing the three organizations with the design system under 'IT Apps'](/projects/cross-platform-color/cross-platform-color_02.jpg)
 
-![Placeholder image](/placeholder-image.jpg)
+The three organizations at Tesla that work on software are IT Apps (where the design system sits), Energy, and Vehicle. All efforts to align these groups are grassroots, which is exactly what the focus of this effort involves.
+
+The vehicle UI team does not consume anything from the design system outside of icons (but that's another case study), so when they ship these changes it means that the rest of the digital experiences need to pivot to match.
+
 
 ### Role
 
 I was the sole designer on this project, partnering with design and engineering stakeholders in each of the major organizations to gather their feedback and approval on a solution.
 
-![Placeholder image](/placeholder-image.jpg)
-
 ### Cross-Platform Alignment
 
 This was the second step in a design-system-driven initiative I led to align our visual style across all platforms.
+
+![A diagram showing three steps: Typography, Colors, and Visual Style](/projects/cross-platform-color/cross-platform-color_03.jpg)
 
 ## Problems
 
@@ -43,21 +45,17 @@ This was the second step in a design-system-driven initiative I led to align our
 - Make sure all colors are accessible when paired together appropriately
 - Create more design and engineering efficiency by using one set of tokens
 
-## Process
-
-### Audit & Research
+## Audit & Research
 
 Leaning on my previous experience creating a brand-new color palette at HP, I began to audit all digital experiences at Tesla and get an updated perspective on industry-standard best practices, in case anything had changed in the few years since I did this at HP.
 
-![Placeholder image](/placeholder-image.jpg)
-
-#### Audit
+### Audit
 
 In the audit, a few key divergences were identified that would need to be corrected. These divergences would be subconsciously visible to the end user and created further misalignments between Tesla experiences across platforms.
 
-![Placeholder image](/placeholder-image.jpg)
+![Four color swatches split in two to show the different colors for light background, green, greys, and dark background](/projects/cross-platform-color/cross-platform-color_04.jpg)
 
-#### Research
+### Research
 
 After updating my perspective on best practices, I reinforced two different approaches that I've used in the past: avoiding a pure black background for dark mode and using an inverse brightness/saturation relationship for primary and secondary colors.
 
@@ -65,45 +63,52 @@ After updating my perspective on best practices, I reinforced two different appr
 
 According to my research, it is best to avoid pure black backgrounds to prevent halation and pixel smearing on OLED devices.
 
+![Side by side light/dark backgrounds with green, yellow, and red icons](/projects/cross-platform-color/cross-platform-color_07.jpg)
+
 #### Desaturating & Brightening Colors
 
 In order to create an equitable experience for users across light and dark mode, it is important to keep color contrast at the forefront, including how a user perceives those colors. Against light backgrounds, darker and saturated colors create contrast. The opposite is true for dark mode. 
 
-![Placeholder image](/placeholder-image.jpg)
-
-### Creating Palettes
+## Creating Palettes
 
 Armed with the context needed to make informed decisions, it was finally time to start creating color palettes!
 
-#### Primitive Colors
+### Primitive Colors
 
 Every time I create large palettes, I rely on connecting the hues and their corresponding scales to the overall brand. Since Tesla uses a primary blue for experiences rather than the brand red, all of the hues were chosen to be harmonious with that blue.
 
-<Video src="/cross-platform-colors_05.mp4" />
-
+![An animation showing hues on a color wheel, to a subset of harmonious hues, then larger palettes generated from those hues](/projects/cross-platform-color/cross-platform-color_05.gif)
 
 From there, I took those hues into ColorBox, a tool created a few years ago for this exact purpose: to create balanced and usable color palettes. I used it previously at HP and provided feedback to the creator during its beta, so it feels very cozy to me. Leveraging bezier curves on the HSB colors (and a lot of tweaking), I had a set of primitive colors that provided us room to grow into over the years.
 
-#### Semantic Colors
+### Semantic Colors
 
 One of my primary goals with the semantic layer was to keep usage and naming as close to our existing usage as possible, in order to prevent needless breaking changes. I followed our token naming structure and expanded our semantic colors to fit the wide variety of use cases needed across platforms.
 
-![Placeholder image](/placeholder-image.jpg)
+![A diagram showing colors used in primitive, semantic, and component tokens](/projects/cross-platform-color/cross-platform-color_06.jpg)
 
 The goal here was to create a set that would cover the majority of use cases for each of the platforms, while also providing platform-specific semantic color tokens. Generally, I try not to optimize for any edge cases that would introduce unnecessary inconsistency or wasted effort.
 
-### Testing
+## Testing
 Throughout the process, I tested the primitive and semantic color palettes, but once they were largely ready to present, I stress tested them against hundreds of screens. These screens represented a large variety of scenarios including data density, color usage, and platforms.
 
-After some tweaking, it was time to present to stakeholders!
+![An animation going from light to dark mode with the corresponding semantic colors](/projects/cross-platform-color/cross-platform-color_09.gif)
 
-![Placeholder image](/placeholder-image.jpg)
+And, of course, accessibility was at the core of everything that happened. It is extremely important and a non-negotiable. I strove to make sure we met AA color contrast across the board, making sure we were getting at least a 4.5:1 ratio on our worst case scenarios (far right).
+
+![A set of colors and their corresponding contrast ratios](/projects/cross-platform-color/cross-platform-color_08.jpg)
+
+After some tweaking, it was time to present to stakeholders.
 
 ## Conclusion & Impact
 
 After many rounds of revision and approval, we landed on a solution that we were happy with!
 
+![An animation between light and dark of an ecosystem of digital products all using the same colors](/projects/cross-platform-color/cross-platform-color_10.gif)
+
 This effort ended up being a situation where the tail wagged the dog, in which I worked with a few product teams and organization leaders to define a dark mode strategy across all applications in each platform and even across platforms. This was the first effort of its kind at Tesla.
+
+![Mobile, web, and vehicle screens side by side with their respective 'appearance' toggles](/projects/cross-platform-color/cross-platform-color_11.jpg)
 
 Finally, after literal years since the vehicle UI team shipped their refreshed UI, we had a consistent approach for color, all referencing tokens from the design system as a source of truth.
 
