@@ -21,36 +21,11 @@ export async function generateMetadata({
     return;
   }
 
-  let {
-    title,
-    date: publishedTime,
-    subtitle: description,
-    thumbnail,
-  } = project;
-
-  let ogImage = thumbnail.src;
+  let { title, subtitle: description } = project;
 
   return {
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      publishedTime,
-      url: `https://austinmrobinson.com/projects/${project.slug}`,
-      images: [
-        {
-          url: ogImage,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [ogImage],
-    },
   };
 }
 
