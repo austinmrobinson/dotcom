@@ -26,7 +26,7 @@ export type Role = {
 export type Project = {
   title: string;
   date: string;
-  subtitle?: string;
+  subtitle: string;
   slug: string;
   company?: Company;
   role?: string;

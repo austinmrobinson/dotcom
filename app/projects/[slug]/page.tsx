@@ -12,9 +12,47 @@ import Animate from "@/app/components/animate";
 import ImageZoom, { ImageZoomGallery } from "@/app/components/image";
 import { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Projects",
-};
+export async function generateMetadata({
+  params,
+}: any): Promise<Metadata | undefined> {
+  let projects = await getProjects();
+  let project = projects?.find((project) => project.slug === params.slug);
+  if (!project) {
+    return;
+  }
+
+  let {
+    title,
+    date: publishedTime,
+    subtitle: description,
+    thumbnail,
+  } = project;
+
+  let ogImage = thumbnail.src;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      publishedTime,
+      url: `https://austinmrobinson.com/projects/${project.slug}`,
+      images: [
+        {
+          url: ogImage,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function ProjectPage({ params }: any) {
   const { slug } = params;

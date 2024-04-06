@@ -22,6 +22,7 @@ export function SkeletonWorkGrid() {
   const blankItem: Project = {
     title: "",
     date: "",
+    subtitle: "",
     slug: "",
     thumbnail: { src: "", alt: "" },
   };
