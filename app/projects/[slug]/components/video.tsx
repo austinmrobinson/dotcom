@@ -17,7 +17,6 @@ export default function Video({ src, width, height, className }: VideoProps) {
       autoPlay
       controls
       src={src}
-      type="video/mp4"
     />
   );
 }
