@@ -15,6 +15,7 @@ interface ImageZoomProps {
   height?: number;
   className?: string;
   buttonClassName?: string;
+  priority?: boolean;
 }
 
 export default function ImageZoom({
@@ -24,6 +25,7 @@ export default function ImageZoom({
   height,
   className,
   buttonClassName,
+  priority,
 }: ImageZoomProps) {
   const [open, setOpen] = useState(false);
 
@@ -41,6 +43,7 @@ export default function ImageZoom({
             className={className}
             src={src}
             alt={alt}
+            priority={priority}
           />
         </button>
       </Dialog.Trigger>

@@ -52,6 +52,7 @@ export default async function ProjectPage({ params }: any) {
             alt={project.thumbnail.alt}
             className="w-full rounded-none md:rounded-xl bg-neutral-900/10 dark:bg-white/10"
             buttonClassName="max-w-[767px] w-[100vw] self-center"
+            priority
           />
           <PostBody>{project?.body}</PostBody>
           {project.images && (
