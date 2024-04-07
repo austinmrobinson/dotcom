@@ -35,7 +35,7 @@ export default function ImageZoom({
         <button
           aria-label="Zoom in on image"
           onClick={() => setOpen(!open)}
-          className={`flex cursor-zoom-in not-prose transition-opacity hover:opacity-80 ${buttonClassName}`}
+          className={`flex cursor-zoom-in not-prose transition-opacity hover:opacity-70 ${buttonClassName}`}
         >
           <Image
             width={width ?? "480"}

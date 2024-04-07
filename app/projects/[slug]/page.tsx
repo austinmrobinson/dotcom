@@ -50,7 +50,7 @@ export default async function ProjectPage({ params }: any) {
           <ImageZoom
             src={project.thumbnail.src}
             alt={project.thumbnail.alt}
-            className="w-full rounded-none md:rounded-xl bg-neutral-900/10 dark:bg-white/10"
+            className="w-full rounded-none md:rounded-xl bg-neutral-900/10 dark:bg-white/10 border border-neutral-200/[0.005] dark:border-white/[0.005]"
             buttonClassName="max-w-[767px] w-[100vw] self-center"
             priority
           />
