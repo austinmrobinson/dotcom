@@ -69,7 +69,7 @@ export default async function ProjectPage({ params }: any) {
                 Categories
               </Heading>
               {project.categories && (
-                <ul className="flex gap-2">
+                <ul className="flex flex-wrap gap-2">
                   {project.categories.map((category: string, index: number) => (
                     <li
                       className="flex items-center justify-center px-3 py-1 rounded-full bg-neutral-100 border border-neutral-900/5 dark:bg-neutral-100/10 dark:border-neutral-100/5"

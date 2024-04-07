@@ -120,7 +120,7 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
                 height="144"
                 src={image.src}
                 alt={image.alt}
-                className="rounded-xl w-full h-full object-cover bg-neutral-900/10 dark:bg-neutral-100/10"
+                className="rounded-xl w-full h-full object-cover m-0 bg-neutral-900/10 dark:bg-neutral-100/10 border border-neutral-200/[0.005] dark:border-white/[0.005]"
               />
             </button>
           </Dialog.Trigger>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { MDXComponents } from "mdx/types";
 import { Heading } from "@/app/components/text";
-import ImageZoom from "@/app/components/image";
+import ImageZoom, { ImageZoomGallery } from "@/app/components/image";
 import Video from "./video";
 
 export const mdxComponents: MDXComponents = {
@@ -47,4 +47,5 @@ export const mdxComponents: MDXComponents = {
     />
   ),
   Video,
+  ImageZoomGallery,
 };
