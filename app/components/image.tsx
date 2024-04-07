@@ -15,6 +15,7 @@ interface ImageZoomProps {
   height?: number;
   className?: string;
   buttonClassName?: string;
+  priority?: boolean;
 }
 
 export default function ImageZoom({
@@ -24,6 +25,7 @@ export default function ImageZoom({
   height,
   className,
   buttonClassName,
+  priority,
 }: ImageZoomProps) {
   const [open, setOpen] = useState(false);
 
@@ -33,7 +35,7 @@ export default function ImageZoom({
         <button
           aria-label="Zoom in on image"
           onClick={() => setOpen(!open)}
-          className={`flex cursor-zoom-in not-prose transition-opacity hover:opacity-80 ${buttonClassName}`}
+          className={`flex cursor-zoom-in not-prose transition-opacity hover:opacity-70 ${buttonClassName}`}
         >
           <Image
             width={width ?? "480"}
@@ -41,6 +43,7 @@ export default function ImageZoom({
             className={className}
             src={src}
             alt={alt}
+            priority={priority}
           />
         </button>
       </Dialog.Trigger>
@@ -117,7 +120,7 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
                 height="144"
                 src={image.src}
                 alt={image.alt}
-                className="rounded-xl w-full h-full object-cover bg-neutral-900/10 dark:bg-neutral-100/10"
+                className="rounded-xl w-full h-full object-cover m-0 bg-neutral-900/10 dark:bg-neutral-100/10 border border-neutral-200/[0.005] dark:border-white/[0.005]"
               />
             </button>
           </Dialog.Trigger>

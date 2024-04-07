@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import TextInput, { PasswordInput } from "./input";
 import Button from "./button";
-import { Heading } from "./text";
+import { Heading, Text } from "./text";
 import { Lock } from "react-feather";
 import Animate from "./animate";
 
@@ -31,13 +31,16 @@ export default function PasswordForm() {
 
   return (
     <Animate className="flex flex-col justify-center gap-10 w-full max-w-[364px] sm:max-w-[264px] grow mx-auto mb-32">
-      <div className="flex flex-col gap-4 items-center">
+      <div className="flex flex-col gap-5 items-center text-center">
         <div className="p-3 w-12 h-12 rounded-full bg-neutral-900/10 dark:bg-white/10">
           <Lock />
         </div>
-        <Heading size="h3" as="h2">
-          This Content is Locked
-        </Heading>
+        <div className="flex flex-col gap-1">
+          <Heading size="h3" as="h1">
+            Content Locked
+          </Heading>
+          <Text>Request access to view</Text>
+        </div>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <PasswordInput

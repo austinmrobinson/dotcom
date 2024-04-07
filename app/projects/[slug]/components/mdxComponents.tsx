@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { MDXComponents } from "mdx/types";
 import { Heading } from "@/app/components/text";
-import ImageZoom from "@/app/components/image";
+import ImageZoom, { ImageZoomGallery } from "@/app/components/image";
 import Video from "./video";
 
 export const mdxComponents: MDXComponents = {
@@ -42,9 +42,10 @@ export const mdxComponents: MDXComponents = {
       width="480"
       height="270"
       buttonClassName="my-6 w-full"
-      className="w-full object-cover aspect-[16/9] rounded-xl bg-neutral-900/10 dark:bg-white/10"
+      className="w-full object-cover aspect-[16/9] rounded-xl bg-neutral-900/10 dark:bg-white/10 border border-neutral-200/[0.005] dark:border-white/[0.005]"
       {...props}
     />
   ),
   Video,
+  ImageZoomGallery,
 };

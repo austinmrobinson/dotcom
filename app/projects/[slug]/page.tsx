@@ -11,6 +11,7 @@ import ProjectPageLoading from "./loading";
 import Animate from "@/app/components/animate";
 import ImageZoom, { ImageZoomGallery } from "@/app/components/image";
 import { Metadata } from "next";
+import AuthContext from "@/app/components/authContext";
 
 export async function generateMetadata({
   params,
@@ -35,19 +36,11 @@ export default async function ProjectPage({ params }: any) {
   let projects = await getProjects();
   let project = projects?.find((project) => project.slug === slug);
 
-  const cookiesStore = cookies();
-  const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
-  const isLoggedIn = !!loginCookies?.value;
+  if (!project) return notFound();
 
-  if (!isLoggedIn) {
-    return <PasswordForm />;
-  } else {
-    if (!project) return notFound();
-
-    return (
-      <Suspense
-        fallback={!isLoggedIn ? <PasswordForm /> : <ProjectPageLoading />}
-      >
+  return (
+    <AuthContext>
+      <Suspense fallback={<ProjectPageLoading />}>
         <Animate className="flex flex-col gap-8 sm:gap-12">
           <TopOfPage title={project.title} back="/projects">
             <Text>{`${formatDateMonth(project.date)} • ${project.company} • ${
@@ -57,8 +50,9 @@ export default async function ProjectPage({ params }: any) {
           <ImageZoom
             src={project.thumbnail.src}
             alt={project.thumbnail.alt}
-            className="w-full rounded-none md:rounded-xl bg-neutral-900/10 dark:bg-white/10"
+            className="w-full rounded-none md:rounded-xl bg-neutral-900/10 dark:bg-white/10 border border-neutral-200/[0.005] dark:border-white/[0.005]"
             buttonClassName="max-w-[767px] w-[100vw] self-center"
+            priority
           />
           <PostBody>{project?.body}</PostBody>
           {project.images && (
@@ -75,7 +69,7 @@ export default async function ProjectPage({ params }: any) {
                 Categories
               </Heading>
               {project.categories && (
-                <ul className="flex gap-2">
+                <ul className="flex flex-wrap gap-2">
                   {project.categories.map((category: string, index: number) => (
                     <li
                       className="flex items-center justify-center px-3 py-1 rounded-full bg-neutral-100 border border-neutral-900/5 dark:bg-neutral-100/10 dark:border-neutral-100/5"
@@ -90,6 +84,6 @@ export default async function ProjectPage({ params }: any) {
           )}
         </Animate>
       </Suspense>
-    );
-  }
+    </AuthContext>
+  );
 }

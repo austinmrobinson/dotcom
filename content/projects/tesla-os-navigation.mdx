@@ -1,0 +1,138 @@
+---
+title: Tesla OS Navigation
+date: "2023-04-01T03:23:16.738Z"
+subtitle: Aligning all internal enterprise experiences to one unifiied navigation standard
+slug: tesla-os-navigation
+company: Tesla
+role: Staff UX Designer
+thumbnail: {src: '/projects/tesla-os-navigation/tesla-os-navigation_01.jpg', alt: "Placeholder"}
+categories: ['design systems', 'components', 'web']
+---
+
+## Context
+
+There is an initiative to create an “operating system” of internal web applications, named Tesla OS. This should be many experiences stitched tightly together into one cohesive experience for Tesla employees to use on a daily basis. Every employee's daily work should take place in this operating system, including time tracking, payroll, HR, resource planning, and much more. 
+
+These applications are all built and maintained by different teams across the company, with different reporting structures, tech stacks, and design support. 
+
+At the request of our CIO, I was tasked with creating a consistent navigation experience across all of our applications within the Tesla OS ecosystem. This was the first real proof of concept for the Tesla OS dream, and the intent was to use it as the mechanism to incentivize product teams to align to a single standard for navigation. 
+
+This was TDS' first real enterprise pattern designed from the ground-up. The system began as a set of patterns specific to consumer web experiences. As it has matured, so has its support of enterprise patterns. 
+
+![A crazy diagram with many, many, many apps that is far too complex to see](/projects/tesla-os-navigation/tesla-os-navigation_015.jpg)
+
+There are hundreds of applications in this ecosystem, the image above is just a small snapshot of every app's IA put together, and some of them have even been abbreviated (insert squinting at tiny piece of paper meme).
+
+### Role
+
+I was the sole designer on this project, partnering with design and engineering stakeholders for the products under Tesla OS to gather their feedback and approval on a solution.
+
+### Deliverables
+
+I created four net-new components for this project, including any child components needed. This included: header, side navigation, app switcher, and app layout. I also created a spec for engineering and wrote documentation for the TDS website.
+
+### Timeline
+
+This project took ~2 months from start to finish. Most of that time was spent auditing and going through multiple rounds of revisions and reviews. Like with all of my projects, I was working on other projects concurrently. Once the design was fully approved, engineering implemented and released it the following quarter.
+
+## Audit
+
+To gather all of the variables and clarify the needs of the internal apps at Tesla, I conducted an audit of many apps and hundreds of screens. I discovered more problems than I could've imagined; from legacy products that hadn't been touched in years to brand new products that were using TDS well, they all had issues.
+
+![A collage of applications with disparate navigation structures](/projects/tesla-os-navigation/tesla-os-navigation_02.jpg)
+
+## Problems
+
+- Current navigation in TDS is not scalable enough for the needs of enterprise users, which prevents standardizing navigation experiences within Tesla OS
+- Tesla OS does not feel like one experience
+- Users have a hard time knowing where they are within the operating system
+- Many users need to jump between apps quickly, many bookmark them today
+- Current TDS header & side navigation are not flexible enough for deep nested IA
+- Can't maximize screen real estate (with current persistent TDS side navigation)
+- Current “menu” from TDS header is not efficient or built for enterprise users
+- Need middle slot usage (primarily for global search) without sacrificing navigation
+
+## External Audit
+
+Once I had all of the variables in front of me, I wanted to see if there were any industry-standard solutions that we should consider for this. We wanted to lean on any well-established patterns to prevent reinventing the wheel.
+
+![The Microsoft 365 and Google app switchers side by side](/projects/tesla-os-navigation/tesla-os-navigation_04.jpg)
+
+Some of the key experiences I liked were Google and Microsoft's app switchers and the collapsible side navigation of many tools.
+
+## Goals
+
+- Create a cohesive navigation and enable muscle memory by keeping placement of key elements consistent across apps
+- Enable users to easily switch between apps
+- Support deep nested information architecture
+- Maximize screen real estate 
+
+## Proposal
+
+From here, I developed a proposal that sought to address all of the goals that we aligned on.
+
+![An anatomy look at the Header at the top of the screen with each element inside annotated](/projects/tesla-os-navigation/tesla-os-navigation_05.jpg)
+
+### Key Element Placement
+
+I realized that this pattern needed to be our most opinionated pattern in the system by design. In order to address the needs outlined above, key elements needed to be placed as consistently as possible from one experience to the other. This would allow users to develop muscle memory as they navigated between applications.
+
+Removing navigation from the header was done to enable a more scalable solution in the side navigation.
+
+![A side navigation with a few levels of nesting, down to three in total](/projects/tesla-os-navigation/tesla-os-navigation_06.jpg)
+
+### Side Navigation Nesting
+
+As discovered in the audit, there were many applications with deeply nested information architecture. I wanted to support these levels of nesting at the top end (with the app switcher) and the bottom end (with the side navigation).
+
+<Video src="/projects/tesla-os-navigation/tesla-os-navigation_065.mp4" alt="An animation of the side navigation expanding and collapsing when clicking the hamburger menu" />
+
+### Collapsible Navigation
+
+In order to maximize screen real estate, the side navigation can be collapsed. This allows content to grow to fill available space. The navigation can be set to closed by default in an application if it is needed.
+
+<Video src="/projects/tesla-os-navigation/tesla-os-navigation_07.mp4" alt="An animation of the app switcher opening when clicking on the app name" />
+
+### App Switcher
+
+In order to enable users to switch between applications easier and help address very complex IAs, the app switcher was born. Rather than place it somewhere in the trailing or leading area (like Google and Microsoft do respectively), I proposed that we keep it contextual to the name of the application. This would help with wayfinding within and between applications.
+
+I also proposed a nested second level of navigation within the app switcher to help cover groups of apps under a parent umbrella. While not entirely common, a few complex applications would need this. The users of those applications often switch between apps within the umbrella for the majority of their work, rather than leaving that group. This would make it more efficient for them to get their work done and keep the side navigation of each app in the umbrella less complex.
+
+![A banner sits at the top of the screen, indicating which environment the application is in](/projects/tesla-os-navigation/tesla-os-navigation_08.jpg)
+
+### Environment Banner
+
+It was a common practice for applications to allow users working on the product to switch between environments like stage, QA, and production. I proposed using our banner component to push content down and be hyper clear which environment the user is in, and the inline dropdown component to switch between environments.
+
+### Responsive
+
+Of course, all of this needed to be responsive! The header, side navigation, app switcher, and more.
+
+![A mobile phone with the responsive header](/projects/tesla-os-navigation/tesla-os-navigation_09.jpg)
+
+<ImageZoomGallery images={[{ src: "/projects/tesla-os-navigation/tesla-os-navigation_10.jpg", alt: "Mobile phones with the menu and app switcher mobile versions side by side" }, { src: "/projects/tesla-os-navigation/tesla-os-navigation_11.jpg", alt: "Mobile phones with the search and user profile side by side" }]} />
+
+## Testing
+
+Throughout the process of developing the proposal, I tested it against the screens I gathered in the internal audit. I picked a smaller subset that represented a large variety of scenarios to test against and gathered iterative feedback from the designers that owned them.
+
+Once I felt confident in what I had, it was time to present to stakeholders.
+
+## Implementation + Docs
+
+After many rounds of revision and approval, we landed on a solution that we were happy with!
+
+From there, I put together documentation and a VRT page for engineering and authored documentation for the website.
+
+**Documentation**
+
+- [Overview](../../projects/tesla-os-navigation/documentation/components_tesla-os-navigation.png)
+- [Header](../../projects/tesla-os-navigation/documentation/components_tesla-os-header.png)
+- [Side Navigation](../../projects/tesla-os-navigation/documentation/components_tesla-os-side-navigation.png)
+- [App Switcher](../../projects/tesla-os-navigation/documentation/components_tesla-os-app-switcher.png)
+
+
+## Conclusion & Impact
+
+This project resulted in a unified navigation to share across all experiences under Tesla OS, bringing teams and organizations together under one standard. This solution was delivered to all teams with any tech stack: vanilla HTML, React, and Angular, so that every team had the tools to align to the new Tesla OS direction.
