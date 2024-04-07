@@ -8,6 +8,7 @@ import { Metadata } from "next";
 import { Project } from "../types";
 import PasswordForm from "../components/passwordForm";
 import { cookies } from "next/headers";
+import AuthContext from "../components/authContext";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -23,17 +24,9 @@ export default async function Projects() {
     return +new Date(b.date) - +new Date(a.date);
   });
 
-  const cookiesStore = cookies();
-  const loginCookies = cookiesStore.get(process.env.PASSWORD_COOKIE_NAME!);
-  const isLoggedIn = !!loginCookies?.value;
-
-  if (!isLoggedIn) {
-    return <PasswordForm />;
-  } else {
-    return (
-      <Suspense
-        fallback={!isLoggedIn ? <PasswordForm /> : <ProjectGalleryLoading />}
-      >
+  return (
+    <AuthContext>
+      <Suspense fallback={<ProjectGalleryLoading />}>
         <section className="flex flex-col gap-6">
           <TopOfPage title="Projects" />
           <Animate>
@@ -41,6 +34,6 @@ export default async function Projects() {
           </Animate>
         </section>
       </Suspense>
-    );
-  }
+    </AuthContext>
+  );
 }

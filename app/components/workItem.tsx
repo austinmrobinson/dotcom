@@ -40,7 +40,7 @@ export default function WorkItem({ item, type, skeleton }: WorkItemProps) {
     return (
       <Link
         href={`/${route}/${item.slug}`}
-        className="w-full relative before:absolute before:-inset-3 before:transition-all before:duration-300 before:opacity-0 before:scale-95 before:rounded-3xl hover:before:scale-100 hover:before:opacity-100 hover:before:bg-neutral-900/10"
+        className="w-full relative before:absolute before:-inset-3 before:transition-all before:duration-300 before:opacity-0 before:scale-95 before:rounded-3xl hover:before:scale-100 hover:before:opacity-100 hover:before:bg-neutral-900/10 dark:hover:before:bg-white/10"
       >
         <article className="flex flex-col gap-4 h-full" key={item.slug}>
           <figure className="relative">
