@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const response = NextResponse.redirect(url);
 
-  const passwords = JSON.parse(process.env.PAGE_PASSWORD);
+  const passwords = JSON.parse(process.env.PAGE_PASSWORD!);
 
   if (passwords.includes(password) && !hasCookie) {
     try {

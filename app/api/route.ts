@@ -15,7 +15,7 @@ export async function POST(request: Request, params: { slug: string }) {
     return new Response("Server error");
   }
 
-  const passwords = JSON.parse(process.env.PAGE_PASSWORD);
+  const passwords = JSON.parse(process.env.PAGE_PASSWORD!);
   console.log(passwords);
 
   if (passwords.includes(password)) {
