@@ -11,21 +11,58 @@ categories: ['design systems', 'documentation', 'web']
 
 ## Context
 
-- System started as vanilla HTML only, then expanded to React, React Native and Angular
-- The original website was built solely with vanilla HTML using Handlebars, did not provide code snippets
-- Very difficult to update content, so the content was stale
-- Used Storybook for all React code snippets/demos
-- Difficult to get reproductions or share demos (playground)
-- Documentation was only relevant for the most recent version - leaving many consumers out to dry
-- Wanted something scalable into the future and easy to update
-- Content discoverability issue: lack of search, no prioitized IA, long side nav
+The Tesla Design system was originally built as vanilla HTML only, used as a component library for Tesla.com. From there, it then expanded to React for applications adjacent to Tesla.com. Then, in the following two years, it expanded to React Native and Angular.
+
+Throughout all of these expansions, the website was largely unchanged. For the first three years of the system, it was only updated once or twice annually to link to new migration guides. This was due to the difficulty of updates. The entire website was hand-written in vanilla HTML and did not have any kind of content authoring driving it. It also did not provide code snippets. After awhile, a React Storybook was created, which greatly improved the user experience, but created a second source of truth for users. Many did not know which place they should go to for the latest information.
+
+On top of all of this, the website's IA was a mess (it just had one long scrolling side navigation for all content) and it *did not support search at all*. The design system team answered the same questions daily because users could not self serve in any sort of efficient manner.
 
 ### Role
 
+I was the sole designer on this project, partnering with engineering to build the redesigned website. I also interviewed design, engineering, and product stakeholders that consume the system to gather their feedback.
+
+### Deliverables
+
+I redesigned the website from the ground-up to be a best-in-class demo of the system and address the many issues we faced with the original website. I conducted user interviews, held exercises, and more to properly gather user needs and properly scope them out. In preparation for the launch, I also rewrote 50+ documentation pages and created 1500+ net-new assets that worked for light and dark mode.
+
 ### Timeline
 
-### Scope
+This project took months. The discovery and design phases were short in comparison (~2 months), but I had to advocate over multiple quarters to get this work prioritized.
 
 ## Problems
 
+- Current website was built solely with vanilla HTML, did not provide code snippets for other supported packages
+- Very difficult to update content, so the content was stale
+- Used Storybook for all React code snippets/demos
+- Difficult to get code reproductions or share demos
+- Documentation was only relevant for the most recent version - leaving many consumers not on latest out to dry
+- Content discoverability issue: lack of search, no prioritized IA, long side nav
+- Did not demonstrate some of the features of the system (dark mode, RTL support, etc)
+
 ## Goals
+
+- Create single source of truth for all design system documentation
+- Enable users to find content quickly and easily
+- Allow user to choose their preferred code framework
+- Make content as easy to update as possible, for technical and non-technical users
+- Support website configuration (dark mode, RL)  for user to test the system's features
+
+## Audit & Research
+
+- Fixing IA with Card sorting
+- External audit of other DS websites
+- User interviews
+
+## Proposal
+
+- Updated IA
+- Overview pages & images
+- Search (with keyword matching)
+- Light/dark mode and RTL toggle
+- Framework-specific code snippets, preferred framework selection
+- Playground
+- Version switcher
+
+
+
+- Release email
