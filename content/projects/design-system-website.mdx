@@ -1,11 +1,11 @@
 ---
 title: Design System Website
-date: "2023-05-01T03:23:16.738Z"
+date: 2023-05-01T03:23:16.738Z
 subtitle: Redesigning the TDS website to be a best-in-class demo of the system
 slug: design-system-website
 company: Tesla
 role: Senior UX Designer
-thumbnail: {src: '/placeholder-image.jpg', alt: "Placeholder"}
+thumbnail: {src: '/placeholder-image.jpg', alt: Placeholder}
 categories: ['design systems', 'documentation', 'web']
 ---
 
@@ -16,6 +16,8 @@ The Tesla Design system was originally built as vanilla HTML only, used as a com
 Throughout all of these expansions, the website was largely unchanged. For the first three years of the system, it was only updated once or twice annually to link to new migration guides. This was due to the difficulty of updates. The entire website was hand-written in vanilla HTML and did not have any kind of content authoring driving it. It also did not provide code snippets. After awhile, a React Storybook was created, which greatly improved the user experience, but created a second source of truth for users. Many did not know which place they should go to for the latest information.
 
 On top of all of this, the website's IA was a mess (it just had one long scrolling side navigation for all content) and it *did not support search at all*. The design system team answered the same questions daily because users could not self serve in any sort of efficient manner.
+
+![Placeholder](/placeholder-image.jpg)
 
 ### Role
 
@@ -45,24 +47,78 @@ This project took months. The discovery and design phases were short in comparis
 - Enable users to find content quickly and easily
 - Allow user to choose their preferred code framework
 - Make content as easy to update as possible, for technical and non-technical users
-- Support website configuration (dark mode, RL)  for user to test the system's features
+- Support website configuration (dark mode, RTL)  for user to test the system's features
+
+![Placeholder](/placeholder-image.jpg)
 
 ## Audit & Research
 
-- Fixing IA with Card sorting
-- External audit of other DS websites
-- User interviews
+With the problems and goals established, it was time to dive into the work! The most important place to start was reworking the information architecture to help users find the content they are looking for as easily as possible.
+
+To start, I gathered an inventory of every single page on the existing website, with each page as a card. From there, I conducted a card sort with over ten users with different  functions: designers, engineers, and product managers. This group represented our larger userbase, and the goal was to determine how they would group these topics to help them find this content easier. It was an open card sort, so users could create their own groups and name them.
+
+![Placeholder](/placeholder-image.jpg)
+
+--- some time passed
 
 ## Proposal
 
-- Updated IA
-- Overview pages & images
-- Search (with keyword matching)
-- Light/dark mode and RTL toggle
-- Framework-specific code snippets, preferred framework selection
-- Playground
-- Version switcher
+Once the research and testing were over with, it was time to move into the design phase, creating a new proposed design for the website.
 
+### Improved Discoverability
 
+![Placeholder](/placeholder-image.jpg)
+
+#### Updated IA
+
+The card sort left us with four primary groups: Foundations, Components, Guidelines, and Resources. These top-level groups would help us cut down on the side navigation length and make content discovery easier generally.
+
+![Placeholder](/placeholder-image.jpg)
+
+#### Search
+
+Of course, a documentation website needs search, especially search that can identify aliases and keywords within the docs pages.
+My proposal was a global search in the header, triggered on any page with /, and a search on the homepage as the very first action. This optimized for new and returning users alike. It also features string matching, to help users quickly parse which pages are relevant to their query.
+
+![Placeholder](/placeholder-image.jpg)
+
+#### Overview Pages
+
+Now the overview pages do a better job of setting user expectations and help the user avoid the what is that component called? trap. This use of visuals as language helps new users find what they are looking for, even if they do not have experience with the system.
+
+![Placeholder](/placeholder-image.jpg)
+
+### Framework Selection
+
+As the system has grown to support different technologies, centralizing all documentation and code snippets together means that users will want to look at documentation relevant to the framework they work with most. So, we added a the ability to pick their preferred framework in properties.
+
+Overview and component pages will allow changing this locally to reference other documentation on a session basis if needed.
+
+![Placeholder](/placeholder-image.jpg)
+
+### Version Switcher
+
+Since many of our users are not using the latest version of the system, it is very important to provide them with documentation and code snippets that are relevant to their version. This aids day-to-day development, but also provides a clear path to migrate to newer versions, with version-specific migration guides.
+
+![Placeholder](/placeholder-image.jpg)
+
+### Preferences
+
+We believed that it was very important to demonstrate the power, flexibility, and elegance of the system with the TDS website. It should show users what a best-in-class experience built with the system should look like. This includes demoing key features like light & dark mode and RTL.
+
+![Placeholder](/placeholder-image.jpg)
+![Placeholder](/placeholder-image.jpg)
+
+### Playground
+
+Finally, we wanted to make it as easy as possible to spin up demos built using the system and/or reproductions of bugs. To do this, we extended the code playgrounds used to render and demonstrate code snippets all over the website to be a full-fledged in-browser code editor, using the Monaco editor.
+
+This made it dramatically easier to provide support to users, especially when providing system demos and debugging.
+
+## Release
+
+After everything was completed, we launched the redesigned website and began to gather even more user feedback. The reception was unbelievably positive, and we had many more ideas on how to improve the website in the future!
+
+![Placeholder](/placeholder-image.jpg)
 
 - Release email

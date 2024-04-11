@@ -46,6 +46,9 @@ export const mdxComponents: MDXComponents = {
       {...props}
     />
   ),
+  code: ({ children, ...props }: any) => {
+    return <pre {...props}>{children}</pre>;
+  },
   Video,
   ImageZoomGallery,
 };

@@ -44,12 +44,12 @@ export function Heading({
       lineHeightClass = "h-[1.75rem] sm:h-[1.75rem] lg:h-[1.75rem]";
       break;
     case "h4":
-      sizeClass = "text-sm text-md lg:text-lg";
+      sizeClass = "text-base lg:text-lg";
       skeletonSizeClass = "h-[0.75rem] lg:h-[1rem]";
       lineHeightClass = "h-[1.25rem] lg:h-[1.75rem]";
       break;
     case "h5":
-      sizeClass = "text-sm lg:text-md";
+      sizeClass = "text-sm lg:text-base";
       skeletonSizeClass = "h-[0.75rem]";
       lineHeightClass = "h-[1.25rem]";
       break;
