@@ -1,4 +1,5 @@
 import { useId } from "react";
+import clsx from "clsx";
 
 interface HeadingProps {
   size?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "caption" | undefined;
@@ -64,17 +65,27 @@ export function Heading({
   if (skeleton)
     return (
       <div
-        className={`flex flex-col justify-center animate-pulse ${lineHeightClass}`}
+        className={clsx(
+          "flex flex-col justify-center animate-pulse",
+          lineHeightClass
+        )}
       >
         <span
-          className={`rounded-full bg-neutral-900/15 dark:bg-white/15 ${skeletonSizeClass}`}
+          className={clsx(
+            "rounded-full bg-neutral-900/15 dark:bg-white/15",
+            skeletonSizeClass
+          )}
           style={{ width: skeletonWidth }}
         />
       </div>
     );
   return (
     <Tag
-      className={`font-medium text-neutral-900 dark:text-white ${sizeClass} ${className}`}
+      className={clsx(
+        "font-medium text-neutral-900 dark:text-white",
+        sizeClass,
+        className
+      )}
     >
       {children}
     </Tag>
@@ -140,29 +151,33 @@ export function Text({
   if (skeleton) {
     return (
       <div
-        className={`flex flex-col justify-center animate-pulse ${
-          characters && `w-[${skeletonWidth}px]`
-        } ${lineHeightClass} ${className}`}
+        className={clsx(
+          "flex flex-col justify-center animate-pulse",
+          lineHeightClass,
+          className,
+          {
+            characters: `w-[${skeletonWidth}px]`,
+          }
+        )}
       >
         <span
-          className={`w-full rounded-full bg-neutral-900/15 dark:bg-white/15 ${skeletonSizeClass}`}
+          className={clsx(
+            "w-full rounded-full bg-neutral-900/15 dark:bg-white/15",
+            skeletonSizeClass
+          )}
         />
       </div>
     );
   } else {
     return (
       <Tag
-        className={
-          sizeClass +
-          " " +
-          weightClass +
-          " " +
-          contrastClass +
-          " " +
-          sizeChange +
-          " " +
+        className={clsx(
+          sizeClass,
+          weightClass,
+          contrastClass,
+          sizeChange,
           className
-        }
+        )}
       >
         {children}
       </Tag>
@@ -182,7 +197,7 @@ export function SkeletonMultilineText({
   const id = useId();
 
   return (
-    <div className={`flex flex-col gap-0 min-w-40 ${className}`}>
+    <div className={clsx("flex flex-col gap-0 min-w-40", className)}>
       {[...Array(lines)].map(() => (
         <Text key={id} className="w-full" skeleton />
       ))}
