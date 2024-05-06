@@ -14,7 +14,9 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const response = NextResponse.redirect(url);
 
-  if (password === process.env.PAGE_PASSWORD && !hasCookie) {
+  const passwords = JSON.parse(process.env.PAGE_PASSWORD!);
+
+  if (passwords.includes(password) && !hasCookie) {
     try {
       response.cookies.set(`${process.env.PASSWORD_COOKIE_NAME}`, "true");
       return response;

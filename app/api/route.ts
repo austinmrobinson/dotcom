@@ -15,16 +15,19 @@ export async function POST(request: Request, params: { slug: string }) {
     return new Response("Server error");
   }
 
-  if (process.env.PAGE_PASSWORD !== password) {
+  const passwords = JSON.parse(process.env.PAGE_PASSWORD!);
+  console.log(passwords);
+
+  if (passwords.includes(password)) {
+    return new Response("Password correct", {
+      status: 200,
+      headers: {
+        "Set-Cookie": cookie,
+      },
+    });
+  } else {
     return new Response("Incorrect password", {
       status: 401,
     });
   }
-
-  return new Response("Password correct", {
-    status: 200,
-    headers: {
-      "Set-Cookie": cookie,
-    },
-  });
 }
