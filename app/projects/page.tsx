@@ -6,8 +6,6 @@ import Animate from "../components/animate";
 import ProjectGalleryLoading from "./loading";
 import { Metadata } from "next";
 import AuthContext from "../components/authContext";
-import { sortDesc } from "../utils/sort";
-import { SelectorGroup } from "../components/selector";
 import { Project } from "../types";
 import { Heading, Text } from "../components/text";
 import Button from "../components/button";

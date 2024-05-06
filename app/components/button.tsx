@@ -1,5 +1,6 @@
 import React from "react";
 import Tooltip from "./tooltip";
+import clsx from "clsx";
 
 const { default: Link } = require("next/link");
 
@@ -67,17 +68,13 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
         <Tooltip label={props.label}>
           <Link
             href={props.href}
-            className={
-              baseStyles +
-              " " +
-              variantClass +
-              " " +
-              sizeClass +
-              " " +
-              props.className +
-              " " +
+            className={clsx(
+              baseStyles,
+              variantClass,
+              sizeClass,
+              props.className,
               position
-            }
+            )}
           >
             {props.children}
           </Link>
@@ -90,17 +87,13 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
             onClick={props.onClick}
             type={props.type}
             aria-label={props.label}
-            className={
-              baseStyles +
-              " " +
-              variantClass +
-              " " +
-              sizeClass +
-              " " +
-              props.className +
-              " " +
+            className={clsx(
+              baseStyles,
+              variantClass,
+              sizeClass,
+              props.className,
               position
-            }
+            )}
             ref={ref}
             {...props}
           >
@@ -169,17 +162,13 @@ export default function Button({
     return (
       <Link
         href={href}
-        className={
-          baseStyles +
-          " " +
-          variantClass +
-          " " +
-          sizeClass +
-          " " +
-          className +
-          " " +
+        className={clsx(
+          baseStyles,
+          variantClass,
+          sizeClass,
+          className,
           position
-        }
+        )}
       >
         {children}
       </Link>
@@ -188,17 +177,13 @@ export default function Button({
     return (
       <button
         type={type}
-        className={
-          baseStyles +
-          " " +
-          variantClass +
-          " " +
-          sizeClass +
-          " " +
-          className +
-          " " +
+        className={clsx(
+          baseStyles,
+          variantClass,
+          sizeClass,
+          className,
           position
-        }
+        )}
       >
         {children}
       </button>
