@@ -118,7 +118,7 @@ export default async function Home() {
         <Heading size="h1">Austin Robinson</Heading>
         <Text>
           Hi, I am Austin. I am a self-taught software designer and engineer
-          living in Austin, Texas. Up until recently, I was building the design
+          living in Austin, Texas. Up until recently, I was leading the design
           system at <AustinLink href="https://tesla.com">Tesla</AustinLink>,
           focusing on aligning products across platforms and organizations.
         </Text>
