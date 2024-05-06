@@ -21,7 +21,7 @@ export default function NotFound() {
             <AustinLink href="mailto:austinrobinsondesign@gmail.com">
               Contact me
             </AustinLink>{" "}
-            if you need help
+            if you need help!
           </Text>
         </div>
       </div>
