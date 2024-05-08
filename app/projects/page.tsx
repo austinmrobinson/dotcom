@@ -9,6 +9,7 @@ import AuthContext from "../components/authContext";
 import { Project } from "../types";
 import { Heading, Text } from "../components/text";
 import Button from "../components/button";
+import Copy from "../components/copy";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -60,13 +61,11 @@ export default async function Projects() {
                   like to see more!
                 </Text>
               </div>
-              <Button
-                variant="secondary"
-                size="small"
-                href="mailto:austinrobinsondesign@gmail.com"
-              >
-                Contact
-              </Button>
+              <Copy text="austinrobinsondesign@gmail.com">
+                <Button variant="secondary" size="small">
+                  Contact
+                </Button>
+              </Copy>
             </div>
           </Animate>
         </section>

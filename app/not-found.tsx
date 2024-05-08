@@ -3,6 +3,7 @@ import Button from "@/app/components/button";
 import { Heading, Text } from "@/app/components/text";
 import { Frown } from "react-feather";
 import AustinLink from "./components/link";
+import Copy from "./components/copy";
 
 export default function NotFound() {
   return (
@@ -18,9 +19,9 @@ export default function NotFound() {
           <Text>
             There is no content here. This is probably an error on my end.
             <br></br>
-            <AustinLink href="mailto:austinrobinsondesign@gmail.com">
-              Contact me
-            </AustinLink>{" "}
+            <Copy text="austinrobinsondesign@gmail.com">
+              <AustinLink>Contact me</AustinLink>
+            </Copy>{" "}
             if you need help!
           </Text>
         </div>

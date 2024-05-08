@@ -11,15 +11,17 @@ import getCompanies from "./utils/getCompanies";
 import { Company } from "./types";
 import formatDate from "./utils/formatDate";
 import IconPaperCrowns from "./components/icons/paperCrowns";
+import Copy from "./components/copy";
 
 interface LinkItemProps {
   href?: string;
   leading: string;
   caption?: string;
   trailing?: string;
+  copy?: boolean;
 }
 
-function LinkItem({ href, leading, caption, trailing }: LinkItemProps) {
+function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
   let icon: React.ReactNode;
 
   switch (leading) {
@@ -75,6 +77,35 @@ function LinkItem({ href, leading, caption, trailing }: LinkItemProps) {
         </Text>
       </Link>
     );
+  } else if (copy) {
+    return (
+      <div
+        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl relative hover:before:bg-neutral-900/10 dark:hover:before:bg-white/10
+        before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-xl"
+      >
+        <div className="flex grow gap-3 items-center">
+          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+            {icon}
+          </span>
+          <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
+            <div className="flex grow">
+              <Heading size="h6" as="h4" className="grow sm:grow-0">
+                {leading}
+              </Heading>
+              {/* Mobile */}
+              <Text className="block sm:hidden tabular-nums min-w-[78px] truncate max-w-full">
+                {trailing}
+              </Text>
+            </div>
+            {caption && <Text className="truncate max-w-full">{caption}</Text>}
+          </div>
+        </div>
+        {/* Not Mobile */}
+        <Text className="hidden sm:block tabular-nums min-w-[78px]">
+          {trailing}
+        </Text>
+      </div>
+    );
   } else {
     return (
       <li className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl">
@@ -118,9 +149,10 @@ export default async function Home() {
         <Heading size="h1">Austin Robinson</Heading>
         <Text>
           Hi, I am Austin. I am a self-taught software designer and engineer
-          living in Austin, Texas. Up until recently, I was leading the design
-          system at <AustinLink href="https://tesla.com">Tesla</AustinLink>,
-          focusing on aligning products across platforms and organizations.
+          living in Austin, Texas. <br></br>Up until recently, I was leading the
+          design system at{" "}
+          <AustinLink href="https://tesla.com">Tesla</AustinLink>, focusing on
+          aligning products across platforms and organizations.
         </Text>
         <Text>
           Before my time at Tesla, I led design for the design system at{" "}
@@ -173,11 +205,13 @@ export default async function Home() {
             leading="LinkedIn"
             trailing="robinsonaustin"
           />
-          <LinkItem
-            href="mailto:austinrobinsondesign@gmail.com"
-            leading="Email"
-            trailing="austinrobinsondesign@gmail.com"
-          />
+          <Copy text="austinrobinsondesign@gmail.com">
+            <LinkItem
+              copy
+              leading="Email"
+              trailing="austinrobinsondesign@gmail.com"
+            />
+          </Copy>
         </div>
       </section>
     </div>
