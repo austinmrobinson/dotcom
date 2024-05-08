@@ -6,6 +6,7 @@ import Button from "./button";
 import { Heading, Text } from "./text";
 import { Lock } from "react-feather";
 import Animate from "./animate";
+import Copy from "./copy";
 
 export default function PasswordForm() {
   const [password, setPassword] = useState("");
@@ -58,9 +59,11 @@ export default function PasswordForm() {
         />
         <Button type="submit">Submit</Button>
       </form>
-      <Button href="mailto:austinrobinsondesign@gmail.com" variant="text">
-        Request Access
-      </Button>
+      <Copy text="austinrobinsondesign@gmail.com">
+        <Button as="div" variant="text">
+          Request Access
+        </Button>
+      </Copy>
     </Animate>
   );
 }

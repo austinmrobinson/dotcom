@@ -14,6 +14,7 @@ interface ButtonProps {
   type?: "submit" | "reset" | "button" | undefined;
   onClick?: any;
   disabled?: boolean;
+  as?: keyof JSX.IntrinsicElements;
 }
 
 interface IconButtonProps extends ButtonProps {
@@ -113,6 +114,7 @@ export default function Button({
   className,
   absolute,
   type,
+  as,
   ...rest
 }: ButtonProps) {
   let variantClass;
@@ -158,6 +160,8 @@ export default function Button({
 
   const position = absolute === true ? "absolute" : "relative";
 
+  const Tag = as!;
+
   if (href) {
     return (
       <Link
@@ -172,6 +176,20 @@ export default function Button({
       >
         {children}
       </Link>
+    );
+  } else if (as) {
+    return (
+      <Tag
+        className={clsx(
+          baseStyles,
+          variantClass,
+          sizeClass,
+          className,
+          position
+        )}
+      >
+        {children}
+      </Tag>
     );
   } else {
     return (
