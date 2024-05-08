@@ -4,6 +4,7 @@ import * as RadixTooltip from "@radix-ui/react-tooltip";
 import { Text } from "./text";
 import { useState } from "react";
 import { AlertCircle, Check } from "react-feather";
+import { useCopyToClipboard } from "usehooks-ts";
 
 interface TooltipProps {
   children: React.ReactNode;
@@ -11,49 +12,32 @@ interface TooltipProps {
 }
 
 export default function Copy({ children, text }: TooltipProps) {
+  const [copiedText, copy] = useCopyToClipboard();
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState(false);
 
   async function copyToClipboard(text: string) {
-    try {
-      const permissions = await navigator.permissions.query({
-        // @ts-expect-error
-        name: "clipboard-write",
-      });
-
-      if (permissions.state === "granted" || permissions.state === "prompt") {
-        await navigator.clipboard.writeText(text);
-        console.log("Text copied to clipboard!");
-      } else {
+    copy(text)
+      .then(() => {
+        setCopied(true);
+        console.log("Copied!", { text });
+        setTimeout(() => {
+          setCopied(false);
+        }, 2400);
+      })
+      .catch((error) => {
         setError(true);
-        console.log(
-          "Can't access the clipboard. Check your browser permissions."
-        );
-      }
-    } catch (error) {
-      console.log(
-        "Can't access the clipboard. Check your browser permissions."
-      );
-      setError(true);
-    }
-  }
-
-  async function copy(text: string) {
-    try {
-      await copyToClipboard(text);
-      setCopied(true);
-      setTimeout(() => {
-        setCopied(false);
-      }, 2400);
-    } catch {
-      setError(true);
-    }
+        console.error("Failed to copy!", error);
+      });
   }
 
   return (
     <RadixTooltip.Provider>
       <RadixTooltip.Root open={copied}>
-        <RadixTooltip.Trigger onClick={() => copy(text)} className="text-start">
+        <RadixTooltip.Trigger
+          onClick={() => copyToClipboard(text)}
+          className="text-start"
+        >
           {children}
         </RadixTooltip.Trigger>
         <RadixTooltip.Portal>
