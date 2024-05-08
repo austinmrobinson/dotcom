@@ -26,12 +26,14 @@ export default function Copy({ children, text }: TooltipProps) {
         console.log("Text copied to clipboard!");
       } else {
         setError(true);
-        throw new Error(
+        console.log(
           "Can't access the clipboard. Check your browser permissions."
         );
       }
     } catch (error) {
-      console.log("Error copying to clipboard");
+      console.log(
+        "Can't access the clipboard. Check your browser permissions."
+      );
       setError(true);
     }
   }
