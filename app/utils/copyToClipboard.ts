@@ -13,6 +13,6 @@ export default async function copyToClipboard(text: string) {
       );
     }
   } catch (error) {
-    alert("Error copying to clipboard: " + error);
+    alert("Error copying to clipboard");
   }
 }
