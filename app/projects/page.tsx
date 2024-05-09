@@ -61,7 +61,7 @@ export default async function Projects() {
                   like to see more!
                 </Text>
               </div>
-              <Copy text="austinrobinsondesign@gmail.com">
+              <Copy text="austinrobinsondesign@gmail.com" type="Email">
                 <Button as="div" variant="secondary" size="small">
                   Contact
                 </Button>

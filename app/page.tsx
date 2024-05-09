@@ -205,7 +205,7 @@ export default async function Home() {
             leading="LinkedIn"
             trailing="robinsonaustin"
           />
-          <Copy text="austinrobinsondesign@gmail.com">
+          <Copy text="austinrobinsondesign@gmail.com" type="Email">
             <LinkItem
               copy
               leading="Email"

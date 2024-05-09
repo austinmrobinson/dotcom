@@ -9,9 +9,10 @@ import { useCopyToClipboard } from "usehooks-ts";
 interface TooltipProps {
   children: React.ReactNode;
   text: string;
+  type?: string;
 }
 
-export default function Copy({ children, text }: TooltipProps) {
+export default function Copy({ children, text, type }: TooltipProps) {
   const [copiedText, copy] = useCopyToClipboard();
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState(false);
@@ -51,7 +52,7 @@ export default function Copy({ children, text }: TooltipProps) {
                 size={12}
                 strokeWidth={3}
               />
-              <Text size="caption">Copied to Clipboard</Text>
+              <Text size="caption">Copied{type && ` ${type}`}</Text>
             </RadixTooltip.Content>
           ) : (
             <RadixTooltip.Content

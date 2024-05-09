@@ -59,7 +59,7 @@ export default function PasswordForm() {
         />
         <Button type="submit">Submit</Button>
       </form>
-      <Copy text="austinrobinsondesign@gmail.com">
+      <Copy text="austinrobinsondesign@gmail.com" type="Email">
         <Button as="div" variant="text">
           Request Access
         </Button>
