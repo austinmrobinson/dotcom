@@ -19,7 +19,7 @@ export default function NotFound() {
           <Text>
             There is no content here. This is probably an error on my end.
             <br></br>
-            <Copy text="austinrobinsondesign@gmail.com">
+            <Copy text="austinrobinsondesign@gmail.com" type="Email">
               <AustinLink>Contact me</AustinLink>
             </Copy>{" "}
             if you need help!

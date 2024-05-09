@@ -48,7 +48,7 @@ export default function Copy({ children, text, type }: TooltipProps) {
               sideOffset={4}
             >
               <Check
-                className="text-green-500 dark:text-green-300"
+                className="text-green-300 dark:text-green-500"
                 size={12}
                 strokeWidth={3}
               />
@@ -60,7 +60,7 @@ export default function Copy({ children, text, type }: TooltipProps) {
               sideOffset={4}
             >
               <AlertCircle
-                className="text-red-500 dark:text-red-300"
+                className="text-red-300 dark:text-red-500"
                 size={12}
                 strokeWidth={3}
               />
