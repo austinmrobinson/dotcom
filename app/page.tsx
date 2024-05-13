@@ -5,7 +5,14 @@ import Link from "next/link";
 import AustinLink from "./components/link";
 import IconTesla from "./components/icons/tesla";
 import IconHP from "./components/icons/hp";
-import { Hexagon, Linkedin, Mail, Twitter } from "react-feather";
+import {
+  Box,
+  Briefcase,
+  Hexagon,
+  Linkedin,
+  Mail,
+  Twitter,
+} from "react-feather";
 import ImageZoom from "./components/image";
 import getCompanies from "./utils/getCompanies";
 import { Company } from "./types";
@@ -175,6 +182,22 @@ export default async function Home() {
           View Work
         </Button>
       </section>
+      <div className="px-5 py-4 sm:px-7 sm:py-6 rounded-xl flex flex-col gap-2 sm:gap-3 border-2 border-neutral-900/5 dark:border-white/5 items-start">
+        <div className="flex flex-col gap-1">
+          <Heading size="h4" as="h2">
+            Open to Work
+          </Heading>
+          <Text>
+            I am looking for design and design engineering roles. I have
+            extensive experience building and leading design systems.
+          </Text>
+        </div>
+        <Copy text="austinrobinsondesign@gmail.com" type="Email">
+          <Button as="div" variant="secondary" size="small">
+            Contact
+          </Button>
+        </Copy>
+      </div>
       <section id="history" className="flex flex-col gap-4 sm:gap-5">
         <div className="flex gap-2 justify-between items-center">
           <Heading size="h3">History</Heading>
