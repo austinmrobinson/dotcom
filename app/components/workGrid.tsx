@@ -24,6 +24,7 @@ export function SkeletonWorkGrid() {
     date: "",
     subtitle: "",
     slug: "",
+    published: true,
     thumbnail: { src: "", alt: "" },
   };
 
