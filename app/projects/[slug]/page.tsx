@@ -34,7 +34,9 @@ export default async function ProjectPage({ params }: any) {
   const { slug } = params;
 
   let projects = await getProjects();
-  let project = projects?.find((project) => project.slug === slug);
+  let project = projects
+    ?.filter((project) => project.published === true)
+    .find((project) => project.slug === slug);
 
   if (!project) return notFound();
 
