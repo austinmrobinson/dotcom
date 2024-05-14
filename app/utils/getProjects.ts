@@ -27,10 +27,6 @@ export const getProjects = cache(async () => {
           const postContent = await fs.readFile(filePath, "utf8");
           const { data, content } = matter(postContent);
 
-          if (data.published === false) {
-            return null;
-          }
-
           return { ...data, body: content } as any;
         })
     );

@@ -28,6 +28,7 @@ export type Project = {
   date: string;
   subtitle: string;
   slug: string;
+  published: boolean;
   company?: Company;
   role?: string;
   categories?: Category[];

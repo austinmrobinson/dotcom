@@ -18,29 +18,12 @@ export const metadata: Metadata = {
 export default async function Projects() {
   const projects = await getProjects();
 
-  // let selectedCategory: any;
-
-  // let filteredProjects = projects;
-  // // If "all" -> show all, else -> filter
-  // switch (selectedCategory) {
-  //   case "all":
-  //     filteredProjects = projects;
-  //     break;
-  //   default:
-  //     filteredProjects = projects?.filter((project) =>
-  //       project?.categories?.some(
-  //         (category: string) => category === selectedCategory
-  //       )
-  //     );
-  //     break;
-  // }
-  // // Sorts projects newest -> oldest
-  // const sortedProjects = sortDesc(filteredProjects);
-
   let sortedProjects: Project[] | undefined;
-  sortedProjects = projects?.sort((a, b) => {
-    return +new Date(b.date) - +new Date(a.date);
-  });
+  sortedProjects = projects
+    ?.filter((project: Project) => project.published === true)
+    .sort((a, b) => {
+      return +new Date(b.date) - +new Date(a.date);
+    });
 
   return (
     <AuthContext>
