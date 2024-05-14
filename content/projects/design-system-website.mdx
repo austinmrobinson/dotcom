@@ -12,13 +12,7 @@ categories: ['design systems', 'documentation', 'web', 'product design']
 
 ## Context
 
-The Tesla Design System was originally built as vanilla HTML only, used as a component library for Tesla.com. From there, it then expanded to React for applications adjacent to Tesla.com. Then, in the following two years, it expanded to React Native and Angular.
-
-Throughout all of these expansions, the website was largely unchanged. For the first three years of the system, it was only updated once or twice annually to link to new migration guides. This was due to the difficulty of updates. The entire website was hand-written in vanilla HTML and did not have any kind of content authoring driving it. It also did not provide code snippets. After awhile, a React Storybook was created, which greatly improved the user experience, but created a second source of truth for users. Many did not know which place they should go to for the latest information.
-
-![A side by side of desktop/mobile on the existing website](/projects/tds-website/tds-website_01.jpg)
-
-On top of all of this, the website's IA was a mess (it just had one long scrolling side navigation for all content) and it *did not support search at all*. The design system team answered the same questions daily because users could not self serve in any sort of efficient manner.
+The Tesla Design System was originally built as vanilla HTML only, used as a component library for Tesla.com. From there, it then expanded to React for applications adjacent to Tesla.com. Then, in the following two years, it expanded to React Native and Angular. The TDS website (design.tesla.com) was born during this time period as a source of truth for users to learn more about the system and best practices for using it.
 
 ### Role
 
@@ -32,6 +26,12 @@ I redesigned the website from the ground-up to be a best-in-class demo of the sy
 
 This project took months. The discovery and design phases were short in comparison (~2 months), but I had to advocate over multiple quarters to get this work prioritized.
 
+### Personas
+
+The key users that we're focused on are designers & engineers (both new & existing), with consideration for the smaller subset of product managers and executives.
+
+![Designer, engineer, and other personas with their corresponding icons](/projects/tds-website/tds-website_18.jpg)
+
 ## Problems
 
 - Current website was built solely with vanilla HTML, did not provide code snippets for other supported packages
@@ -40,29 +40,16 @@ This project took months. The discovery and design phases were short in comparis
 - Difficult to get code reproductions or share demos
 - Documentation was only relevant for the most recent version - leaving many consumers not on latest out to dry
 - Content discoverability issue: lack of search, no prioritized IA, long side nav
-- Did not demonstrate some of the features of the system (dark mode, RTL support, etc)
+- Did not demonstrate some of the features of the system (dark mode, RTL support, and more)
 
-## Goals
+![A side by side of desktop/mobile on the existing website](/projects/tds-website/tds-website_01.jpg)
 
-- Create single source of truth for all design system documentation
-- Enable users to find content quickly and easily
-- Allow user to choose their preferred code framework
-- Make content as easy to update as possible, for technical and non-technical users
-- Support website configuration (dark mode, RTL)  for user to test the system's features
+## Solution
 
-## Audit & Research
-
-With the problems and goals established, it was time to dive into the work! The most important place to start was reworking the information architecture to help users find the content they are looking for as easily as possible.
-
-To start, I gathered an inventory of every single page on the existing website, with each page as a card. From there, I conducted a card sort with over ten users with different  functions: designers, engineers, and product managers. This group represented our larger userbase, and the goal was to determine how they would group these topics to help them find this content easier. It was an open card sort, so users could create their own groups and name them.
-
-![A similarity matrix of all of the different topics](/projects/tds-website/tds-website_02.jpg)
-
-This resulted in a similarity matrix that made it very easy to understand how most users thought about these topics and what their mental model for interacting with the website was.
-
-## Proposal
-
-Once the research and testing were over with, it was time to move into the design phase, creating a new proposed design for the website.
+- Redesigned homepage
+- Improved discoverability
+- Support user preferences
+- New code playground
 
 ### Redesigned Homepage
 
@@ -72,15 +59,23 @@ In tandem with improving discoverability, I redesigned the homepage to direct ne
 
 ### Improved Discoverability
 
-![Groups of topics](/projects/tds-website/tds-website_03.jpg)
+To start, I gathered an inventory of every single page on the existing website, with each page as a card. From there, I conducted a card sort with over ten users with different  functions: designers, engineers, and product managers. This group represented our larger userbase, and the goal was to determine how they would group these topics to help them find this content easier. It was an open card sort, so users could create their own groups and name them.
 
-The card sort left us with four primary groups: Foundations, Components, Guidelines, and Resources. These were determined based on the most common responses in the card sort.
+![A similarity matrix of all of the different topics](/projects/tds-website/tds-website_02.jpg)
+
+This resulted in a similarity matrix that made it very easy to understand how most users thought about these topics and what their mental model for interacting with the website was. It also resulted in four primary groups: Foundations, Components, Guidelines, and Resources.
 
 ![Top-level categories in the header](/projects/tds-website/tds-website_05.jpg)
 
 These top-level groups would also help us cut down on the side navigation length and make content discovery easier generally.
 
 ![Shorter side navigation](/projects/tds-website/tds-website_04.jpg)
+
+#### Overview Pages
+
+Now the overview pages do a better job of setting user expectations and help the user avoid the "now what is that component called?" trap. This use of visuals as language helps new users find what they are looking for, even if they do not have experience with the system.
+
+![A grid of results under "Components" with images for each component](/projects/tds-website/tds-website_07.jpg)
 
 #### Search
 
@@ -89,33 +84,23 @@ My proposal was a global search in the header, triggered on any page with "/", a
 
 ![A search field with "Button" results](/projects/tds-website/tds-website_06.jpg)
 
-#### Overview Pages
-
-Now the overview pages do a better job of setting user expectations and help the user avoid the "now what is that component called?" trap. This use of visuals as language helps new users find what they are looking for, even if they do not have experience with the system.
-
-![A grid of results under "Components" with images for each component](/projects/tds-website/tds-website_07.jpg)
-
-### Framework Selection
-
-As the system has grown to support different technologies, centralizing all documentation and code snippets together means that users will want to look at documentation relevant to the framework they work with most. So, we added a the ability to pick their preferred framework in properties.
-
-Overview and component pages will allow changing this locally to reference other documentation on a session basis if needed.
-
-![A selector to choose a given framework](/projects/tds-website/tds-website_08.jpg)
-
-### Version Switcher
-
-Since many of our users are not using the latest version of the system, it is very important to provide them with documentation and code snippets that are relevant to their version. This aids day-to-day development, but also provides a clear path to migrate to newer versions, with version-specific migration guides.
-
-![A dropdown to choose a version of the system ot view](/projects/tds-website/tds-website_09.jpg)
-
 ### Preferences
 
-We believed that it was very important to demonstrate the power, flexibility, and elegance of the system with the TDS website. It should show users what a best-in-class experience built with the system should look like. This includes demoing key features like light & dark mode and RTL.
+We believed that it was very important to demonstrate the power, flexibility, and elegance of the system with the TDS website. It should show users what a best-in-class experience built with the system should look like. This includes demoing key features like light & dark mode, RTL, version switching, and framework selection.
 
 ![A preferences panel with options for appearance, language direction, and framework](/projects/tds-website/tds-website_11.jpg)
 
-![A group of options for "appearance", with dark mode selected](/projects/tds-website/tds-website_10.jpg)
+<ImageZoomGallery images={[{src: '/projects/tds-website/tds-website_10.jpg', alt: 'A group of options for "appearance", with dark mode selected'},{src: '/projects/tds-website/tds-website_08.jpg', alt: 'A selector to choose a given framework'},{src: '/projects/tds-website/tds-website_09.jpg', alt: 'A dropdown to choose a version of the system ot view", with dark mode selected'}]} />
+
+#### Framework Selection
+
+Centralizing all documentation and code snippets together means that users will want to look at documentation relevant to the framework they work with most. So, we added a the ability to pick their preferred framework in properties.
+
+Overview and component pages will allow changing this locally to reference other documentation on a session basis if needed.
+
+#### Version Switcher
+
+Since many of our users are not using the latest version of the system, it is very important to provide them with documentation and code snippets that are relevant to their version. This aids day-to-day development, but also provides a clear path to migrate to newer versions, with version-specific migration guides.
 
 ### Playground
 
@@ -133,12 +118,12 @@ With the new website, I also rewrote 50+ documentation pages and created 1500+ n
 
 For the assets, I redesigned all of them across the entire website to use a style that was more "evergreen", enabling less maintenance to update them regularly as products/standards changed. Instead, they focused users on concepts and fundamentals rather than a design that was 1:1 with an ever-changing product. And of course, they needed to work in dark mode! After over 1500 of these.. I was starting to see double.
 
-## Release
+## Conclusion & Impact
 
 After everything was completed, we launched the redesigned website with an email to all of our consumers. 
 
 ![An email sent from Austin to all consumers of the system](/projects/tds-website/tds-website_13.jpg)
 
-From there, we began to gather even more user feedback. The reception was unbelievably positive, and we had many more ideas on how to improve the website in the future!
+The redesigned website was incredibly positive. It resulted in increases across the board - more user visits and longer visits (with more pages visited per visit).
 
 ![The final website, with the redesigned homepage](/projects/tds-website/tds-website_14.jpg)
