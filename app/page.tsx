@@ -182,7 +182,8 @@ export default async function Home() {
           View Work
         </Button>
       </section>
-      <div className="px-5 py-4 sm:px-7 sm:py-6 rounded-xl flex flex-col gap-2 sm:gap-3 border-2 border-neutral-900/5 dark:border-white/5 items-start">
+      {/* Open to work */}
+      {/* <div className="px-5 py-4 sm:px-7 sm:py-6 rounded-xl flex flex-col gap-2 sm:gap-3 border-2 border-neutral-900/5 dark:border-white/5 items-start">
         <div className="flex flex-col gap-1">
           <Heading size="h4" as="h2">
             Open to Work
@@ -197,7 +198,7 @@ export default async function Home() {
             Contact
           </Button>
         </Copy>
-      </div>
+      </div> */}
       <section id="history" className="flex flex-col gap-4 sm:gap-5">
         <div className="flex gap-2 justify-between items-center">
           <Heading size="h3">History</Heading>
