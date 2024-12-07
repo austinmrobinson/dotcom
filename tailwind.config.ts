@@ -16,6 +16,10 @@ const config: Config = {
       ...defaultTheme.screens,
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-geist-sans)"],
+        mono: ["var(--font-geist-mono)"],
+      },
       keyframes: {
         overlayShow: {
           from: { opacity: "0" },

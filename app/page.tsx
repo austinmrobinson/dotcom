@@ -1,24 +1,16 @@
-import Image from "next/image";
 import Button from "./components/button";
 import { Heading, Text } from "./components/text";
 import Link from "next/link";
 import AustinLink from "./components/link";
 import IconTesla from "./components/icons/tesla";
 import IconHP from "./components/icons/hp";
-import {
-  Box,
-  Briefcase,
-  Hexagon,
-  Linkedin,
-  Mail,
-  Twitter,
-} from "react-feather";
-import ImageZoom from "./components/image";
+import { Hexagon, Linkedin, Mail, Twitter } from "react-feather";
 import getCompanies from "./utils/getCompanies";
 import { Company } from "./types";
 import formatDate from "./utils/formatDate";
 import IconPaperCrowns from "./components/icons/paperCrowns";
 import Copy from "./components/copy";
+import IconNominal from "./components/icons/nominal";
 
 interface LinkItemProps {
   href?: string;
@@ -32,6 +24,9 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
   let icon: React.ReactNode;
 
   switch (leading) {
+    case "Nominal":
+      icon = <IconNominal />;
+      break;
     case "Tesla":
       icon = <IconTesla />;
       break;
@@ -156,13 +151,17 @@ export default async function Home() {
         <Heading size="h1">Austin Robinson</Heading>
         <Text>
           Hi, I am Austin. I am a self-taught software designer and engineer
-          living in Austin, Texas. <br></br>Up until recently, I was leading the
-          design system at{" "}
+          living in Austin, Texas. <br></br>I am currently a design engineer at{" "}
+          <AustinLink href="https://nominal.io">Nominal</AustinLink>, where
+          we're building software to accelerate hardware testing.
+        </Text>
+        <Text>
+          Before Nominal, I was leading the design system at{" "}
           <AustinLink href="https://tesla.com">Tesla</AustinLink>, focusing on
           aligning products across platforms and organizations.
         </Text>
         <Text>
-          Before my time at Tesla, I led design for the design system at{" "}
+          Before Tesla, I led design for the design system at{" "}
           <AustinLink href="https://hp.com">HP</AustinLink>. Our team worked on
           a ground-up redesign that scaled the system across the company and to
           multiple platforms.

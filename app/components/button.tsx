@@ -1,6 +1,7 @@
 import React from "react";
 import Tooltip from "./tooltip";
 import clsx from "clsx";
+import { cn } from "../utils/cn";
 
 const { default: Link } = require("next/link");
 
@@ -166,13 +167,7 @@ export default function Button({
     return (
       <Link
         href={href}
-        className={clsx(
-          baseStyles,
-          variantClass,
-          sizeClass,
-          className,
-          position
-        )}
+        className={cn(baseStyles, variantClass, sizeClass, className, position)}
       >
         {children}
       </Link>
