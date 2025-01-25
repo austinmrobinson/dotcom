@@ -44,7 +44,7 @@ export default function Copy({ children, text, type }: TooltipProps) {
         <RadixTooltip.Portal>
           {!error ? (
             <RadixTooltip.Content
-              className="z-50 flex gap-1 items-center select-none rounded-full bg-neutral-900 dark:bg-white px-2 py-[2px]  will-change-[transform,opacity] text-white dark:text-neutral-900"
+              className="z-50 flex gap-1 items-center select-none rounded-[3px] bg-yellow-1050 dark:bg-yellow-50 px-2 py-[2px]  will-change-[transform,opacity] text-yellow-50 dark:text-yellow-1050"
               sideOffset={4}
             >
               <Check
@@ -56,7 +56,7 @@ export default function Copy({ children, text, type }: TooltipProps) {
             </RadixTooltip.Content>
           ) : (
             <RadixTooltip.Content
-              className="z-50 flex gap-1 items-center select-none rounded-full bg-neutral-900 dark:bg-white px-2 py-[2px]  will-change-[transform,opacity] text-white dark:text-neutral-900"
+              className="z-50 flex gap-1 items-center select-none rounded-[3px] bg-yellow-1050 dark:bg-yellow-50 px-2 py-[2px]  will-change-[transform,opacity] text-yellow-50 dark:text-yellow-1050"
               sideOffset={4}
             >
               <AlertCircle

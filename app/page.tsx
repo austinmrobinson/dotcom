@@ -53,11 +53,11 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
     return (
       <Link
         href={href}
-        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl relative hover:before:bg-neutral-900/10 dark:hover:before:bg-white/10
-        before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-xl"
+        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-[3px] relative hover:before:bg-yellow-1050/10 dark:hover:before:bg-yellow-50/10
+        before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-[3px]"
       >
         <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-[3px] border border-yellow-1050/10 dark:border-yellow-50/10">
             {icon}
           </span>
           <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
@@ -66,7 +66,7 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
                 {leading}
               </Heading>
               {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[78px] truncate max-w-full">
+              <Text className="block sm:hidden min-w-[78px] truncate max-w-full">
                 {trailing}
               </Text>
             </div>
@@ -74,19 +74,17 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
           </div>
         </div>
         {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[78px]">
-          {trailing}
-        </Text>
+        <Text className="hidden sm:block min-w-[78px]">{trailing}</Text>
       </Link>
     );
   } else if (copy) {
     return (
       <div
-        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl relative hover:before:bg-neutral-900/10 dark:hover:before:bg-white/10
-        before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-xl"
+        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-[3px] relative hover:before:bg-yellow-1050/10 dark:hover:before:bg-yellow-50/10
+        before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-[3px]"
       >
         <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-[3px] border border-yellow-1050/10 dark:border-yellow-50/10">
             {icon}
           </span>
           <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
@@ -95,7 +93,7 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
                 {leading}
               </Heading>
               {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[78px] truncate max-w-full">
+              <Text className="block sm:hidden tabular-nums min-w-[78px] font-mono truncate max-w-full">
                 {trailing}
               </Text>
             </div>
@@ -103,16 +101,16 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
           </div>
         </div>
         {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[78px]">
+        <Text className="hidden sm:block tabular-nums min-w-[78px] font-mono">
           {trailing}
         </Text>
       </div>
     );
   } else {
     return (
-      <li className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl">
+      <li className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-[3px]">
         <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-[3px] border border-yellow-1050/10 dark:border-yellow-50/10">
             {icon}
           </span>
           <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
@@ -121,7 +119,7 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
                 {leading}
               </Heading>
               {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[78px] truncate max-w-full">
+              <Text className="block sm:hidden tabular-nums min-w-[78px] font-mono truncate max-w-full">
                 {trailing}
               </Text>
             </div>
@@ -129,7 +127,7 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
           </div>
         </div>
         {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[78px]">
+        <Text className="hidden sm:block tabular-nums min-w-[78px] font-mono">
           {trailing}
         </Text>
       </li>
@@ -142,7 +140,16 @@ export default async function Home() {
 
   let sortedCompanies: Company[] | undefined;
   sortedCompanies = companies?.sort((a, b) => {
-    return +new Date(b.startingDate) - +new Date(a.startingDate);
+    // If both have no end date, sort by starting date (newest first)
+    if (!a.endingDate && !b.endingDate) {
+      return +new Date(b.startingDate) - +new Date(a.startingDate);
+    }
+    // If a has no end date, it should come first
+    if (!a.endingDate) return -1;
+    // If b has no end date, it should come first
+    if (!b.endingDate) return 1;
+    // Otherwise sort by ending date (most recent first)
+    return +new Date(b.endingDate) - +new Date(a.endingDate);
   });
 
   return (
@@ -182,7 +189,7 @@ export default async function Home() {
         </Button>
       </section>
       {/* Open to work */}
-      {/* <div className="px-5 py-4 sm:px-7 sm:py-6 rounded-xl flex flex-col gap-2 sm:gap-3 border-2 border-neutral-900/5 dark:border-white/5 items-start">
+      {/* <div className="px-5 py-4 sm:px-7 sm:py-6 rounded-[3px] flex flex-col gap-2 sm:gap-3 border-2 border-yellow-1050/605 dark:border-yellow-50/5 items-start">
         <div className="flex flex-col gap-1">
           <Heading size="h4" as="h2">
             Open to Work
@@ -203,16 +210,21 @@ export default async function Home() {
           <Heading size="h3">History</Heading>
         </div>
         <ul className="flex flex-col gap-4">
-          {sortedCompanies?.map((company: Company) => (
-            <LinkItem
-              key={company.slug}
-              leading={company.title}
-              caption={company.roles[company.roles.length - 1].title}
-              trailing={`${formatDate(company.startingDate)}–${
-                company.endingDate ? formatDate(company.endingDate) : "Present"
-              }`}
-            />
-          ))}
+          {sortedCompanies?.map((company: Company) => {
+            const startDate = formatDate(company.startingDate);
+            const endDate = company.endingDate
+              ? formatDate(company.endingDate).replace(/^20/, "") // Remove leading "20" from end date
+              : "\u00A0\u00A0";
+
+            return (
+              <LinkItem
+                key={company.slug}
+                leading={company.title}
+                caption={company.roles[company.roles.length - 1].title}
+                trailing={`${startDate}–${endDate}`}
+              />
+            );
+          })}
         </ul>
       </section>
       <section id="contact" className="flex flex-col gap-4 sm:gap-5">

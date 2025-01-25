@@ -2,7 +2,6 @@ import { Eye, EyeOff } from "react-feather";
 import { IconButton } from "./button";
 import { Text } from "./text";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { useState } from "react";
 import clsx from "clsx";
 
 export default function TextInput({
@@ -38,10 +37,11 @@ export default function TextInput({
           onChange={onChange}
           data-1p-ignore
           className={clsx(
-            "w-full h-10 px-4 py-2.5 border-2 bg-neutral-900/[0.05] dark:bg-white/[0.05] flex text-base sm:text-sm rounded-full font-medium text-neutral-900 dark:text-white",
+            "w-full h-10 px-4 py-2.5 border-2 placeholder:text-yellow-1050/60 dark:placeholder:text-yellow-50/50 bg-yellow-1050/60 dark:bg-yellow-50/[0.05] flex text-base sm:text-sm rounded-[3px] font-medium text-yellow-1050 dark:text-yellow-50",
             className,
             error ? "border-red-600 dark:border-red-400" : "border-transparent"
           )}
+          {...rest}
         />
         {trailing && <div className="absolute right-1 top-1">{trailing}</div>}
       </div>

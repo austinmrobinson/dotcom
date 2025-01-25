@@ -17,8 +17,15 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
+        serif: ["var(--font-lora)"],
         sans: ["var(--font-geist-sans)"],
         mono: ["var(--font-geist-mono)"],
+      },
+      colors: {
+        yellow: {
+          1000: "#302423",
+          1050: "#221D1D",
+        },
       },
       keyframes: {
         overlayShow: {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+// import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "./components/header";
 import { Analytics } from "@vercel/analytics/react";
@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "./utils/cn";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Lora, Literata } from "next/font/google";
 
 export const metadata: Metadata = {
   title: {
@@ -33,16 +34,28 @@ export const metadata: Metadata = {
   },
 };
 
+const lora = Lora({
+  subsets: ["latin"],
+  display: "swap",
+});
+const literata = Literata({
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html
+      lang="en"
+      className={`${GeistSans.variable} ${GeistMono.variable} ${lora.className}`}
+    >
       <body
         className={cn(
-          "flex flex-col items-center min-h-[100vh] text-sm transition-colors duration-300 text-neutral-600 bg-neutral-100 dark:text-neutral-300 dark:bg-neutral-900"
+          "flex flex-col items-center min-h-[100vh] text-sm transition-colors duration-300 text-yellow-1050/90 bg-neutral-100 dark:text-yellow-50/60 dark:bg-yellow-1050"
         )}
       >
         <Header />

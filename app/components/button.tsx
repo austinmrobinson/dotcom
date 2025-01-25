@@ -30,19 +30,19 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
     switch (props.variant) {
       case "secondary":
         variantClass =
-          "text-neutral-900 bg-neutral-900/10 hover:before:bg-neutral-900/20 dark:text-white dark:bg-white/10 dark:hover:before:bg-white/20";
+          "text-yellow-1050 bg-yellow-1050/10 hover:before:bg-yellow-1050/20 dark:text-yellow-50 dark:bg-yellow-50/10 dark:hover:before:bg-yellow-50/20";
         break;
       case "tertiary":
         variantClass =
-          "text-neutral-700 border border-neutral-900/20 hover:text-neutral-900 hover:before:bg-neutral-900/10 hover:border-neutral-900/30 dark:text-neutral-300 dark:border-white/20 dark:hover:text-white dark:hover:before:bg-white/10 dark:hover:border-white/30";
+          "text-yellow-1050/90 border border-yellow-1050/20 hover:text-yellow-1050 hover:before:bg-yellow-1050/10 hover:border-yellow-1050/6030 dark:text-yellow-50/60 dark:border-yellow-50/20 dark:hover:text-yellow-50 dark:hover:before:bg-yellow-50/10 dark:hover:border-yellow-50/30";
         break;
       case "text":
         variantClass =
-          "text-neutral-700 hover:text-neutral-900 hover:before:bg-neutral-900/10 dark:text-neutral-300 dark:hover:text-white dark:hover:before:bg-white/10";
+          "text-yellow-1050/90 hover:text-yellow-1050 hover:before:bg-yellow-1050/10 dark:text-yellow-50/60 dark:hover:text-yellow-50 dark:hover:before:bg-yellow-50/10";
         break;
       default:
         variantClass =
-          "text-white bg-neutral-900 hover:before:bg-white/20 dark:text-neutral-900 dark:bg-white dark:hover:before:bg-neutral-900/20";
+          "text-yellow-50 bg-yellow-1050 hover:before:bg-yellow-50/20 dark:text-yellow-1050 dark:bg-yellow-50 dark:hover:before:bg-yellow-1050/20";
         break;
     }
 
@@ -57,7 +57,7 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
         sizeClass = "h-10 w-10";
     }
 
-    const baseStyles = `overflow-hidden font-medium transition-colors duration-300 rounded-full flex items-center justify-center before:absolute before:inset-0 before:transition-all before:duration-300 before:rounded-full before:scale-75 hover:before:scale-100 ${
+    const baseStyles = `overflow-hidden font-medium transition-colors duration-300 rounded-[3px] flex items-center justify-center before:absolute before:inset-0 before:transition-all before:duration-300 before:rounded-[3px] before:scale-75 hover:before:scale-100 ${
       props.disabled
         ? "opacity-50 before:bg-transparent hover:before:bg-transparent"
         : ""
@@ -124,19 +124,19 @@ export default function Button({
   switch (variant) {
     case "secondary":
       variantClass =
-        "text-neutral-900 bg-neutral-900/10 hover:before:bg-neutral-900/20 dark:text-white dark:bg-white/10 dark:hover:before:bg-white/20";
+        "text-yellow-1050 bg-yellow-1050/10 hover:before:bg-yellow-1050/20 dark:text-yellow-50 dark:bg-yellow-50/10 dark:hover:before:bg-yellow-50/20";
       break;
     case "tertiary":
       variantClass =
-        "text-neutral-700 border border-neutral-900/20 hover:text-neutral-900 hover:before:bg-neutral-900/10 hover:border-neutral-900/30 dark:text-neutral-300 dark:border-white/20 dark:hover:text-white dark:hover:before:bg-white/10 dark:hover:border-white/30";
+        "text-yellow-1050/90 border border-yellow-1050/20 hover:text-yellow-1050 hover:before:bg-yellow-1050/10 hover:border-yellow-1050/6030 dark:text-yellow-50/60 dark:border-yellow-50/20 dark:hover:text-yellow-50 dark:hover:before:bg-yellow-50/10 dark:hover:border-yellow-50/30";
       break;
     case "text":
       variantClass =
-        "text-neutral-700 hover:text-neutral-900 hover:before:bg-neutral-900/10 dark:text-neutral-300 dark:hover:text-white dark:hover:before:bg-white/10";
+        "text-yellow-1050/90 hover:text-yellow-1050 hover:before:bg-yellow-1050/10 dark:text-yellow-50/60 dark:hover:text-yellow-50 dark:hover:before:bg-yellow-50/10";
       break;
     default:
       variantClass =
-        "text-white bg-neutral-900 hover:before:bg-white/20 dark:text-neutral-900 dark:bg-white dark:hover:before:bg-neutral-900/20";
+        "text-yellow-50 bg-yellow-1050 hover:before:bg-yellow-50/20 dark:text-yellow-1050 dark:bg-yellow-50 dark:hover:before:bg-yellow-1050/20";
       break;
   }
 
@@ -153,7 +153,7 @@ export default function Button({
 
   const { disabled } = { ...rest };
 
-  const baseStyles = `overflow-hidden font-medium transition-colors duration-300 rounded-full flex items-center justify-center before:absolute before:inset-0 before:transition-all before:duration-300 before:rounded-full before:scale-75 hover:before:scale-100 ${
+  const baseStyles = `overflow-hidden font-medium transition-colors duration-300 rounded-[3px] flex items-center justify-center before:absolute before:inset-0 before:transition-all before:duration-300 before:rounded-[3px] before:scale-75 hover:before:scale-100 ${
     disabled
       ? "opacity-50 before:bg-transparent hover:before:bg-transparent"
       : ""

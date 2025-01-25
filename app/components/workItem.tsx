@@ -25,7 +25,7 @@ export default function WorkItem({ item, type, skeleton }: WorkItemProps) {
     return (
       <div className="w-full">
         <div className="flex flex-col gap-4 h-full">
-          <div className="w-full aspect-[16/9] rounded-xl animate-pulse bg-neutral-900/10 dark:bg-white/10"></div>
+          <div className="w-full aspect-[16/9] rounded-[3px] animate-pulse bg-yellow-1050/10 dark:bg-yellow-50/10"></div>
           <div className="flex flex-col gap-1">
             <div className="flex gap-3 items-center justify-between">
               <Heading size="h4" skeleton />
@@ -40,17 +40,17 @@ export default function WorkItem({ item, type, skeleton }: WorkItemProps) {
     return (
       <Link
         href={`/${route}/${item.slug}`}
-        className="w-full relative before:absolute before:-inset-3 before:transition-all before:duration-300 before:opacity-0 before:scale-95 before:rounded-3xl hover:before:scale-100 hover:before:opacity-100 hover:before:bg-neutral-900/10 dark:hover:before:bg-white/10"
+        className="w-full relative before:absolute before:-inset-3 before:transition-all before:duration-300 before:opacity-0 before:scale-95 before:rounded-[3px] hover:before:scale-100 hover:before:opacity-100 hover:before:bg-yellow-1050/10 dark:hover:before:bg-yellow-50/10"
       >
         <article className="flex flex-col gap-4 h-full" key={item.slug}>
           <figure className="relative">
-            <span className="absolute top-2 left-2 flex items-center text-sm justify-center text-neutral-700 px-2 py-[2px] rounded-md bg-neutral-300">
+            <span className="absolute top-2 left-2 flex items-center text-sm justify-center text-yellow-1050/90 px-2 py-[2px] rounded-[3px] bg-yellow-50/60">
               {item.company}
             </span>
             <Image
               width="640"
               height="360"
-              className="w-full object-cover aspect-[16/9] border border-neutral-200/[0.005] dark:border-white/[0.005] rounded-xl bg-neutral-900/10 dark:bg-white/10"
+              className="w-full object-cover aspect-[16/9] border border-neutral-200/[0.005] dark:border-yellow-50/[0.005] rounded-[3px] bg-yellow-1050/10 dark:bg-yellow-50/10"
               src={item.thumbnail.src ?? "/placeholder-image.jpg"}
               alt={
                 item.thumbnail.alt ??

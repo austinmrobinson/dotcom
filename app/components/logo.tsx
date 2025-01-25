@@ -9,7 +9,7 @@ export default function Logo({ width, height, className }: LogoProps) {
     <svg
       width={width ?? "20"}
       height={height ?? "20"}
-      className={`fill-neutral-800 dark:fill-neutral-200 transition-colors ${className}`}
+      className={`fill-yellow-1050/90 dark:fill-yellow-50 transition-colors ${className}`}
       viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

@@ -36,12 +36,12 @@ export function Heading({
       lineHeightClass = "h-[2rem] lg:h-[2.25rem]";
       break;
     case "h2":
-      sizeClass = "text-lg sm:text-xl lg:text-2xl tracking-tight";
+      sizeClass = "text-lg sm:text-xl lg:text-2xl";
       skeletonSizeClass = "h-[1rem] sm:h-[1.125rem] lg:h-[1.25rem]";
       lineHeightClass = "h-[1.75rem] sm:h-[1.75rem] lg:h-[2rem]";
       break;
     case "h3":
-      sizeClass = "text-lg sm:text-lg lg:text-xl tracking-tight";
+      sizeClass = "text-lg sm:text-lg lg:text-xl";
       skeletonSizeClass = "h-[1rem] sm:h-[1rem] lg:h-[1.125rem]";
       lineHeightClass = "h-[1.75rem] sm:h-[1.75rem] lg:h-[1.75rem]";
       break;
@@ -56,7 +56,7 @@ export function Heading({
       lineHeightClass = "h-[1.25rem]";
       break;
     default:
-      sizeClass = "text-sm font-mono font-semibold";
+      sizeClass = "text-sm";
       skeletonSizeClass = "h-[0.75rem]";
       lineHeightClass = "h-[1.25rem]";
   }
@@ -73,7 +73,7 @@ export function Heading({
       >
         <span
           className={clsx(
-            "rounded-full bg-neutral-900/15 dark:bg-white/15",
+            "rounded-[3px] bg-yellow-1050/6015 dark:bg-yellow-50/15",
             skeletonSizeClass
           )}
           style={{ width: skeletonWidth }}
@@ -83,7 +83,7 @@ export function Heading({
   return (
     <Tag
       className={cn(
-        "font-medium text-neutral-900 dark:text-white",
+        "font-medium text-yellow-1050 dark:text-yellow-50",
         sizeClass,
         className
       )}
@@ -140,7 +140,7 @@ export function Text({
 
   switch (contrast) {
     case "high":
-      contrastClass = "text-neutral-900 dark:text-white";
+      contrastClass = "text-yellow-1050 dark:text-yellow-50";
       break;
     default:
       contrastClass = "";
@@ -163,7 +163,7 @@ export function Text({
       >
         <span
           className={clsx(
-            "w-full rounded-full bg-neutral-900/15 dark:bg-white/15",
+            "w-full rounded-[3px] bg-yellow-1050/15 dark:bg-yellow-50/15",
             skeletonSizeClass
           )}
         />
@@ -173,7 +173,6 @@ export function Text({
     return (
       <Tag
         className={cn(
-          "font-mono",
           sizeClass,
           weightClass,
           contrastClass,

@@ -32,7 +32,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="fixed flex gap-3 px-4 py-3 h-14 items-center bg-neutral-100/80 backdrop-blur-md sm:bg-transparent sm:backdrop-filter-none left-0 top-0 right-0 z-10 dark:bg-neutral-900/80 sm:dark:bg-transparent">
+    <header className="fixed flex gap-3 px-4 py-3 h-14 items-center bg-neutral-100/80 backdrop-blur-md sm:bg-transparent sm:backdrop-filter-none left-0 top-0 right-0 z-10 dark:bg-yellow-1050/90 sm:dark:bg-transparent">
       <div className="flex-grow">
         <NavLogo />
       </div>
@@ -43,9 +43,9 @@ export default function Header() {
               <Link
                 className={`${
                   pathname.includes("/" + item.href)
-                    ? "text-neutral-900 bg-neutral-900/5 dark:text-white dark:bg-white/5"
+                    ? "text-yellow-1050 bg-yellow-1050/605 dark:text-yellow-50 dark:bg-yellow-50/5"
                     : ""
-                } relative font-medium flex items-center px-4 h-8 rounded-full text-neutral-600 transition-colors duration-300 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white`}
+                } relative font-medium flex items-center px-4 h-8 rounded-[3px] text-yellow-1050/90 transition-colors duration-300 hover:text-yellow-1050 dark:text-yellow-50/60 dark:hover:text-yellow-50`}
                 href={item.href}
                 passHref
                 onFocus={() => setFocused(item.href)}
@@ -64,7 +64,7 @@ export default function Header() {
                           ease: "easeOut",
                         },
                       }}
-                      className="absolute bg-neutral-900/10 dark:bg-white/10 inset-0 rounded-full h-8 z-0"
+                      className="absolute bg-yellow-1050/10 dark:bg-yellow-50/10 inset-0 rounded-[3px] h-8 z-0"
                       layoutId="highlight"
                     />
                   ) : null}
