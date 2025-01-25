@@ -56,7 +56,7 @@ export function Heading({
       lineHeightClass = "h-[1.25rem]";
       break;
     default:
-      sizeClass = "text-sm font-mono font-semibold";
+      sizeClass = "text-sm font-semibold";
       skeletonSizeClass = "h-[0.75rem]";
       lineHeightClass = "h-[1.25rem]";
   }
@@ -173,7 +173,6 @@ export function Text({
     return (
       <Tag
         className={cn(
-          "font-mono",
           sizeClass,
           weightClass,
           contrastClass,

@@ -60,13 +60,13 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
           <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
             {icon}
           </span>
-          <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
-            <div className="flex grow">
-              <Heading size="h6" as="h4" className="grow sm:grow-0">
+          <div className="flex flex-col gap-1 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
+            <div className="flex justify-between min-w-0">
+              <Heading size="h6" as="h4" className="shrink-0">
                 {leading}
               </Heading>
               {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[78px] truncate max-w-full">
+              <Text className="block sm:hidden tabular-nums min-w-[60px] text-right shrink truncate ml-3">
                 {trailing}
               </Text>
             </div>
@@ -74,7 +74,7 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
           </div>
         </div>
         {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[78px]">
+        <Text className="hidden sm:block tabular-nums min-w-[60px]">
           {trailing}
         </Text>
       </Link>
@@ -90,12 +90,12 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
             {icon}
           </span>
           <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
-            <div className="flex grow">
-              <Heading size="h6" as="h4" className="grow sm:grow-0">
+            <div className="flex justify-between min-w-0">
+              <Heading size="h6" as="h4" className="shrink-0">
                 {leading}
               </Heading>
               {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[78px] truncate max-w-full">
+              <Text className="block sm:hidden tabular-nums min-w-[60px] text-right shrink truncate ml-3">
                 {trailing}
               </Text>
             </div>
@@ -103,7 +103,7 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
           </div>
         </div>
         {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[78px]">
+        <Text className="hidden sm:block tabular-nums min-w-[60px]">
           {trailing}
         </Text>
       </div>
@@ -116,12 +116,12 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
             {icon}
           </span>
           <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
-            <div className="flex grow">
-              <Heading size="h6" as="h4" className="grow sm:grow-0">
+            <div className="flex justify-between min-w-0">
+              <Heading size="h6" as="h4" className="shrink-0">
                 {leading}
               </Heading>
               {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[78px] truncate max-w-full">
+              <Text className="block sm:hidden tabular-nums min-w-[60px] text-right shrink truncate ml-3">
                 {trailing}
               </Text>
             </div>
@@ -129,7 +129,7 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
           </div>
         </div>
         {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[78px]">
+        <Text className="hidden sm:block tabular-nums min-w-[60px]">
           {trailing}
         </Text>
       </li>
@@ -142,6 +142,12 @@ export default async function Home() {
 
   let sortedCompanies: Company[] | undefined;
   sortedCompanies = companies?.sort((a, b) => {
+    // Sort companies with no ending date first
+    if (!a.endingDate && b.endingDate) return -1;
+    if (a.endingDate && !b.endingDate) return 1;
+
+    // For companies with same ending date status (both null or both have dates)
+    // sort by starting date, most recent first
     return +new Date(b.startingDate) - +new Date(a.startingDate);
   });
 
@@ -209,7 +215,12 @@ export default async function Home() {
               leading={company.title}
               caption={company.roles[company.roles.length - 1].title}
               trailing={`${formatDate(company.startingDate)}–${
-                company.endingDate ? formatDate(company.endingDate) : "Present"
+                company.endingDate
+                  ? formatDate(company.startingDate).substring(0, 2) ===
+                    formatDate(company.endingDate).substring(0, 2)
+                    ? formatDate(company.endingDate).substring(2)
+                    : formatDate(company.endingDate)
+                  : "  "
               }`}
             />
           ))}
