@@ -5,7 +5,7 @@ import Animate from "../components/animate";
 import { Metadata } from "next";
 import { Project } from "../types";
 import { Heading, Text } from "../components/text";
-import Button from "../components/button";
+import { Button } from "../components/ui/button";
 import Copy from "../components/copy";
 
 export const metadata: Metadata = {

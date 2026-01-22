@@ -1,18 +1,23 @@
 "use client";
 
-import * as RadixTooltip from "@radix-ui/react-tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/app/components/ui/tooltip";
 import { Text } from "./text";
 import { useState } from "react";
-import { AlertCircle, Check } from "react-feather";
+import { IconAlertCircle, IconCheck } from "@tabler/icons-react";
 import { useCopyToClipboard } from "usehooks-ts";
 
-interface TooltipProps {
+interface CopyProps {
   children: React.ReactNode;
   text: string;
   type?: string;
 }
 
-export default function Copy({ children, text, type }: TooltipProps) {
+export default function Copy({ children, text, type }: CopyProps) {
   const [copiedText, copy] = useCopyToClipboard();
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState(false);
@@ -33,42 +38,36 @@ export default function Copy({ children, text, type }: TooltipProps) {
   }
 
   return (
-    <RadixTooltip.Provider>
-      <RadixTooltip.Root open={copied}>
-        <RadixTooltip.Trigger
+    <TooltipProvider>
+      <Tooltip open={copied}>
+        <TooltipTrigger
           onClick={() => copyToClipboard(text)}
           className="text-start rounded-xl p-2 -m-2"
         >
           {children}
-        </RadixTooltip.Trigger>
-        <RadixTooltip.Portal>
+        </TooltipTrigger>
+        <TooltipContent className="flex gap-1 items-center">
           {!error ? (
-            <RadixTooltip.Content
-              className="z-50 flex gap-1 items-center select-none rounded-full bg-neutral-900 dark:bg-white px-2 py-[2px]  will-change-[transform,opacity] text-white dark:text-neutral-900"
-              sideOffset={4}
-            >
-              <Check
+            <>
+              <IconCheck
                 className="text-green-300 dark:text-green-500"
                 size={12}
-                strokeWidth={3}
+                stroke={3}
               />
               <Text size="caption">Copied{type && ` ${type}`}</Text>
-            </RadixTooltip.Content>
+            </>
           ) : (
-            <RadixTooltip.Content
-              className="z-50 flex gap-1 items-center select-none rounded-full bg-neutral-900 dark:bg-white px-2 py-[2px]  will-change-[transform,opacity] text-white dark:text-neutral-900"
-              sideOffset={4}
-            >
-              <AlertCircle
+            <>
+              <IconAlertCircle
                 className="text-red-300 dark:text-red-500"
                 size={12}
-                strokeWidth={3}
+                stroke={3}
               />
               <Text size="caption">Failed to Copy</Text>
-            </RadixTooltip.Content>
+            </>
           )}
-        </RadixTooltip.Portal>
-      </RadixTooltip.Root>
-    </RadixTooltip.Provider>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

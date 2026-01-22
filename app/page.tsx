@@ -1,10 +1,10 @@
-import Button from "./components/button";
+import { Button } from "./components/ui/button";
 import { Heading, Text } from "./components/text";
 import Link from "next/link";
 import AustinLink from "./components/link";
 import IconTesla from "./components/icons/tesla";
 import IconHP from "./components/icons/hp";
-import { Hexagon, Linkedin, Mail, Twitter } from "react-feather";
+import { IconHexagon, IconBrandLinkedin, IconMail, IconBrandX } from "@tabler/icons-react";
 import getCompanies from "./utils/getCompanies";
 import { Company } from "./types";
 import formatDate from "./utils/formatDate";
@@ -37,16 +37,16 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
       icon = <IconPaperCrowns />;
       break;
     case "Twitter":
-      icon = <Twitter size={16} />;
+      icon = <IconBrandX size={16} stroke={1.5} />;
       break;
     case "Email":
-      icon = <Mail size={16} />;
+      icon = <IconMail size={16} stroke={1.5} />;
       break;
     case "LinkedIn":
-      icon = <Linkedin size={16} />;
+      icon = <IconBrandLinkedin size={16} stroke={1.5} />;
       break;
     default:
-      icon = <Hexagon size={16} />;
+      icon = <IconHexagon size={16} stroke={1.5} />;
   }
 
   if (href) {
