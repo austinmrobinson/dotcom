@@ -3,6 +3,7 @@ import { getProjects } from "@/app/utils/getProjects";
 import { PostBody } from "./components/body";
 import { Heading, Text } from "@/app/components/text";
 import TopOfPage from "@/app/components/topOfPage";
+import StickyHeader from "@/app/components/stickyHeader";
 import { formatDateMonth } from "@/app/utils/formatDate";
 import { cookies } from "next/headers";
 import PasswordForm from "@/app/components/passwordForm";
@@ -43,6 +44,13 @@ export default async function ProjectPage({ params }: any) {
   return (
     <AuthContext>
       <Suspense fallback={<ProjectPageLoading />}>
+        <StickyHeader title={project.title}>
+          <Text className="text-sm text-neutral-600 dark:text-neutral-400">
+            {`${formatDateMonth(project.date)} • ${project.company} • ${
+              project.role
+            }`}
+          </Text>
+        </StickyHeader>
         <Animate className="flex flex-col gap-8 sm:gap-12">
           <TopOfPage title={project.title} back="/projects">
             <Text>{`${formatDateMonth(project.date)} • ${project.company} • ${
