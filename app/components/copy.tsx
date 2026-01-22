@@ -37,7 +37,7 @@ export default function Copy({ children, text, type }: TooltipProps) {
       <RadixTooltip.Root open={copied}>
         <RadixTooltip.Trigger
           onClick={() => copyToClipboard(text)}
-          className="text-start"
+          className="text-start rounded-xl p-2 -m-2"
         >
           {children}
         </RadixTooltip.Trigger>
