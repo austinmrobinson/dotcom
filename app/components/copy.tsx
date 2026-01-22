@@ -42,7 +42,7 @@ export default function Copy({ children, text, type }: CopyProps) {
       <Tooltip open={copied}>
         <TooltipTrigger
           onClick={() => copyToClipboard(text)}
-          className="text-start"
+          className="text-start rounded-xl p-2 -m-2"
         >
           {children}
         </TooltipTrigger>
