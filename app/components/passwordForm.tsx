@@ -6,7 +6,7 @@ import { Button } from "@/app/components/ui/button";
 import { Heading, Text } from "./text";
 import { IconLock } from "@tabler/icons-react";
 import Animate from "./animate";
-import Copy from "./copy";
+import RequestAccessDialog from "./requestAccessDialog";
 
 export default function PasswordForm() {
   const [password, setPassword] = useState("");
@@ -91,11 +91,7 @@ export default function PasswordForm() {
         </Button>
       </form>
       <div className="flex justify-center">
-        <Copy text="austinrobinsondesign@gmail.com" type="Email">
-          <Button as="div" variant="text">
-            Request Access
-          </Button>
-        </Copy>
+        <RequestAccessDialog />
       </div>
     </Animate>
   );
