@@ -1,10 +1,11 @@
 import { Button } from "./components/ui/button";
 import { Heading, Text } from "./components/text";
 import Link from "next/link";
+import Image from "next/image";
 import AustinLink from "./components/link";
 import IconTesla from "./components/icons/tesla";
 import IconHP from "./components/icons/hp";
-import { IconHexagon, IconBrandLinkedin, IconMail, IconBrandX } from "@tabler/icons-react";
+import { IconHexagon, IconBrandLinkedin, IconMail, IconBrandX, IconArrowRight } from "@tabler/icons-react";
 import getCompanies from "./utils/getCompanies";
 import { Company } from "./types";
 import formatDate from "./utils/formatDate";
@@ -153,38 +154,34 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col gap-14 sm:gap-16">
-      <section id="introduction" className="flex flex-col gap-5 justify-start">
-        <Heading size="h1">Austin Robinson</Heading>
+      <section id="introduction" className="flex flex-col gap-4 justify-start">
+        <div className="w-14 h-14 relative rounded-full overflow-hidden shrink-0 mb-2 bg-skeleton">
+          <Image
+            src="/austin.jpg"
+            alt="Austin Robinson"
+            fill
+            className="object-cover object-top"
+          />
+        </div>
+        <div className="flex flex-col gap-1 mb-2">
+          <Heading size="h1">Austin Robinson</Heading>
+          <Text>Design at Nominal</Text>
+        </div>
         <Text>
-          Hi, I am Austin. I am a self-taught software designer and engineer
-          living in Austin, Texas. <br></br>I am currently a design engineer at{" "}
-          <AustinLink href="https://nominal.io">Nominal</AustinLink>, where
-          we're building software to accelerate hardware testing.
+          I'm a software designer and engineer living in Austin, TX, currently
+          building software to accelerate hardware testing at{" "}
+          <AustinLink href="https://nominal.io">Nominal</AustinLink>.
         </Text>
         <Text>
-          Before Nominal, I was leading the design system at{" "}
-          <AustinLink href="https://tesla.com">Tesla</AustinLink>, focusing on
-          aligning products across platforms and organizations.
+          Previously, I led design systems at{" "}
+          <AustinLink href="https://tesla.com">Tesla</AustinLink> and{" "}
+          <AustinLink href="https://hp.com">HP</AustinLink>, and moonlighted as
+          a designer and engineer for{" "}
+          <AustinLink href="https://papercrowns.com/">Paper Crowns</AustinLink>.
         </Text>
-        <Text>
-          Before Tesla, I led design for the design system at{" "}
-          <AustinLink href="https://hp.com">HP</AustinLink>. Our team worked on
-          a ground-up redesign that scaled the system across the company and to
-          multiple platforms.
-        </Text>
-        <Text>
-          For a long time, I moonlighted as a designer and front-end developer
-          for{" "}
-          <AustinLink href="https://papercrowns.com/">Paper Crowns</AustinLink>{" "}
-          and my own company, working on projects for companies like Activision
-          and Supercell.
-        </Text>
-        <Button
-          href="/projects"
-          variant="secondary"
-          className="w-full h-10 px-5 xs:w-auto xs:self-start xs:h-8 xs:px-4 mt-2"
-        >
+        <Button href="/projects" variant="secondary" className="self-start mt-2">
           View Work
+          <IconArrowRight size={16} stroke={2} />
         </Button>
       </section>
       {/* Open to work */}
