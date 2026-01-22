@@ -43,7 +43,7 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body
         className={cn(
-          "flex flex-col items-center min-h-[100vh] text-sm transition-colors duration-300 text-neutral-600 bg-neutral-100 dark:text-neutral-300 dark:bg-neutral-900"
+          "flex flex-col items-center min-h-[100vh] text-sm transition-colors duration-300 text-text-secondary bg-background"
         )}
       >
         <Header />

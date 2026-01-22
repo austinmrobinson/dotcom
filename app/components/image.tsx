@@ -52,10 +52,10 @@ export default function ImageZoom({
         </button>
       </DialogTrigger>
       <DialogPortal>
-        <DialogOverlay className="data-[state=open]:animate-overlayShow bg-neutral-900/20 backdrop-blur-sm cursor-zoom-out" />
+        <DialogOverlay className="data-[state=open]:animate-overlayShow bg-overlay-strong backdrop-blur-sm cursor-zoom-out" />
         <DialogContent
           showCloseButton={false}
-          className="data-[state=open]:animate-contentShow flex rounded-lg overflow-hidden shadow-lg bg-white dark:bg-neutral-800 p-0 border-0 max-h-[90dvh] w-[95vw] h-auto max-w-[1096px]"
+          className="data-[state=open]:animate-contentShow flex rounded-lg overflow-hidden shadow-lg bg-surface-elevated p-0 border-0 max-h-[90dvh] w-[95vw] h-auto max-w-[1096px]"
         >
           <Image
             src={src}
@@ -120,7 +120,7 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
                 height={144}
                 src={img.src}
                 alt={img.alt}
-                className="rounded-xl w-full h-full object-cover m-0 bg-neutral-900/10 dark:bg-neutral-100/10 border border-neutral-200/[0.005] dark:border-white/[0.005]"
+                className="rounded-xl w-full h-full object-cover m-0 bg-overlay-light border border-border-hairline"
               />
             </button>
           </DialogTrigger>
@@ -128,10 +128,10 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
       </div>
       {image && (
         <DialogPortal>
-          <DialogOverlay className="data-[state=open]:animate-overlayShow bg-neutral-900/20 backdrop-blur-sm cursor-zoom-out" />
+          <DialogOverlay className="data-[state=open]:animate-overlayShow bg-overlay-strong backdrop-blur-sm cursor-zoom-out" />
           <DialogContent
             showCloseButton={false}
-            className="data-[state=open]:animate-contentShow flex rounded-lg overflow-hidden shadow-lg bg-white dark:bg-neutral-800 p-0 border-0 max-h-[90dvh] w-[95vw] h-auto max-w-[1096px]"
+            className="data-[state=open]:animate-contentShow flex rounded-lg overflow-hidden shadow-lg bg-surface-elevated p-0 border-0 max-h-[90dvh] w-[95vw] h-auto max-w-[1096px]"
           >
             <Image
               src={image.src}

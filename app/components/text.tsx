@@ -73,7 +73,7 @@ export function Heading({
       >
         <span
           className={clsx(
-            "rounded-full bg-neutral-900/15 dark:bg-white/15",
+            "rounded-full bg-skeleton",
             skeletonSizeClass
           )}
           style={{ width: skeletonWidth }}
@@ -83,7 +83,7 @@ export function Heading({
   return (
     <Tag
       className={cn(
-        "font-medium text-neutral-900 dark:text-white",
+        "font-medium text-foreground",
         sizeClass,
         className
       )}
@@ -140,7 +140,7 @@ export function Text({
 
   switch (contrast) {
     case "high":
-      contrastClass = "text-neutral-900 dark:text-white";
+      contrastClass = "text-foreground";
       break;
     default:
       contrastClass = "";
@@ -163,7 +163,7 @@ export function Text({
       >
         <span
           className={clsx(
-            "w-full rounded-full bg-neutral-900/15 dark:bg-white/15",
+            "w-full rounded-full bg-skeleton",
             skeletonSizeClass
           )}
         />

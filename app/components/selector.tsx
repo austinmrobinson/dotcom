@@ -15,7 +15,7 @@ export function Selector({ name, label, size }: SelectorProps) {
   }
 
   const baseStyles =
-    "selector flex cursor-pointer relative items-center justify-center overflow-hidden rounded-full text-neutral-900 bg-neutral-900/10 hover:before:bg-neutral-900/20 dark:text-white dark:bg-white/10 dark:hover:before:bg-white/20 text-center font-medium transition-colors duration-300 before:absolute before:inset-0 before:scale-75 before:rounded-full before:transition-all before:duration-300 hover:before:scale-100 hover:before:bg-neutral-900/10 dark:hover:before:bg-white/10";
+    "selector flex cursor-pointer relative items-center justify-center overflow-hidden rounded-full text-foreground bg-overlay-light text-center font-medium transition-colors duration-300 before:absolute before:inset-0 before:scale-75 before:rounded-full before:transition-all before:duration-300 hover:before:scale-100 hover:before:bg-overlay-strong";
 
   return (
     <div className="flex shrink-0">
