@@ -9,7 +9,7 @@ export default function ProjectPageLoading() {
         <Text skeleton characters={24} />
       </SkeletonTopOfPage>
       <div
-        className="rounded-none md:rounded-xl bg-neutral-900/10 dark:bg-white/10
+        className="rounded-none md:rounded-xl bg-overlay-light
 max-w-[767px] w-[100vw] aspect-[16/9] self-center"
       ></div>
       <div className="flex flex-col gap-4">

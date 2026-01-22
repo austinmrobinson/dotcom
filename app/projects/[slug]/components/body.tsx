@@ -8,7 +8,7 @@ import { mdxComponents } from "./mdxComponents";
 
 export function PostBody({ children }: { children: string }) {
   return (
-    <article className="prose prose-neutral prose-sm dark:prose-invert">
+    <article className="prose prose-neutral dark:prose-invert">
       <MDXRemote
         source={children}
         options={{

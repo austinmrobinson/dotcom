@@ -51,12 +51,12 @@ export function Heading({
       lineHeightClass = "h-[1.25rem] lg:h-[1.75rem]";
       break;
     case "h5":
-      sizeClass = "text-sm lg:text-base";
+      sizeClass = "text-base";
       skeletonSizeClass = "h-[0.75rem]";
       lineHeightClass = "h-[1.25rem]";
       break;
     default:
-      sizeClass = "text-sm font-semibold";
+      sizeClass = "text-base font-semibold";
       skeletonSizeClass = "h-[0.75rem]";
       lineHeightClass = "h-[1.25rem]";
   }
@@ -73,7 +73,7 @@ export function Heading({
       >
         <span
           className={clsx(
-            "rounded-full bg-neutral-900/15 dark:bg-white/15",
+            "rounded-full bg-skeleton",
             skeletonSizeClass
           )}
           style={{ width: skeletonWidth }}
@@ -83,7 +83,7 @@ export function Heading({
   return (
     <Tag
       className={cn(
-        "font-medium text-neutral-900 dark:text-white",
+        "font-medium text-foreground",
         sizeClass,
         className
       )}
@@ -140,10 +140,10 @@ export function Text({
 
   switch (contrast) {
     case "high":
-      contrastClass = "text-neutral-900 dark:text-white";
+      contrastClass = "text-foreground";
       break;
     default:
-      contrastClass = "";
+      contrastClass = "text-muted-foreground";
   }
 
   const sizeChange = responsive === true ? "text-xs sm:text-sm" : "";
@@ -163,7 +163,7 @@ export function Text({
       >
         <span
           className={clsx(
-            "w-full rounded-full bg-neutral-900/15 dark:bg-white/15",
+            "w-full rounded-full bg-skeleton",
             skeletonSizeClass
           )}
         />
