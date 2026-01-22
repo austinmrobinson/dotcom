@@ -2,26 +2,15 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  let password;
-  let hasCookie;
+  // URL query parameter authentication has been removed for security.
+  // Passwords in URLs appear in browser history, server logs, and Referer headers.
+  // Authentication is now handled via the POST /api endpoint and cookies only.
 
-  try {
-    password = request.nextUrl.searchParams.get(process.env.SEARCH_QUERY_NAME!);
-    hasCookie = request.cookies.has(process.env.PASSWORD_COOKIE_NAME!);
-  } catch (error) {
-    console.error(error);
-  }
-  const url = request.nextUrl.clone();
-  const response = NextResponse.redirect(url);
-
-  const passwords = JSON.parse(process.env.PAGE_PASSWORD!);
-
-  if (passwords.includes(password) && !hasCookie) {
-    try {
-      response.cookies.set(`${process.env.PASSWORD_COOKIE_NAME}`, "true");
-      return response;
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  // Let the request continue - AuthContext will handle showing the login form
+  // if the user doesn't have a valid cookie.
+  return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/projects/:path*"],
+};
