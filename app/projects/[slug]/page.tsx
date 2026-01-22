@@ -38,13 +38,7 @@ export default async function ProjectPage({ params }: any) {
 
   return (
     <>
-      <StickyHeader title={project.title}>
-        <Text className="text-sm text-neutral-600 dark:text-neutral-400">
-          {`${formatDateMonth(project.date)} • ${project.company} • ${
-            project.role
-          }`}
-        </Text>
-      </StickyHeader>
+      <StickyHeader title={project.title} />
       <Animate className="flex flex-col gap-8 sm:gap-12">
         <TopOfPage title={project.title} back="/projects">
           <Text>{`${formatDateMonth(project.date)} • ${project.company} • ${

@@ -7,10 +7,9 @@ import { motion, useScroll, useTransform } from "framer-motion";
 
 interface StickyHeaderProps {
   title: string;
-  children?: React.ReactNode;
 }
 
-export default function StickyHeader({ title, children }: StickyHeaderProps) {
+export default function StickyHeader({ title }: StickyHeaderProps) {
   const { scrollY } = useScroll();
 
   // Show sticky header after scrolling past threshold
@@ -56,7 +55,7 @@ export default function StickyHeader({ title, children }: StickyHeaderProps) {
           </IconButton>
         </motion.div>
         <motion.div
-          className="flex items-center gap-3 py-3 grow"
+          className="flex items-center py-3 grow min-w-0"
           style={{
             y: contentY,
             opacity: shouldShow,
@@ -67,7 +66,6 @@ export default function StickyHeader({ title, children }: StickyHeaderProps) {
           <Heading size="h3" className="truncate">
             {title}
           </Heading>
-          {children && <div className="ml-auto">{children}</div>}
         </motion.div>
       </div>
     </motion.header>
