@@ -155,7 +155,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col gap-14 sm:gap-16">
       <section id="introduction" className="flex flex-col gap-4 justify-start">
-        <div className="w-14 h-14 relative rounded-full overflow-hidden shrink-0 mb-2">
+        <div className="w-14 h-14 relative rounded-full overflow-hidden shrink-0 mb-2 bg-skeleton">
           <Image
             src="/austin.jpg"
             alt="Austin Robinson"
@@ -165,14 +165,14 @@ export default async function Home() {
         </div>
         <div className="flex flex-col gap-1 mb-2">
           <Heading size="h1">Austin Robinson</Heading>
-          <Text className="text-muted-foreground">Design at Nominal</Text>
+          <Text>Design at Nominal</Text>
         </div>
-        <Text className="text-muted-foreground">
+        <Text>
           I'm a software designer and engineer living in Austin, TX, currently
           building software to accelerate hardware testing at{" "}
           <AustinLink href="https://nominal.io">Nominal</AustinLink>.
         </Text>
-        <Text className="text-muted-foreground">
+        <Text>
           Previously, I led design systems at{" "}
           <AustinLink href="https://tesla.com">Tesla</AustinLink> and{" "}
           <AustinLink href="https://hp.com">HP</AustinLink>, and moonlighted as

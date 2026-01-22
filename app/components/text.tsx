@@ -143,7 +143,7 @@ export function Text({
       contrastClass = "text-foreground";
       break;
     default:
-      contrastClass = "";
+      contrastClass = "text-muted-foreground";
   }
 
   const sizeChange = responsive === true ? "text-xs sm:text-sm" : "";
