@@ -63,9 +63,9 @@ export default function WorkItem({ item, type, skeleton }: WorkItemProps) {
               <Heading size="h4" as="h3">
                 {item.title}
               </Heading>
-              <Text className="shrink-0">{formatDateMonth(item.date)}</Text>
+              <Text className="shrink-0 text-muted-foreground">{formatDateMonth(item.date)}</Text>
             </div>
-            <Text className="max-h-10 line-clamp-2">{item.subtitle}</Text>
+            <Text className="max-h-10 line-clamp-2 text-muted-foreground">{item.subtitle}</Text>
           </header>
         </article>
       </Link>

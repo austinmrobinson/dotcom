@@ -39,7 +39,7 @@ export default async function ProjectPage({ params }: any) {
   return (
     <>
       <StickyHeader title={project.title}>
-        <Text className="text-sm text-text-secondary">
+        <Text className="text-text-secondary">
           {`${formatDateMonth(project.date)} • ${project.company} • ${project.role}`}
         </Text>
       </StickyHeader>

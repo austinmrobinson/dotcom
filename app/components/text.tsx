@@ -51,12 +51,12 @@ export function Heading({
       lineHeightClass = "h-[1.25rem] lg:h-[1.75rem]";
       break;
     case "h5":
-      sizeClass = "text-sm lg:text-base";
+      sizeClass = "text-base";
       skeletonSizeClass = "h-[0.75rem]";
       lineHeightClass = "h-[1.25rem]";
       break;
     default:
-      sizeClass = "text-sm font-semibold";
+      sizeClass = "text-base font-semibold";
       skeletonSizeClass = "h-[0.75rem]";
       lineHeightClass = "h-[1.25rem]";
   }
