@@ -50,7 +50,7 @@ export default function Copy({ children, text, type }: CopyProps) {
           {!error ? (
             <>
               <IconCheck
-                className="text-green-300 dark:text-green-500"
+                className="text-success"
                 size={12}
                 stroke={3}
               />
@@ -59,7 +59,7 @@ export default function Copy({ children, text, type }: CopyProps) {
           ) : (
             <>
               <IconAlertCircle
-                className="text-red-300 dark:text-red-500"
+                className="text-destructive"
                 size={12}
                 stroke={3}
               />

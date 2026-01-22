@@ -53,11 +53,11 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
     return (
       <Link
         href={href}
-        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl relative hover:before:bg-neutral-900/10 dark:hover:before:bg-white/10
+        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl relative hover:before:bg-overlay-light
         before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-xl"
       >
         <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-border-light">
             {icon}
           </span>
           <div className="flex flex-col gap-1 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
@@ -82,11 +82,11 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
   } else if (copy) {
     return (
       <div
-        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl relative hover:before:bg-neutral-900/10 dark:hover:before:bg-white/10
+        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl relative hover:before:bg-overlay-light
         before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-xl"
       >
         <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-border-light">
             {icon}
           </span>
           <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
@@ -112,7 +112,7 @@ function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
     return (
       <li className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl">
         <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-border-light">
             {icon}
           </span>
           <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
@@ -188,7 +188,7 @@ export default async function Home() {
         </Button>
       </section>
       {/* Open to work */}
-      {/* <div className="px-5 py-4 sm:px-7 sm:py-6 rounded-xl flex flex-col gap-2 sm:gap-3 border-2 border-neutral-900/5 dark:border-white/5 items-start">
+      {/* <div className="px-5 py-4 sm:px-7 sm:py-6 rounded-xl flex flex-col gap-2 sm:gap-3 border-2 border-border-subtle items-start">
         <div className="flex flex-col gap-1">
           <Heading size="h4" as="h2">
             Open to Work

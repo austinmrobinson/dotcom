@@ -27,7 +27,7 @@ export default async function Projects() {
       <TopOfPage title="Projects" />
       <Animate className="flex flex-col gap-16">
         {sortedProjects && <WorkGrid items={sortedProjects} />}
-        <div className="px-6 py-6 sm:px-9 sm:py-8 rounded-xl flex flex-col gap-4 border-2 border-neutral-900/5 dark:border-white/5 items-start">
+        <div className="px-6 py-6 sm:px-9 sm:py-8 rounded-xl flex flex-col gap-4 border-2 border-border-subtle items-start">
           <div className="flex flex-col gap-1">
             <Heading size="h4" as="h2">
               More Coming Soon

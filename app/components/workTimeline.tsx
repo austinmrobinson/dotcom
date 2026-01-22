@@ -13,14 +13,14 @@ const WorkYear = ({ year, items }: WorkYearProps) => {
   return (
     <div className="flex gap-6">
       <div className="relative flex flex-col items-center">
-        <div className="sticky z-0 mb-9 top-20 flex items-center justify-center h-8 p-4 rounded-full bg-neutral-100 border border-neutral-900/20 dark:bg-neutral-900 dark:border-white/20">
+        <div className="sticky z-0 mb-9 top-20 flex items-center justify-center h-8 p-4 rounded-full bg-background border border-border-medium">
           <Text as="h2" responsive>
             {formattedDate.toLocaleDateString("en-US", {
               year: "numeric",
             })}
           </Text>
         </div>
-        <span className="absolute -z-10 inset-y-0 w-[1px] bg-neutral-900/20 dark:bg-white/20" />
+        <span className="absolute -z-10 inset-y-0 w-[1px] bg-border-medium" />
       </div>
       <div className="mt-14 mb-9 grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-6">
         {items.map((item, index) => (

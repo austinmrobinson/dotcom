@@ -45,7 +45,7 @@ export default async function ProjectPage({ params }: any) {
       <ImageZoom
         src={project.thumbnail.src}
         alt={project.thumbnail.alt}
-        className="w-full rounded-none md:rounded-xl bg-neutral-900/10 dark:bg-white/10 border border-neutral-200/[0.005] dark:border-white/[0.005]"
+        className="w-full rounded-none md:rounded-xl bg-overlay-light border border-border-hairline"
         buttonClassName="max-w-[767px] w-[100vw] self-center"
         priority
       />
@@ -66,7 +66,7 @@ export default async function ProjectPage({ params }: any) {
           <ul className="flex flex-wrap gap-2">
             {project.categories.map((category: string, index: number) => (
               <li
-                className="flex items-center justify-center px-3 py-1 rounded-full bg-neutral-100 border border-neutral-900/5 dark:bg-neutral-100/10 dark:border-neutral-100/5"
+                className="flex items-center justify-center px-3 py-1 rounded-full bg-overlay-light border border-border-subtle"
                 key={index}
               >
                 {category}

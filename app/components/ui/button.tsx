@@ -18,14 +18,14 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "text-white bg-neutral-900 hover:before:bg-white/20 dark:text-neutral-900 dark:bg-white dark:hover:before:bg-neutral-900/20",
+          "text-primary-foreground bg-primary hover:before:bg-overlay-strong",
         secondary:
-          "text-neutral-900 bg-neutral-900/10 hover:before:bg-neutral-900/20 dark:text-white dark:bg-white/10 dark:hover:before:bg-white/20",
+          "text-foreground bg-overlay-light hover:before:bg-overlay-strong",
         tertiary:
-          "text-neutral-700 border border-neutral-900/20 hover:text-neutral-900 hover:before:bg-neutral-900/10 hover:border-neutral-900/30 dark:text-neutral-300 dark:border-white/20 dark:hover:text-white dark:hover:before:bg-white/10 dark:hover:border-white/30",
-        text: "text-neutral-700 hover:text-neutral-900 hover:before:bg-neutral-900/10 dark:text-neutral-300 dark:hover:text-white dark:hover:before:bg-white/10",
+          "text-text-secondary border border-border-medium hover:text-foreground hover:before:bg-overlay-light hover:border-border-strong",
+        text: "text-text-secondary hover:text-foreground hover:before:bg-overlay-light",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 dark:bg-destructive/60",
+          "bg-destructive text-destructive-foreground hover:before:bg-black/10",
         link: "text-primary underline-offset-4 hover:underline before:hidden",
       },
       size: {
@@ -120,12 +120,12 @@ const iconButtonVariants = cva(
     variants: {
       variant: {
         primary:
-          "text-white bg-neutral-900 hover:before:bg-white/20 dark:text-neutral-900 dark:bg-white dark:hover:before:bg-neutral-900/20",
+          "text-primary-foreground bg-primary hover:before:bg-overlay-strong",
         secondary:
-          "text-neutral-900 bg-neutral-900/10 hover:before:bg-neutral-900/20 dark:text-white dark:bg-white/10 dark:hover:before:bg-white/20",
+          "text-foreground bg-overlay-light hover:before:bg-overlay-strong",
         tertiary:
-          "text-neutral-700 border border-neutral-900/20 hover:text-neutral-900 hover:before:bg-neutral-900/10 hover:border-neutral-900/30 dark:text-neutral-300 dark:border-white/20 dark:hover:text-white dark:hover:before:bg-white/10 dark:hover:border-white/30",
-        text: "text-neutral-700 hover:text-neutral-900 hover:before:bg-neutral-900/10 dark:text-neutral-300 dark:hover:text-white dark:hover:before:bg-white/10",
+          "text-text-secondary border border-border-medium hover:text-foreground hover:before:bg-overlay-light hover:border-border-strong",
+        text: "text-text-secondary hover:text-foreground hover:before:bg-overlay-light",
       },
       size: {
         large: "h-10 w-10",
