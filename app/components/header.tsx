@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Moon, Sun } from "react-feather";
-import { IconButton } from "./button";
+import { IconMoon, IconSun } from "@tabler/icons-react";
+import { IconButton } from "@/app/components/ui/button";
 import Logo from "./logo";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -75,8 +75,8 @@ export default function Header() {
         </ul>
       </nav> */}
       {/* <div className="flex flex-grow justify-end">
-        <IconButton variant="text" size="medium">
-          <Sun size="16" strokeWidth="2.5" />
+        <IconButton variant="text" size="medium" label="Toggle theme">
+          <IconSun size={16} stroke={2.5} />
         </IconButton>
       </div> */}
     </header>

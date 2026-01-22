@@ -2,7 +2,7 @@
 
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { useState } from "react";
-import { Clock, Grid } from "react-feather";
+import { IconClock, IconLayoutGrid } from "@tabler/icons-react";
 import WorkTimeline from "../components/workTimeline";
 import WorkGrid from "../components/workGrid";
 import { AnimatePresence, motion } from "framer-motion";
@@ -32,7 +32,7 @@ export default function WorkView({ companyPosts, postsByYear }) {
           onMouseEnter={() => setFocused("grid")}
           aria-label="Grid View"
         >
-          <Grid size="16" className="z-10" />
+          <IconLayoutGrid size={16} stroke={1.5} className="z-10" />
           <AnimatePresence>
             {focused === "grid" ? (
               <motion.div
@@ -77,7 +77,7 @@ export default function WorkView({ companyPosts, postsByYear }) {
           onMouseEnter={() => setFocused("timeline")}
           aria-label="Timeline View"
         >
-          <Clock size="16" className="z-10" />
+          <IconClock size={16} stroke={1.5} className="z-10" />
           <AnimatePresence>
             {focused === "timeline" ? (
               <motion.div

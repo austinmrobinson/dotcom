@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import TextInput, { PasswordInput } from "./input";
-import Button from "./button";
+import { Button } from "@/app/components/ui/button";
 import { Heading, Text } from "./text";
-import { Lock } from "react-feather";
+import { IconLock } from "@tabler/icons-react";
 import Animate from "./animate";
 import Copy from "./copy";
 
@@ -56,7 +56,7 @@ export default function PasswordForm() {
     <Animate className="flex flex-col justify-center gap-10 w-full max-w-[364px] sm:max-w-[264px] grow mx-auto mb-32">
       <div className="flex flex-col gap-5 items-center text-center">
         <div className="p-3 w-12 h-12 rounded-full bg-neutral-900/10 dark:bg-white/10">
-          <Lock />
+          <IconLock size={24} stroke={1.5} />
         </div>
         <div className="flex flex-col gap-1">
           <Heading size="h3" as="h1">
@@ -90,11 +90,13 @@ export default function PasswordForm() {
           {loading ? "Checking..." : "Submit"}
         </Button>
       </form>
-      <Copy text="austinrobinsondesign@gmail.com" type="Email">
-        <Button as="div" variant="text">
-          Request Access
-        </Button>
-      </Copy>
+      <div className="flex justify-center">
+        <Copy text="austinrobinsondesign@gmail.com" type="Email">
+          <Button as="div" variant="text">
+            Request Access
+          </Button>
+        </Copy>
+      </div>
     </Animate>
   );
 }
