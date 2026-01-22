@@ -115,39 +115,41 @@ export default async function Home() {
         </Copy>
       </div> */}
       <section id="history" className="flex flex-col">
-        <ItemGroup variant="outline">
-          <div className="px-4 py-2 bg-muted">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
-              History
-            </span>
-          </div>
+        <div className="px-4 py-2 pb-4 -mb-2 bg-black/[0.03] dark:bg-white/[0.03] rounded-t-lg">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
+            History
+          </span>
+        </div>
+        <ItemGroup variant="outline" className="">
           {sortedCompanies?.map((company: Company, index: number) => (
             <div key={company.slug}>
-              <ItemSeparator />
+              {index > 0 && <ItemSeparator />}
               <Item className="hover:bg-accent/50 transition-colors">
                 <ItemMedia className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
                   {getIcon(company.title)}
                 </ItemMedia>
-                <ItemContent className="flex-row items-center gap-3">
+                <ItemContent className="flex-col sm:flex-row sm:items-center gap-0 sm:gap-3">
                   <ItemTitle>
                     <Heading size="h6" as="h4">
                       {company.title}
                     </Heading>
                   </ItemTitle>
-                  <ItemDescription className="hidden sm:block truncate">
+                  <ItemDescription className="truncate">
                     {company.roles[company.roles.length - 1].title}
                   </ItemDescription>
                 </ItemContent>
-                <ItemContent className="flex-none">
-                  <Text className="tabular-nums text-right whitespace-nowrap">
-                    {`${formatDate(company.startingDate)}–${
-                      company.endingDate
+                <ItemContent className="flex-none self-start sm:self-center">
+                  <Text className="tabular-nums text-right whitespace-nowrap inline-flex">
+                    <span>{formatDate(company.startingDate)}</span>
+                    <span>–</span>
+                    <span className="w-[2ch]">
+                      {company.endingDate
                         ? formatDate(company.startingDate).substring(0, 2) ===
                           formatDate(company.endingDate).substring(0, 2)
                           ? formatDate(company.endingDate).substring(2)
                           : formatDate(company.endingDate)
-                        : "  "
-                    }`}
+                        : ""}
+                    </span>
                   </Text>
                 </ItemContent>
               </Item>
@@ -156,14 +158,16 @@ export default async function Home() {
         </ItemGroup>
       </section>
       <section id="contact" className="flex flex-col">
-        <ItemGroup variant="outline">
-          <div className="px-4 py-2 bg-muted">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
-              Connect
-            </span>
-          </div>
-          <ItemSeparator />
-          <Link href="https://twitter.com/austinmrobinson">
+        <div className="px-4 py-2 pb-4 -mb-2 bg-black/[0.03] dark:bg-white/[0.03] rounded-t-lg">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
+            Connect
+          </span>
+        </div>
+        <ItemGroup variant="outline" className="">
+          <Link
+            href="https://twitter.com/austinmrobinson"
+            className="rounded-t-lg outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          >
             <Item className="hover:bg-accent/50 transition-colors">
               <ItemMedia className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
                 {getIcon("Twitter")}
@@ -181,7 +185,10 @@ export default async function Home() {
             </Item>
           </Link>
           <ItemSeparator />
-          <Link href="https://www.linkedin.com/in/robinsonaustin/">
+          <Link
+            href="https://www.linkedin.com/in/robinsonaustin/"
+            className="outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          >
             <Item className="hover:bg-accent/50 transition-colors">
               <ItemMedia className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
                 {getIcon("LinkedIn")}
@@ -199,7 +206,7 @@ export default async function Home() {
             </Item>
           </Link>
           <ItemSeparator />
-          <Copy text="austinrobinsondesign@gmail.com" type="Email">
+          <Copy text="austinrobinsondesign@gmail.com" type="Email" className="rounded-b-lg">
             <Item className="hover:bg-accent/50 transition-colors cursor-pointer">
               <ItemMedia className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
                 {getIcon("Email")}

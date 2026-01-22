@@ -10,9 +10,9 @@ const itemGroupVariants = cva("group/item-group flex flex-col", {
     variant: {
       default: "",
       outline:
-        "rounded-xl border border-border bg-card overflow-hidden [&_[data-slot=item]]:rounded-none [&_[data-slot=item]]:border-0 [&>*:first-child_[data-slot=item]]:rounded-t-xl [&>*:last-child_[data-slot=item]]:rounded-b-xl",
+        "rounded-lg bg-card overflow-hidden shadow-[0px_3px_3px_-1.5px_rgba(0,0,0,0.1),0px_1px_1px_-0.5px_rgba(0,0,0,0.1),0px_0px_0px_0.5px_rgba(0,0,0,0.1)] [&_[data-slot=item]]:rounded-none [&_[data-slot=item]]:border-0 [&>*:first-child_[data-slot=item]]:rounded-t-lg [&>*:last-child_[data-slot=item]]:rounded-b-lg",
       muted:
-        "rounded-xl bg-muted/50 overflow-hidden [&_[data-slot=item]]:rounded-none [&_[data-slot=item]]:border-0 [&>*:first-child_[data-slot=item]]:rounded-t-xl [&>*:last-child_[data-slot=item]]:rounded-b-xl",
+        "rounded-lg bg-muted/50 overflow-hidden [&_[data-slot=item]]:rounded-none [&_[data-slot=item]]:border-0 [&>*:first-child_[data-slot=item]]:rounded-t-lg [&>*:last-child_[data-slot=item]]:rounded-b-lg",
     },
   },
   defaultVariants: {
@@ -51,12 +51,12 @@ function ItemSeparator({
 }
 
 const itemVariants = cva(
-  "group/item flex items-center border border-transparent text-sm rounded-md transition-colors [a]:hover:bg-accent/50 [a]:transition-colors duration-100 flex-wrap outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+  "group/item flex items-center text-sm transition-colors [a]:hover:bg-accent/50 [a]:transition-colors duration-100 flex-wrap outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
   {
     variants: {
       variant: {
         default: "bg-transparent",
-        outline: "border-border",
+        outline: "border border-border rounded-md",
         muted: "bg-muted/50",
       },
       size: {
