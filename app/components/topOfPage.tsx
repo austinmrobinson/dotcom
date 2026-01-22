@@ -17,8 +17,7 @@ export default function TopOfPage({ back, title, children }: TopOfPageProps) {
             href={back}
             variant="text"
             size="small"
-            className="relative left-0 -ml-2 md:absolute md:-left-7"
-            absolute
+            className="-ml-2 md:absolute md:-left-7"
             label="Back"
           >
             <IconArrowLeft size={16} stroke={1.5} />
