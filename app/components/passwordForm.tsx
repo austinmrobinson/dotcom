@@ -13,21 +13,43 @@ export default function PasswordForm() {
   const [passwordIncorrect, setPasswordIncorrect] = useState("");
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
+  const [rateLimited, setRateLimited] = useState(false);
+  const [retryAfter, setRetryAfter] = useState(0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setShow(false);
+    setPasswordIncorrect("");
+    setRateLimited(false);
 
-    const request = await fetch(`/api`, {
-      body: JSON.stringify({ password }),
-      headers: { "Content-Type": "application/json" },
-      method: "post",
-    });
+    try {
+      const response = await fetch(`/api`, {
+        body: JSON.stringify({ password }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      });
 
-    if (request.status !== 200)
-      return setPasswordIncorrect("Password incorrect"), setLoading(false);
-    else window.location.reload();
+      const data = await response.json();
+
+      if (response.status === 429) {
+        setRateLimited(true);
+        setRetryAfter(data.retryAfter || 60);
+        setLoading(false);
+        return;
+      }
+
+      if (response.status !== 200) {
+        setPasswordIncorrect(data.error || "Password incorrect");
+        setLoading(false);
+        return;
+      }
+
+      window.location.reload();
+    } catch (error) {
+      setPasswordIncorrect("An error occurred. Please try again.");
+      setLoading(false);
+    }
   }
 
   return (
@@ -52,12 +74,21 @@ export default function PasswordForm() {
           setShow={setShow}
           value={password}
           placeholder="Enter Password"
-          error={passwordIncorrect}
+          error={rateLimited ? "" : passwordIncorrect}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setPassword(e.target.value)
           }
         />
-        <Button type="submit">Submit</Button>
+        {rateLimited && (
+          <Text className="text-amber-600 dark:text-amber-400 text-sm">
+            Too many attempts. Please try again in{" "}
+            {Math.ceil(retryAfter / 60)} minute
+            {Math.ceil(retryAfter / 60) !== 1 ? "s" : ""}.
+          </Text>
+        )}
+        <Button type="submit" disabled={loading || rateLimited}>
+          {loading ? "Checking..." : "Submit"}
+        </Button>
       </form>
       <div className="flex justify-center">
         <RequestAccessDialog />

@@ -51,7 +51,7 @@ export default function StickyHeader({ title, children }: StickyHeaderProps) {
             size="small"
             label="Scroll to top"
           >
-            <IconArrowUp size={16} stroke={1.5} />
+<IconArrowUp size={16} stroke={1.5} />
           </IconButton>
           <Heading size="h3" className="truncate">
             {title}
