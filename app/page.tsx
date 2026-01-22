@@ -1,6 +1,7 @@
 import { Button } from "./components/ui/button";
 import { Heading, Text } from "./components/text";
 import Link from "next/link";
+import Image from "next/image";
 import AustinLink from "./components/link";
 import IconTesla from "./components/icons/tesla";
 import IconHP from "./components/icons/hp";
@@ -154,7 +155,15 @@ export default async function Home() {
   return (
     <div className="flex flex-col gap-14 sm:gap-16">
       <section id="introduction" className="flex flex-col gap-4 justify-start">
-        <div className="flex flex-col gap-1">
+        <div className="w-14 h-14 relative rounded-full overflow-hidden shrink-0 mb-2">
+          <Image
+            src="/austin.jpg"
+            alt="Austin Robinson"
+            fill
+            className="object-cover object-top"
+          />
+        </div>
+        <div className="flex flex-col gap-1 mb-2">
           <Heading size="h1">Austin Robinson</Heading>
           <Text className="text-muted-foreground">Design at Nominal</Text>
         </div>
