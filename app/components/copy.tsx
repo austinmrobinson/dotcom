@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from "@/app/components/ui/tooltip";
-import { Text } from "./text";
-import { useState } from "react";
-import { IconAlertCircle, IconCheck } from "@tabler/icons-react";
+import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
 
 interface CopyProps {
@@ -18,56 +10,25 @@ interface CopyProps {
 }
 
 export default function Copy({ children, text, type }: CopyProps) {
-  const [copiedText, copy] = useCopyToClipboard();
-  const [copied, setCopied] = useState(false);
-  const [error, setError] = useState(false);
+  const [, copy] = useCopyToClipboard();
 
   async function copyToClipboard(text: string) {
     copy(text)
       .then(() => {
-        setCopied(true);
-        console.log("Copied!", { text });
-        setTimeout(() => {
-          setCopied(false);
-        }, 2400);
+        toast.success(`Copied${type ? ` ${type}` : ""}`);
       })
       .catch((error) => {
-        setError(true);
+        toast.error("Failed to copy");
         console.error("Failed to copy!", error);
       });
   }
 
   return (
-    <TooltipProvider>
-      <Tooltip open={copied}>
-        <TooltipTrigger
-          onClick={() => copyToClipboard(text)}
-          className="text-start rounded-xl p-2 -m-2"
-        >
-          {children}
-        </TooltipTrigger>
-        <TooltipContent className="flex gap-1 items-center">
-          {!error ? (
-            <>
-              <IconCheck
-                className="text-green-300 dark:text-green-500"
-                size={12}
-                stroke={3}
-              />
-              <Text size="caption">Copied{type && ` ${type}`}</Text>
-            </>
-          ) : (
-            <>
-              <IconAlertCircle
-                className="text-red-300 dark:text-red-500"
-                size={12}
-                stroke={3}
-              />
-              <Text size="caption">Failed to Copy</Text>
-            </>
-          )}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <button
+      onClick={() => copyToClipboard(text)}
+      className="text-start rounded-xl p-2 -m-2"
+    >
+      {children}
+    </button>
   );
 }
