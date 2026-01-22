@@ -1,8 +1,8 @@
 "use client";
 
 import { Heading } from "./text";
-import { IconButton } from "./button";
-import { ArrowUp } from "react-feather";
+import { IconButton } from "./ui/button";
+import { IconArrowUp } from "@tabler/icons-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 interface StickyHeaderProps {
@@ -51,7 +51,7 @@ export default function StickyHeader({ title, children }: StickyHeaderProps) {
             size="small"
             label="Scroll to top"
           >
-            <ArrowUp size="16" />
+            <IconArrowUp size={16} stroke={1.5} />
           </IconButton>
           <Heading size="h3" className="truncate">
             {title}
