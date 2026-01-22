@@ -7,9 +7,10 @@ import { motion, useScroll, useTransform } from "framer-motion";
 
 interface StickyHeaderProps {
   title: string;
+  children?: React.ReactNode;
 }
 
-export default function StickyHeader({ title }: StickyHeaderProps) {
+export default function StickyHeader({ title, children }: StickyHeaderProps) {
   const { scrollY } = useScroll();
 
   // Show sticky header after scrolling past threshold
@@ -55,6 +56,7 @@ export default function StickyHeader({ title }: StickyHeaderProps) {
           <Heading size="h3" className="truncate">
             {title}
           </Heading>
+          {children && <div className="hidden lg:block ml-auto shrink-0">{children}</div>}
         </motion.div>
       </div>
     </motion.header>
