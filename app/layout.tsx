@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "./utils/cn";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: {
@@ -51,6 +52,7 @@ export default function RootLayout({
           <Analytics />
           <SpeedInsights />
         </main>
+        <Toaster theme="dark" position="bottom-center" />
       </body>
     </html>
   );
