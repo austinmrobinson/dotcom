@@ -1,4 +1,4 @@
-import { IconButton } from "./button";
+import { IconButton } from "@/app/components/ui/button";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { Heading } from "./text";
 

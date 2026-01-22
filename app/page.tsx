@@ -1,4 +1,4 @@
-import Button from "./components/button";
+import { Button } from "./components/ui/button";
 import { Heading, Text } from "./components/text";
 import Link from "next/link";
 import AustinLink from "./components/link";

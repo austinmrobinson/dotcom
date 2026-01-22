@@ -1,5 +1,5 @@
 import Animate from "@/app/components/animate";
-import Button from "@/app/components/button";
+import { Button } from "@/app/components/ui/button";
 import { Heading, Text } from "@/app/components/text";
 import { IconMoodSad } from "@tabler/icons-react";
 import AustinLink from "./components/link";

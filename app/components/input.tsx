@@ -1,7 +1,7 @@
 "use client";
 
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
-import { IconButton } from "./button";
+import { IconButton } from "@/app/components/ui/button";
 import { Text } from "./text";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { cn } from "../utils/cn";

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import TextInput, { PasswordInput } from "./input";
-import Button from "./button";
+import { Button } from "@/app/components/ui/button";
 import { Heading, Text } from "./text";
 import { IconLock } from "@tabler/icons-react";
 import Animate from "./animate";

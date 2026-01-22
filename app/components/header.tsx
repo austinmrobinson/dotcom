@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { IconMoon, IconSun } from "@tabler/icons-react";
-import { IconButton } from "./button";
+import { IconButton } from "@/app/components/ui/button";
 import Logo from "./logo";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";

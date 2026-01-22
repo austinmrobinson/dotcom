@@ -7,7 +7,7 @@ import {
   DialogPortal,
   DialogTrigger,
 } from "@/app/components/ui/dialog";
-import { IconButton } from "./button";
+import { IconButton } from "@/app/components/ui/button";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
