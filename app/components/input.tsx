@@ -1,9 +1,24 @@
-import { Eye, EyeOff } from "react-feather";
+"use client";
+
+import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { IconButton } from "./button";
 import { Text } from "./text";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { useState } from "react";
-import clsx from "clsx";
+import { cn } from "../utils/cn";
+import { Label } from "@/app/components/ui/label";
+
+interface TextInputProps
+  extends Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "type" | "trailing"
+  > {
+  id: string;
+  label?: string;
+  type?: string;
+  error?: string;
+  hiddenLabel?: boolean;
+  trailing?: React.ReactNode;
+}
 
 export default function TextInput({
   id,
@@ -17,17 +32,19 @@ export default function TextInput({
   hiddenLabel,
   trailing,
   ...rest
-}: HTMLInputElement | any) {
+}: TextInputProps) {
   return (
     <div className="flex flex-col gap-1">
       {hiddenLabel ? (
         <VisuallyHidden.Root>
-          <label htmlFor={id}>{label}</label>
+          <Label htmlFor={id}>{label}</Label>
         </VisuallyHidden.Root>
       ) : (
-        <label htmlFor={id}>
-          <Text>{label}</Text>
-        </label>
+        label && (
+          <Label htmlFor={id}>
+            <Text>{label}</Text>
+          </Label>
+        )
       )}
       <div className="relative">
         <input
@@ -37,11 +54,12 @@ export default function TextInput({
           placeholder={placeholder}
           onChange={onChange}
           data-1p-ignore
-          className={clsx(
-            "w-full h-10 px-4 py-2.5 border-2 bg-neutral-900/[0.05] dark:bg-white/[0.05] flex text-base sm:text-sm rounded-full font-medium text-neutral-900 dark:text-white",
-            className,
-            error ? "border-red-600 dark:border-red-400" : "border-transparent"
+          className={cn(
+            "w-full h-10 px-4 py-2.5 border-2 bg-neutral-900/[0.05] dark:bg-white/[0.05] flex text-base sm:text-sm rounded-full font-medium text-neutral-900 dark:text-white outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-[color,box-shadow]",
+            error ? "border-red-600 dark:border-red-400" : "border-transparent",
+            className
           )}
+          {...rest}
         />
         {trailing && <div className="absolute right-1 top-1">{trailing}</div>}
       </div>
@@ -58,9 +76,12 @@ export default function TextInput({
   );
 }
 
-export function PasswordInput(props: any) {
-  const { id, show, setShow, ...rest } = props;
+interface PasswordInputProps extends Omit<TextInputProps, "type" | "trailing"> {
+  show: boolean;
+  setShow: (show: boolean) => void;
+}
 
+export function PasswordInput({ id, show, setShow, ...rest }: PasswordInputProps) {
   return (
     <TextInput
       id={id}
@@ -76,7 +97,7 @@ export function PasswordInput(props: any) {
             setShow(!show);
           }}
         >
-          {show ? <EyeOff size="16" /> : <Eye size="16" />}
+          {show ? <IconEyeOff size={16} stroke={1.5} /> : <IconEye size={16} stroke={1.5} />}
         </IconButton>
       }
       {...rest}

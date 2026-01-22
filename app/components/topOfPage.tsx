@@ -1,5 +1,5 @@
 import { IconButton } from "./button";
-import { ArrowLeft } from "react-feather";
+import { IconArrowLeft } from "@tabler/icons-react";
 import { Heading } from "./text";
 
 interface TopOfPageProps {
@@ -21,7 +21,7 @@ export default function TopOfPage({ back, title, children }: TopOfPageProps) {
             absolute
             label="Back"
           >
-            <ArrowLeft size="16" />
+            <IconArrowLeft size={16} stroke={1.5} />
           </IconButton>
         )}
         <Heading size="h1">{title}</Heading>

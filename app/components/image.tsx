@@ -1,11 +1,16 @@
 "use client";
 
-import * as Dialog from "@radix-ui/react-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+  DialogTrigger,
+} from "@/app/components/ui/dialog";
 import { IconButton } from "./button";
-import { ArrowLeft, ArrowRight, X } from "react-feather";
-import { useEffect, useId, useState } from "react";
+import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import Animate from "./animate";
 import { Image as ImageType } from "../types";
 
 interface ImageZoomProps {
@@ -30,26 +35,28 @@ export default function ImageZoom({
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog.Root>
-      <Dialog.Trigger asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <button
           aria-label="Zoom in on image"
-          onClick={() => setOpen(!open)}
           className={`flex cursor-zoom-in not-prose transition-opacity hover:opacity-70 ${buttonClassName}`}
         >
           <Image
-            width={width ?? "480"}
-            height={height ?? "270"}
+            width={width ?? 480}
+            height={height ?? 270}
             className={className}
             src={src}
             alt={alt}
             priority={priority}
           />
         </button>
-      </Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Overlay className="data-[state=open]:animate-overlayShow bg-neutral-900/20 backdrop-blur-sm fixed h-[100vh] w-[100vw] inset-0 z-20 cursor-zoom-out" />
-        <Dialog.Content className="data-[state=open]:animate-contentShow flex fixed rounded-lg overflow-hidden shadow-lg bg-white dark:bg-neutral-800 z-30 top-[50%] left-[50%] max-h-[90dvh] w-[95vw] h-auto max-w-[1096px] translate-x-[-50%] translate-y-[-50%] focus:outline-none">
+      </DialogTrigger>
+      <DialogPortal>
+        <DialogOverlay className="data-[state=open]:animate-overlayShow bg-neutral-900/20 backdrop-blur-sm cursor-zoom-out" />
+        <DialogContent
+          showCloseButton={false}
+          className="data-[state=open]:animate-contentShow flex rounded-lg overflow-hidden shadow-lg bg-white dark:bg-neutral-800 p-0 border-0 max-h-[90dvh] w-[95vw] h-auto max-w-[1096px]"
+        >
           <Image
             src={src}
             alt={alt}
@@ -58,9 +65,9 @@ export default function ImageZoom({
             sizes="100vw"
             className="w-full h-auto object-cover aspect-[16/9]"
           />
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   );
 }
 
@@ -72,28 +79,22 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
   const [open, setOpen] = useState(false);
   const [image, setImage] = useState<ImageType>(images[0]);
 
-  let nextImage: ImageType;
-  let previousImage: ImageType;
-
   const index = images.indexOf(image);
+  const notLast = index < images.length - 1;
+  const notFirst = index > 0;
+  const nextImage = notLast ? images[index + 1] : null;
+  const previousImage = notFirst ? images[index - 1] : null;
 
-  let notLast = index < images.length - 1;
-  let notFirst = index > 0;
-
-  if (notLast) {
-    nextImage = images[index + 1];
-  }
-  if (notFirst) {
-    previousImage = images[index - 1];
-  }
-
-  function onKeyDown(e: any) {
-    if (e.key === "ArrowLeft" && notFirst) {
-      setImage(previousImage);
-    } else if (e.key === "ArrowRight" && notLast) {
-      setImage(nextImage);
-    }
-  }
+  const onKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft" && previousImage) {
+        setImage(previousImage);
+      } else if (e.key === "ArrowRight" && nextImage) {
+        setImage(nextImage);
+      }
+    },
+    [previousImage, nextImage]
+  );
 
   useEffect(() => {
     document.addEventListener("keydown", onKeyDown);
@@ -103,33 +104,35 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
   }, [onKeyDown]);
 
   return (
-    <Dialog.Root>
+    <Dialog open={open} onOpenChange={setOpen}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        {images.map((image: ImageType, index) => (
-          <Dialog.Trigger asChild key={index}>
+        {images.map((img: ImageType, idx) => (
+          <DialogTrigger asChild key={idx}>
             <button
               aria-label="Zoom in on image"
               onClick={() => {
-                setOpen(!open);
-                setImage(image);
+                setImage(img);
               }}
               className="flex w-full cursor-zoom-in transition-opacity hover:opacity-80"
             >
               <Image
-                width="256"
-                height="144"
-                src={image.src}
-                alt={image.alt}
+                width={256}
+                height={144}
+                src={img.src}
+                alt={img.alt}
                 className="rounded-xl w-full h-full object-cover m-0 bg-neutral-900/10 dark:bg-neutral-100/10 border border-neutral-200/[0.005] dark:border-white/[0.005]"
               />
             </button>
-          </Dialog.Trigger>
+          </DialogTrigger>
         ))}
       </div>
       {image && (
-        <Dialog.Portal>
-          <Dialog.Overlay className="data-[state=open]:animate-overlayShow bg-neutral-900/20 backdrop-blur-sm h-[100vh] w-[100vw] fixed inset-0 z-20 cursor-zoom-out" />
-          <Dialog.Content className="data-[state=open]:animate-contentShow flex fixed rounded-lg overflow-hidden shadow-lg bg-white dark:bg-neutral-800 z-30 top-[50%] left-[50%] max-h-[90dvh] w-[95vw] h-auto max-w-[1096px] translate-x-[-50%] translate-y-[-50%] focus:outline-none">
+        <DialogPortal>
+          <DialogOverlay className="data-[state=open]:animate-overlayShow bg-neutral-900/20 backdrop-blur-sm cursor-zoom-out" />
+          <DialogContent
+            showCloseButton={false}
+            className="data-[state=open]:animate-contentShow flex rounded-lg overflow-hidden shadow-lg bg-white dark:bg-neutral-800 p-0 border-0 max-h-[90dvh] w-[95vw] h-auto max-w-[1096px]"
+          >
             <Image
               src={image.src}
               alt={image.alt}
@@ -143,11 +146,11 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
                 <IconButton
                   variant="secondary"
                   label="Previous"
-                  onClick={() => setImage(previousImage)}
+                  onClick={() => previousImage && setImage(previousImage)}
                   size="medium"
                   disabled={!notFirst}
                 >
-                  <ArrowLeft size={16} />
+                  <IconArrowLeft size={16} stroke={1.5} />
                 </IconButton>
               </div>
             )}
@@ -156,16 +159,16 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
                 <IconButton
                   variant="secondary"
                   label="Next"
-                  onClick={() => setImage(nextImage)}
+                  onClick={() => nextImage && setImage(nextImage)}
                   size="medium"
                 >
-                  <ArrowRight size={16} />
+                  <IconArrowRight size={16} stroke={1.5} />
                 </IconButton>
               </div>
             )}
-          </Dialog.Content>
-        </Dialog.Portal>
+          </DialogContent>
+        </DialogPortal>
       )}
-    </Dialog.Root>
+    </Dialog>
   );
 }
