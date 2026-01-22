@@ -36,14 +36,13 @@ export default function StickyHeader({ title }: StickyHeaderProps) {
     >
       <div className="max-w-screen-sm px-6 mx-auto flex relative items-center">
         <motion.div
+          className="flex items-center gap-1 py-3 grow min-w-0"
           style={{
             y: contentY,
             opacity: shouldShow,
-            position: "absolute",
-            left: -12,
             filter: blur,
           }}
-          transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
+          transition={{ duration: 0.3, ease: "easeOut", delay: 0.15 }}
         >
           <IconButton
             onClick={scrollToTop}
@@ -53,16 +52,6 @@ export default function StickyHeader({ title }: StickyHeaderProps) {
           >
             <ArrowUp size="16" />
           </IconButton>
-        </motion.div>
-        <motion.div
-          className="flex items-center py-3 grow min-w-0"
-          style={{
-            y: contentY,
-            opacity: shouldShow,
-            filter: blur,
-          }}
-          transition={{ duration: 0.3, ease: "easeOut", delay: 0.15 }}
-        >
           <Heading size="h3" className="truncate">
             {title}
           </Heading>
