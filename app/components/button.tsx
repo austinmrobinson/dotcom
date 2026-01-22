@@ -6,7 +6,7 @@ import { cn } from "../utils/cn";
 const { default: Link } = require("next/link");
 
 interface ButtonProps {
-  variant?: "primary" | "secondary" | "tertiary" | "text";
+  variant?: "primary" | "secondary" | "tertiary" | "text" | "destructive";
   size?: "large" | "medium" | "small";
   href?: string;
   children: React.ReactNode;
@@ -39,6 +39,10 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       case "text":
         variantClass =
           "text-neutral-700 hover:text-neutral-900 hover:before:bg-neutral-900/10 dark:text-neutral-300 dark:hover:text-white dark:hover:before:bg-white/10";
+        break;
+      case "destructive":
+        variantClass =
+          "text-red-600 hover:before:bg-red-600/10 dark:text-red-400 dark:hover:before:bg-red-400/15";
         break;
       default:
         variantClass =
@@ -134,6 +138,10 @@ export default function Button({
       variantClass =
         "text-neutral-700 hover:text-neutral-900 hover:before:bg-neutral-900/10 dark:text-neutral-300 dark:hover:text-white dark:hover:before:bg-white/10";
       break;
+    case "destructive":
+      variantClass =
+        "text-red-600 hover:before:bg-red-600/10 dark:text-red-400 dark:hover:before:bg-red-400/15";
+      break;
     default:
       variantClass =
         "text-white bg-neutral-900 hover:before:bg-white/20 dark:text-neutral-900 dark:bg-white dark:hover:before:bg-neutral-900/20";
@@ -187,9 +195,12 @@ export default function Button({
       </Tag>
     );
   } else {
+    const { onClick } = { ...rest };
     return (
       <button
         type={type}
+        disabled={disabled}
+        onClick={onClick}
         className={clsx(
           baseStyles,
           variantClass,
