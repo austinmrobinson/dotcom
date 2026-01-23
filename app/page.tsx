@@ -5,136 +5,47 @@ import Image from "next/image";
 import AustinLink from "./components/link";
 import IconTesla from "./components/icons/tesla";
 import IconHP from "./components/icons/hp";
-import { IconHexagon, IconBrandLinkedin, IconMail, IconBrandX, IconArrowRight } from "@tabler/icons-react";
+import {
+  IconHexagon,
+  IconBrandLinkedin,
+  IconMail,
+  IconBrandX,
+  IconArrowRight,
+} from "@tabler/icons-react";
 import getCompanies from "./utils/getCompanies";
 import { Company } from "./types";
 import formatDate from "./utils/formatDate";
 import IconPaperCrowns from "./components/icons/paperCrowns";
 import Copy from "./components/copy";
 import IconNominal from "./components/icons/nominal";
+import {
+  Item,
+  ItemGroup,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+  ItemSeparator,
+} from "./components/ui/item";
 
-interface LinkItemProps {
-  href?: string;
-  leading: string;
-  caption?: string;
-  trailing?: string;
-  copy?: boolean;
-}
-
-function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
-  let icon: React.ReactNode;
-
-  switch (leading) {
+function getIcon(name: string): React.ReactNode {
+  switch (name) {
     case "Nominal":
-      icon = <IconNominal />;
-      break;
+      return <IconNominal />;
     case "Tesla":
-      icon = <IconTesla />;
-      break;
+      return <IconTesla />;
     case "HP":
-      icon = <IconHP />;
-      break;
+      return <IconHP />;
     case "Paper Crowns":
-      icon = <IconPaperCrowns />;
-      break;
+      return <IconPaperCrowns />;
     case "Twitter":
-      icon = <IconBrandX size={16} stroke={1.5} />;
-      break;
+      return <IconBrandX size={16} stroke={1.5} />;
     case "Email":
-      icon = <IconMail size={16} stroke={1.5} />;
-      break;
+      return <IconMail size={16} stroke={1.5} />;
     case "LinkedIn":
-      icon = <IconBrandLinkedin size={16} stroke={1.5} />;
-      break;
+      return <IconBrandLinkedin size={16} stroke={1.5} />;
     default:
-      icon = <IconHexagon size={16} stroke={1.5} />;
-  }
-
-  if (href) {
-    return (
-      <Link
-        href={href}
-        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl relative hover:before:bg-overlay-light
-        before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-xl"
-      >
-        <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-border-light">
-            {icon}
-          </span>
-          <div className="flex flex-col gap-1 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
-            <div className="flex justify-between min-w-0">
-              <Heading size="h6" as="h4" className="shrink-0">
-                {leading}
-              </Heading>
-              {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[60px] text-right shrink truncate ml-3">
-                {trailing}
-              </Text>
-            </div>
-            {caption && <Text className="truncate max-w-full">{caption}</Text>}
-          </div>
-        </div>
-        {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[60px]">
-          {trailing}
-        </Text>
-      </Link>
-    );
-  } else if (copy) {
-    return (
-      <div
-        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl relative hover:before:bg-overlay-light
-        before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-xl"
-      >
-        <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-border-light">
-            {icon}
-          </span>
-          <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
-            <div className="flex justify-between min-w-0">
-              <Heading size="h6" as="h4" className="shrink-0">
-                {leading}
-              </Heading>
-              {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[60px] text-right shrink truncate ml-3">
-                {trailing}
-              </Text>
-            </div>
-            {caption && <Text className="truncate max-w-full">{caption}</Text>}
-          </div>
-        </div>
-        {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[60px]">
-          {trailing}
-        </Text>
-      </div>
-    );
-  } else {
-    return (
-      <li className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl">
-        <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-border-light">
-            {icon}
-          </span>
-          <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
-            <div className="flex justify-between min-w-0">
-              <Heading size="h6" as="h4" className="shrink-0">
-                {leading}
-              </Heading>
-              {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[60px] text-right shrink truncate ml-3">
-                {trailing}
-              </Text>
-            </div>
-            {caption && <Text className="truncate max-w-full">{caption}</Text>}
-          </div>
-        </div>
-        {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[60px]">
-          {trailing}
-        </Text>
-      </li>
-    );
+      return <IconHexagon size={16} stroke={1.5} />;
   }
 }
 
@@ -201,49 +112,118 @@ export default async function Home() {
           </Button>
         </Copy>
       </div> */}
-      <section id="history" className="flex flex-col gap-4 sm:gap-5">
-        <div className="flex gap-2 justify-between items-center">
-          <Heading size="h3">History</Heading>
+      <section id="history" className="flex flex-col">
+        <div className="px-4 py-2 pb-4 -mb-2 bg-black/[0.03] dark:bg-white/[0.03] rounded-t-lg">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
+            History
+          </span>
         </div>
-        <ul className="flex flex-col gap-4">
-          {sortedCompanies?.map((company: Company) => (
-            <LinkItem
-              key={company.slug}
-              leading={company.title}
-              caption={company.roles[company.roles.length - 1].title}
-              trailing={`${formatDate(company.startingDate)}–${
-                company.endingDate
-                  ? formatDate(company.startingDate).substring(0, 2) ===
-                    formatDate(company.endingDate).substring(0, 2)
-                    ? formatDate(company.endingDate).substring(2)
-                    : formatDate(company.endingDate)
-                  : "  "
-              }`}
-            />
+        <ItemGroup variant="outline" className="">
+          {sortedCompanies?.map((company: Company, index: number) => (
+            <div key={company.slug}>
+              {index > 0 && <ItemSeparator />}
+              <Item className="hover:bg-accent/50 transition-colors">
+                <ItemMedia className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+                  {getIcon(company.title)}
+                </ItemMedia>
+                <ItemContent className="flex-col sm:flex-row sm:items-center gap-0 sm:gap-3">
+                  <ItemTitle>
+                    <Heading size="h6" as="h4">
+                      {company.title}
+                    </Heading>
+                  </ItemTitle>
+                  <ItemDescription className="truncate">
+                    {company.roles[company.roles.length - 1].title}
+                  </ItemDescription>
+                </ItemContent>
+                <ItemContent className="flex-none self-start sm:self-center">
+                  <Text className="tabular-nums text-right whitespace-nowrap inline-flex">
+                    <span>{formatDate(company.startingDate)}</span>
+                    <span>–</span>
+                    <span className="w-[2ch]">
+                      {company.endingDate
+                        ? formatDate(company.startingDate).substring(0, 2) ===
+                          formatDate(company.endingDate).substring(0, 2)
+                          ? formatDate(company.endingDate).substring(2)
+                          : formatDate(company.endingDate)
+                        : ""}
+                    </span>
+                  </Text>
+                </ItemContent>
+              </Item>
+            </div>
           ))}
-        </ul>
+        </ItemGroup>
       </section>
-      <section id="contact" className="flex flex-col gap-4 sm:gap-5">
-        <Heading size="h3">Connect</Heading>
-        <div className="flex flex-col gap-4">
-          <LinkItem
-            href="https://twitter.com/austinmrobinson"
-            leading="Twitter"
-            trailing="@austinmrobinson"
-          />
-          <LinkItem
-            href="https://www.linkedin.com/in/robinsonaustin/"
-            leading="LinkedIn"
-            trailing="robinsonaustin"
-          />
-          <Copy text="austinrobinsondesign@gmail.com" type="Email">
-            <LinkItem
-              copy
-              leading="Email"
-              trailing="austinrobinsondesign@gmail.com"
-            />
-          </Copy>
+      <section id="contact" className="flex flex-col">
+        <div className="px-4 py-2 pb-4 -mb-2 bg-black/[0.03] dark:bg-white/[0.03] rounded-t-lg">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
+            Connect
+          </span>
         </div>
+        <ItemGroup variant="outline" className="">
+          <Link
+            href="https://twitter.com/austinmrobinson"
+            className="rounded-t-lg outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          >
+            <Item className="hover:bg-accent/50 transition-colors">
+              <ItemMedia className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+                {getIcon("Twitter")}
+              </ItemMedia>
+              <ItemContent className="flex-row items-center gap-3">
+                <ItemTitle>
+                  <Heading size="h6" as="h4">
+                    Twitter
+                  </Heading>
+                </ItemTitle>
+              </ItemContent>
+              <ItemContent className="flex-none">
+                <Text className="tabular-nums text-right">@austinmrobinson</Text>
+              </ItemContent>
+            </Item>
+          </Link>
+          <ItemSeparator />
+          <Link
+            href="https://www.linkedin.com/in/robinsonaustin/"
+            className="outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          >
+            <Item className="hover:bg-accent/50 transition-colors">
+              <ItemMedia className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+                {getIcon("LinkedIn")}
+              </ItemMedia>
+              <ItemContent className="flex-row items-center gap-3">
+                <ItemTitle>
+                  <Heading size="h6" as="h4">
+                    LinkedIn
+                  </Heading>
+                </ItemTitle>
+              </ItemContent>
+              <ItemContent className="flex-none">
+                <Text className="tabular-nums text-right">robinsonaustin</Text>
+              </ItemContent>
+            </Item>
+          </Link>
+          <ItemSeparator />
+          <Copy text="austinrobinsondesign@gmail.com" type="Email" className="rounded-b-lg">
+            <Item className="hover:bg-accent/50 transition-colors cursor-pointer">
+              <ItemMedia className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-neutral-900/10 dark:border-white/10">
+                {getIcon("Email")}
+              </ItemMedia>
+              <ItemContent className="flex-row items-center gap-3">
+                <ItemTitle>
+                  <Heading size="h6" as="h4">
+                    Email
+                  </Heading>
+                </ItemTitle>
+              </ItemContent>
+              <ItemContent className="flex-none">
+                <Text className="tabular-nums text-right">
+                  austinrobinsondesign@gmail.com
+                </Text>
+              </ItemContent>
+            </Item>
+          </Copy>
+        </ItemGroup>
       </section>
     </div>
   );
