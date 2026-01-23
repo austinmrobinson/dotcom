@@ -31,8 +31,14 @@ export default function Header() {
     { href: "about", title: "About" },
   ];
 
+  const isHomepage = pathname === "/";
+
   return (
-    <header className="fixed flex gap-3 px-4 py-3 h-14 items-center bg-background/80 backdrop-blur-md sm:bg-transparent sm:backdrop-filter-none left-0 top-0 right-0 z-10">
+    <header
+      className={`fixed gap-3 px-4 py-3 h-14 items-center bg-background/80 backdrop-blur-md sm:bg-transparent sm:backdrop-filter-none left-0 top-0 right-0 z-10 ${
+        isHomepage ? "hidden sm:flex" : "flex"
+      }`}
+    >
       <div className="flex-grow">
         <NavLogo />
       </div>
