@@ -10,7 +10,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   IconMail,
   IconBrandX,
-  IconBrandInstagram,
+  IconBrandLinkedin,
   IconArrowUpRight,
   IconCopy,
 } from "@tabler/icons-react";
@@ -247,9 +247,9 @@ export default function Home() {
           hoverSubtitle="Navigate"
         />
         <CTACard
-          href="https://instagram.com/robinsonaustin"
-          icon={<IconBrandInstagram size={20} stroke={1.5} />}
-          title="Instagram"
+          href="https://www.linkedin.com/in/robinsonaustin/"
+          icon={<IconBrandLinkedin size={20} stroke={1.5} />}
+          title="LinkedIn"
           subtitle="/robinsonaustin"
           hoverSubtitle="Navigate"
         />
