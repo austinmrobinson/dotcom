@@ -7,9 +7,11 @@ interface CopyProps {
   children: React.ReactNode;
   text: string;
   type?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
-export default function Copy({ children, text, type }: CopyProps) {
+export default function Copy({ children, text, type, onFocus, onBlur }: CopyProps) {
   const [, copy] = useCopyToClipboard();
 
   async function copyToClipboard(text: string) {
@@ -26,7 +28,9 @@ export default function Copy({ children, text, type }: CopyProps) {
   return (
     <button
       onClick={() => copyToClipboard(text)}
-      className="text-start rounded-xl p-2 -m-2"
+      onFocus={onFocus}
+      onBlur={onBlur}
+      className="flex text-start w-full min-w-0 overflow-hidden rounded-2xl sm:rounded-3xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
     >
       {children}
     </button>

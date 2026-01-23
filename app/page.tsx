@@ -1,157 +1,198 @@
-import { Button } from "./components/ui/button";
+"use client";
+
+import { useState } from "react";
 import { Heading, Text } from "./components/text";
 import Link from "next/link";
 import Image from "next/image";
 import AustinLink from "./components/link";
-import IconTesla from "./components/icons/tesla";
-import IconHP from "./components/icons/hp";
-import { IconHexagon, IconBrandLinkedin, IconMail, IconBrandX, IconArrowRight } from "@tabler/icons-react";
-import getCompanies from "./utils/getCompanies";
-import { Company } from "./types";
-import formatDate from "./utils/formatDate";
-import IconPaperCrowns from "./components/icons/paperCrowns";
 import Copy from "./components/copy";
-import IconNominal from "./components/icons/nominal";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import {
+  IconMail,
+  IconBrandX,
+  IconBrandInstagram,
+  IconArrowUpRight,
+  IconCopy,
+} from "@tabler/icons-react";
 
-interface LinkItemProps {
-  href?: string;
-  leading: string;
-  caption?: string;
-  trailing?: string;
-  copy?: boolean;
+const iconVariants = {
+  initial: { scale: 0.5, opacity: 0, filter: "blur(4px)" },
+  animate: { scale: 1, opacity: 1, filter: "blur(0px)" },
+  exit: { scale: 0.5, opacity: 0, filter: "blur(4px)" },
+};
+
+const textVariants = {
+  initial: { opacity: 0, filter: "blur(4px)" },
+  animate: { opacity: 1, filter: "blur(0px)" },
+  exit: { opacity: 0, filter: "blur(4px)" },
+};
+
+const reducedMotionVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+};
+
+interface CTACardContentProps {
+  isActive: boolean;
+  icon: React.ReactNode;
+  activeIcon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  hoverSubtitle: string;
 }
 
-function LinkItem({ href, leading, caption, trailing, copy }: LinkItemProps) {
-  let icon: React.ReactNode;
+function CTACardContent({
+  isActive,
+  icon,
+  activeIcon,
+  title,
+  subtitle,
+  hoverSubtitle,
+}: CTACardContentProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const currentIconVariants = prefersReducedMotion ? reducedMotionVariants : iconVariants;
+  const currentTextVariants = prefersReducedMotion ? reducedMotionVariants : textVariants;
+  const transitionDuration = prefersReducedMotion ? 0 : 0.15;
 
-  switch (leading) {
-    case "Nominal":
-      icon = <IconNominal />;
-      break;
-    case "Tesla":
-      icon = <IconTesla />;
-      break;
-    case "HP":
-      icon = <IconHP />;
-      break;
-    case "Paper Crowns":
-      icon = <IconPaperCrowns />;
-      break;
-    case "Twitter":
-      icon = <IconBrandX size={16} stroke={1.5} />;
-      break;
-    case "Email":
-      icon = <IconMail size={16} stroke={1.5} />;
-      break;
-    case "LinkedIn":
-      icon = <IconBrandLinkedin size={16} stroke={1.5} />;
-      break;
-    default:
-      icon = <IconHexagon size={16} stroke={1.5} />;
-  }
-
-  if (href) {
-    return (
-      <Link
-        href={href}
-        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl relative hover:before:bg-overlay-light
-        before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-xl"
-      >
-        <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-border-light">
-            {icon}
-          </span>
-          <div className="flex flex-col gap-1 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
-            <div className="flex justify-between min-w-0">
-              <Heading size="h6" as="h4" className="shrink-0">
-                {leading}
-              </Heading>
-              {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[60px] text-right shrink truncate ml-3">
-                {trailing}
-              </Text>
-            </div>
-            {caption && <Text className="truncate max-w-full">{caption}</Text>}
-          </div>
+  return (
+    <>
+      <span className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center rounded-full bg-black/10 sm:mb-auto relative">
+        <AnimatePresence mode="popLayout" initial={false}>
+          {isActive ? (
+            <motion.span
+              key="action"
+              variants={currentIconVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: transitionDuration }}
+              className="absolute"
+            >
+              {activeIcon}
+            </motion.span>
+          ) : (
+            <motion.span
+              key="default"
+              variants={currentIconVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: transitionDuration }}
+              className="absolute"
+            >
+              {icon}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </span>
+      <div className="flex flex-col w-full min-w-0 overflow-hidden sm:mt-6">
+        <Heading size="h6" as="span">
+          {title}
+        </Heading>
+        <div className="relative h-6">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {isActive ? (
+              <motion.div
+                key="hover"
+                variants={currentTextVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: transitionDuration }}
+                className="absolute w-full"
+              >
+                <Text className="truncate">{hoverSubtitle}</Text>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="default"
+                variants={currentTextVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: transitionDuration }}
+                className="absolute w-full"
+              >
+                <Text className="truncate">{subtitle}</Text>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[60px]">
-          {trailing}
-        </Text>
-      </Link>
-    );
-  } else if (copy) {
-    return (
-      <div
-        className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl relative hover:before:bg-overlay-light
-        before:absolute before:-inset-x-2 before:-inset-y-2 before:transition-colors before:duration-300 before:rounded-xl"
-      >
-        <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-border-light">
-            {icon}
-          </span>
-          <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
-            <div className="flex justify-between min-w-0">
-              <Heading size="h6" as="h4" className="shrink-0">
-                {leading}
-              </Heading>
-              {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[60px] text-right shrink truncate ml-3">
-                {trailing}
-              </Text>
-            </div>
-            {caption && <Text className="truncate max-w-full">{caption}</Text>}
-          </div>
-        </div>
-        {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[60px]">
-          {trailing}
-        </Text>
       </div>
-    );
-  } else {
-    return (
-      <li className="flex py-1 sm:py-0 gap-4 items-start sm:items-center rounded-xl">
-        <div className="flex grow gap-3 items-center">
-          <span className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-border-light">
-            {icon}
-          </span>
-          <div className="flex flex-col gap-0 sm:flex-row sm:gap-3 grow sm:items-center justify-between">
-            <div className="flex justify-between min-w-0">
-              <Heading size="h6" as="h4" className="shrink-0">
-                {leading}
-              </Heading>
-              {/* Mobile */}
-              <Text className="block sm:hidden tabular-nums min-w-[60px] text-right shrink truncate ml-3">
-                {trailing}
-              </Text>
-            </div>
-            {caption && <Text className="truncate max-w-full">{caption}</Text>}
-          </div>
-        </div>
-        {/* Not Mobile */}
-        <Text className="hidden sm:block tabular-nums min-w-[60px]">
-          {trailing}
-        </Text>
-      </li>
-    );
-  }
+    </>
+  );
 }
 
-export default async function Home() {
-  const companies = await getCompanies();
+interface CTACardProps {
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  hoverSubtitle: string;
+}
 
-  let sortedCompanies: Company[] | undefined;
-  sortedCompanies = companies?.sort((a, b) => {
-    // Sort companies with no ending date first
-    if (!a.endingDate && b.endingDate) return -1;
-    if (a.endingDate && !b.endingDate) return 1;
+function CTACard({ href, icon, title, subtitle, hoverSubtitle }: CTACardProps) {
+  const [isActive, setIsActive] = useState(false);
 
-    // For companies with same ending date status (both null or both have dates)
-    // sort by starting date, most recent first
-    return +new Date(b.startingDate) - +new Date(a.startingDate);
-  });
+  return (
+    <Link
+      href={href}
+      className="flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0 sm:justify-between p-4 sm:p-6 rounded-2xl sm:rounded-3xl border-[0.5px] border-black/20 flex-1 min-w-0 hover:bg-black/5 transition-colors"
+      onMouseEnter={() => setIsActive(true)}
+      onMouseLeave={() => setIsActive(false)}
+      onFocus={() => setIsActive(true)}
+      onBlur={() => setIsActive(false)}
+    >
+      <CTACardContent
+        isActive={isActive}
+        icon={icon}
+        activeIcon={<IconArrowUpRight size={20} stroke={1.5} />}
+        title={title}
+        subtitle={subtitle}
+        hoverSubtitle={hoverSubtitle}
+      />
+    </Link>
+  );
+}
 
+interface CopyCTACardProps {
+  text: string;
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  hoverSubtitle: string;
+}
+
+function CopyCTACard({ text, icon, title, subtitle, hoverSubtitle }: CopyCTACardProps) {
+  const [isActive, setIsActive] = useState(false);
+
+  return (
+    <Copy
+      text={text}
+      type="Email"
+      onFocus={() => setIsActive(true)}
+      onBlur={() => setIsActive(false)}
+    >
+      <div
+        className="flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0 sm:justify-between p-4 sm:p-6 rounded-2xl sm:rounded-3xl border-[0.5px] border-black/20 flex-1 min-w-0 hover:bg-black/5 transition-colors h-full cursor-pointer"
+        onMouseEnter={() => setIsActive(true)}
+        onMouseLeave={() => setIsActive(false)}
+      >
+        <CTACardContent
+          isActive={isActive}
+          icon={icon}
+          activeIcon={<IconCopy size={20} stroke={1.5} />}
+          title={title}
+          subtitle={subtitle}
+          hoverSubtitle={hoverSubtitle}
+        />
+      </div>
+    </Copy>
+  );
+}
+
+export default function Home() {
   return (
     <div className="flex flex-col gap-14 sm:gap-16">
       <section id="introduction" className="flex flex-col gap-4 justify-start">
@@ -179,71 +220,29 @@ export default async function Home() {
           a designer and engineer for{" "}
           <AustinLink href="https://papercrowns.com/">Paper Crowns</AustinLink>.
         </Text>
-        <Button href="/projects" variant="secondary" className="self-start mt-2">
-          View Work
-          <IconArrowRight size={16} stroke={2} />
-        </Button>
       </section>
-      {/* Open to work */}
-      {/* <div className="px-5 py-4 sm:px-7 sm:py-6 rounded-xl flex flex-col gap-2 sm:gap-3 border-2 border-border-subtle items-start">
-        <div className="flex flex-col gap-1">
-          <Heading size="h4" as="h2">
-            Open to Work
-          </Heading>
-          <Text>
-            I am looking for design and design engineering roles. I have
-            extensive experience building and leading design systems.
-          </Text>
-        </div>
-        <Copy text="austinrobinsondesign@gmail.com" type="Email">
-          <Button as="div" variant="secondary" size="small">
-            Contact
-          </Button>
-        </Copy>
-      </div> */}
-      <section id="history" className="flex flex-col gap-4 sm:gap-5">
-        <div className="flex gap-2 justify-between items-center">
-          <Heading size="h3">History</Heading>
-        </div>
-        <ul className="flex flex-col gap-4">
-          {sortedCompanies?.map((company: Company) => (
-            <LinkItem
-              key={company.slug}
-              leading={company.title}
-              caption={company.roles[company.roles.length - 1].title}
-              trailing={`${formatDate(company.startingDate)}–${
-                company.endingDate
-                  ? formatDate(company.startingDate).substring(0, 2) ===
-                    formatDate(company.endingDate).substring(0, 2)
-                    ? formatDate(company.endingDate).substring(2)
-                    : formatDate(company.endingDate)
-                  : "  "
-              }`}
-            />
-          ))}
-        </ul>
-      </section>
-      <section id="contact" className="flex flex-col gap-4 sm:gap-5">
-        <Heading size="h3">Connect</Heading>
-        <div className="flex flex-col gap-4">
-          <LinkItem
-            href="https://twitter.com/austinmrobinson"
-            leading="Twitter"
-            trailing="@austinmrobinson"
-          />
-          <LinkItem
-            href="https://www.linkedin.com/in/robinsonaustin/"
-            leading="LinkedIn"
-            trailing="robinsonaustin"
-          />
-          <Copy text="austinrobinsondesign@gmail.com" type="Email">
-            <LinkItem
-              copy
-              leading="Email"
-              trailing="austinrobinsondesign@gmail.com"
-            />
-          </Copy>
-        </div>
+      <section id="contact" className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+        <CopyCTACard
+          text="austinrobinsondesign@gmail.com"
+          icon={<IconMail size={20} stroke={1.5} />}
+          title="Email"
+          subtitle="austinrobinsondesign@gmail.com"
+          hoverSubtitle="Copy email"
+        />
+        <CTACard
+          href="https://twitter.com/austinmrobinson"
+          icon={<IconBrandX size={20} stroke={1.5} />}
+          title="Twitter"
+          subtitle="@austinmrobinson"
+          hoverSubtitle="Navigate"
+        />
+        <CTACard
+          href="https://instagram.com/robinsonaustin"
+          icon={<IconBrandInstagram size={20} stroke={1.5} />}
+          title="Instagram"
+          subtitle="/robinsonaustin"
+          hoverSubtitle="Navigate"
+        />
       </section>
     </div>
   );
