@@ -11,14 +11,12 @@ import {
   IconSword,
   IconChevronLeft,
   IconChevronRight,
-  IconChevronDown,
 } from "@tabler/icons-react";
 
 interface ActivityGridProps {
   data: ActivityData;
+  isLoading?: boolean;
 }
-
-type ZoomLevel = "month" | "year";
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 const MONTH_LABELS_FULL = [
@@ -92,8 +90,8 @@ function generateMonthGrid(year: number, month: number): (string | null)[][] {
   const startDate = new Date(firstOfMonth);
   startDate.setDate(startDate.getDate() - firstDayOfWeek);
 
-  // Generate 6 weeks to ensure we cover all month layouts
-  for (let week = 0; week < 6; week++) {
+  // Generate 4 weeks for month view
+  for (let week = 0; week < 4; week++) {
     for (let day = 0; day < 7; day++) {
       const date = new Date(startDate);
       date.setDate(startDate.getDate() + week * 7 + day);
@@ -105,77 +103,39 @@ function generateMonthGrid(year: number, month: number): (string | null)[][] {
 }
 
 /**
- * Generate year grid with weeks as columns and days as rows
+ * Get dot size based on activity value
+ * Returns size in pixels: 4 (none), 6 (low), 10 (medium), 16 (high)
  */
-function generateYearGrid(year: number): (string | null)[][] {
-  const grid: (string | null)[][] = Array.from({ length: 7 }, () => []);
-
-  const jan1 = new Date(year, 0, 1);
-  const jan1DayOfWeek = jan1.getDay() === 0 ? 6 : jan1.getDay() - 1;
-
-  const startDate = new Date(jan1);
-  startDate.setDate(startDate.getDate() - jan1DayOfWeek);
-
-  for (let week = 0; week < 53; week++) {
-    for (let day = 0; day < 7; day++) {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + week * 7 + day);
-
-      if (date.getFullYear() === year) {
-        grid[day].push(date.toISOString().split("T")[0]);
-      } else {
-        grid[day].push(null);
-      }
-    }
-  }
-
-  return grid;
-}
-
-/**
- * Get week positions where months start
- */
-function getMonthPositions(grid: (string | null)[][]): { month: number; weekIndex: number }[] {
-  const positions: { month: number; weekIndex: number }[] = [];
-  let currentMonth = -1;
-
-  grid[0].forEach((date, weekIndex) => {
-    if (date) {
-      const month = new Date(date + "T00:00:00").getMonth();
-      if (month !== currentMonth) {
-        currentMonth = month;
-        positions.push({ month, weekIndex });
-      }
-    }
-  });
-
-  return positions;
-}
-
-/**
- * Get dot size and opacity based on activity value
- */
-function getDotStyle(value: number, activityType: ActivityType): { scale: number; opacity: number } {
-  // Different thresholds for different activity types
+function getDotSize(value: number, activityType: ActivityType): number {
   if (activityType === "github") {
-    if (value === 0) return { scale: 0.25, opacity: 0.15 };
-    if (value < 3) return { scale: 0.4, opacity: 0.3 };
-    if (value < 6) return { scale: 0.6, opacity: 0.5 };
-    if (value < 10) return { scale: 0.8, opacity: 0.7 };
-    return { scale: 1, opacity: 1 };
+    if (value === 0) return 4;
+    if (value < 3) return 6;
+    if (value < 6) return 10;
+    return 16;
   } else if (activityType === "strava") {
-    if (value === 0) return { scale: 0.25, opacity: 0.15 };
-    if (value < 2) return { scale: 0.4, opacity: 0.3 };
-    if (value < 5) return { scale: 0.6, opacity: 0.5 };
-    if (value < 10) return { scale: 0.8, opacity: 0.7 };
-    return { scale: 1, opacity: 1 };
+    if (value === 0) return 4;
+    if (value < 2) return 6;
+    if (value < 5) return 10;
+    return 16;
   } else {
     // OSRS hours
-    if (value === 0) return { scale: 0.25, opacity: 0.15 };
-    if (value < 1) return { scale: 0.4, opacity: 0.3 };
-    if (value < 2) return { scale: 0.6, opacity: 0.5 };
-    if (value < 4) return { scale: 0.8, opacity: 0.7 };
-    return { scale: 1, opacity: 1 };
+    if (value === 0) return 4;
+    if (value < 1) return 6;
+    if (value < 2) return 10;
+    return 16;
+  }
+}
+
+/**
+ * Get dot opacity based on size
+ */
+function getDotOpacity(size: number): number {
+  switch (size) {
+    case 4: return 0.15;
+    case 6: return 0.3;
+    case 10: return 0.6;
+    case 16: return 0.75;
+    default: return 0.15;
   }
 }
 
@@ -200,19 +160,20 @@ interface ActivityDotProps {
 
 function ActivityDot({ date, day, selectedType, activityConfig }: ActivityDotProps) {
   if (!date) {
-    return <div className="aspect-square" />;
+    return <div className="h-[27px] flex items-center justify-center" />;
   }
 
   const value = day ? activityConfig.getValue(day) : 0;
-  const { scale, opacity } = getDotStyle(value, selectedType);
+  const size = getDotSize(value, selectedType);
+  const opacity = getDotOpacity(size);
 
   const dotElement = (
-    <div className="aspect-square flex items-center justify-center">
+    <div className="h-[27px] flex items-center justify-center">
       <div
         className="rounded-full bg-foreground transition-all"
         style={{
-          width: `${scale * 100}%`,
-          height: `${scale * 100}%`,
+          width: `${size}px`,
+          height: `${size}px`,
           opacity,
         }}
       />
@@ -259,91 +220,59 @@ function ActivityDot({ date, day, selectedType, activityConfig }: ActivityDotPro
   );
 }
 
-export function ActivityGrid({ data }: ActivityGridProps) {
+export function ActivityGrid({ data, isLoading = false }: ActivityGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [zoomLevel, setZoomLevel] = useState<ZoomLevel>("month");
   const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(() => data.year);
   const [selectedType, setSelectedType] = useState<ActivityType>("github");
 
   const selectedConfig = ACTIVITY_TYPES.find(t => t.type === selectedType)!;
 
-  // Debounce refs for gestures
+  // Check if we're on the current month (can't go into future)
+  const now = new Date();
+  const isAtCurrentPeriod = currentYear === now.getFullYear() && currentMonth === now.getMonth();
+
+  // Debounce ref for gestures
   const lastNavigationTime = useRef<number>(0);
-  const initialPinchDistance = useRef<number | null>(null);
 
-  // Generate appropriate grid based on zoom level
+  // Generate month grid
   const grid = useMemo(() => {
-    if (zoomLevel === "month") {
-      return generateMonthGrid(currentYear, currentMonth);
-    }
-    return generateYearGrid(currentYear);
-  }, [zoomLevel, currentYear, currentMonth]);
+    return generateMonthGrid(currentYear, currentMonth);
+  }, [currentYear, currentMonth]);
 
 
-  // Navigate to next/previous time period
+  // Navigate to next/previous month
   const navigate = useCallback((direction: "next" | "prev") => {
-    const now = Date.now();
+    const timestamp = Date.now();
     // Debounce navigation to prevent rapid firing
-    if (now - lastNavigationTime.current < 300) return;
-    lastNavigationTime.current = now;
+    if (timestamp - lastNavigationTime.current < 300) return;
+    lastNavigationTime.current = timestamp;
 
-    if (zoomLevel === "month") {
-      if (direction === "next") {
-        if (currentMonth < 11) {
-          setCurrentMonth(m => m + 1);
-        } else {
-          setCurrentMonth(0);
-          setCurrentYear(y => y + 1);
-        }
+    const currentDate = new Date();
+
+    if (direction === "next") {
+      // Prevent going into future
+      const nextMonth = currentMonth < 11 ? currentMonth + 1 : 0;
+      const nextYear = currentMonth < 11 ? currentYear : currentYear + 1;
+      if (nextYear > currentDate.getFullYear() ||
+          (nextYear === currentDate.getFullYear() && nextMonth > currentDate.getMonth())) {
+        return;
+      }
+      if (currentMonth < 11) {
+        setCurrentMonth(m => m + 1);
       } else {
-        if (currentMonth > 0) {
-          setCurrentMonth(m => m - 1);
-        } else {
-          setCurrentMonth(11);
-          setCurrentYear(y => y - 1);
-        }
+        setCurrentMonth(0);
+        setCurrentYear(y => y + 1);
       }
     } else {
-      if (direction === "next") {
-        setCurrentYear(y => y + 1);
+      if (currentMonth > 0) {
+        setCurrentMonth(m => m - 1);
       } else {
+        setCurrentMonth(11);
         setCurrentYear(y => y - 1);
       }
     }
-  }, [zoomLevel, currentMonth]);
-
-  // Handle pinch gesture
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      initialPinchDistance.current = Math.sqrt(dx * dx + dy * dy);
-    }
-  }, []);
-
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (e.touches.length === 2 && initialPinchDistance.current !== null) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      const currentDistance = Math.sqrt(dx * dx + dy * dy);
-      const delta = currentDistance - initialPinchDistance.current;
-
-      if (Math.abs(delta) > 40) {
-        if (delta < 0 && zoomLevel === "month") {
-          setZoomLevel("year");
-          initialPinchDistance.current = null;
-        } else if (delta > 0 && zoomLevel === "year") {
-          setZoomLevel("month");
-          initialPinchDistance.current = null;
-        }
-      }
-    }
-  }, [zoomLevel]);
-
-  const handleTouchEnd = useCallback(() => {
-    initialPinchDistance.current = null;
-  }, []);
+  }, [currentMonth, currentYear]);
 
   // Handle wheel for horizontal scroll navigation
   const handleWheel = useCallback((e: WheelEvent) => {
@@ -361,119 +290,177 @@ export function ActivityGrid({ data }: ActivityGridProps) {
     const container = containerRef.current;
     if (!container) return;
 
-    container.addEventListener("touchstart", handleTouchStart, { passive: true });
-    container.addEventListener("touchmove", handleTouchMove, { passive: true });
-    container.addEventListener("touchend", handleTouchEnd);
     container.addEventListener("wheel", handleWheel, { passive: false });
 
     return () => {
-      container.removeEventListener("touchstart", handleTouchStart);
-      container.removeEventListener("touchmove", handleTouchMove);
-      container.removeEventListener("touchend", handleTouchEnd);
       container.removeEventListener("wheel", handleWheel);
     };
-  }, [handleTouchStart, handleTouchMove, handleTouchEnd, handleWheel]);
+  }, [handleWheel]);
 
   return (
     <TooltipPrimitive.Provider delayDuration={100}>
-      <div ref={containerRef} className="flex flex-col gap-4 select-none">
-        {/* Activity type tabs */}
-        <div className="grid grid-cols-3 gap-0 rounded-xl bg-black/[0.06] p-1 overflow-hidden">
-          {ACTIVITY_TYPES.map((config) => (
-            <button
-              key={config.type}
-              onClick={() => setSelectedType(config.type)}
-              className={cn(
-                "flex items-center justify-between px-3 py-2 transition-colors rounded-lg",
-                selectedType === config.type
-                  ? "bg-background shadow-sm"
-                  : "hover:bg-background/50"
-              )}
-            >
-              <div className="flex flex-col items-start">
-                <span className="text-xs text-text-secondary">{config.label}</span>
-                <span className="text-2xl font-semibold tabular-nums">
-                  {config.getTotalValue(data)}
-                </span>
-              </div>
-              <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center",
-                selectedType === config.type ? "bg-black/[0.06]" : "bg-black/[0.04]"
-              )}>
-                {config.icon}
-              </div>
-            </button>
-          ))}
-        </div>
+      <div ref={containerRef} className="select-none">
+        {/* Card container */}
+        <div className="rounded-3xl border border-black/12 overflow-hidden">
+          {/* Activity type tabs */}
+          <div className="flex bg-black/5">
+            {ACTIVITY_TYPES.map((config, index) => {
+              const isSelected = selectedType === config.type;
+              const isFirst = index === 0;
+              const isLast = index === ACTIVITY_TYPES.length - 1;
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`${zoomLevel}-${currentYear}-${currentMonth}-${selectedType}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="flex flex-col gap-1"
-          >
-            {/* Day labels row */}
-            <div className="grid grid-cols-7 gap-2 mb-1">
+              // Build shadow styles (looks better with rounded corners than borders)
+              const shadows: string[] = [];
+              const selectedIndex = ACTIVITY_TYPES.findIndex(t => t.type === selectedType);
+
+              if (isSelected) {
+                // Active tabs: first gets right, last gets left, middle gets both
+                if (isFirst) {
+                  shadows.push("1px 0 0 0 rgba(0,0,0,0.12)");
+                } else if (isLast) {
+                  shadows.push("-1px 0 0 0 rgba(0,0,0,0.12)");
+                } else {
+                  shadows.push("1px 0 0 0 rgba(0,0,0,0.12)");
+                  shadows.push("-1px 0 0 0 rgba(0,0,0,0.12)");
+                }
+              } else {
+                // Inactive tabs need dividers between other inactive tabs
+                // Right shadow: if active tab is to the left AND there's an inactive tab to the right
+                if (selectedIndex < index && !isLast) {
+                  shadows.push("1px 0 0 0 rgba(0,0,0,0.12)");
+                }
+                // Left shadow: if active tab is to the right AND there's an inactive tab to the left
+                if (selectedIndex > index && !isFirst) {
+                  shadows.push("-1px 0 0 0 rgba(0,0,0,0.12)");
+                }
+                // Bottom shadow for inactive tabs
+                shadows.push("0 1px 0 0 rgba(0,0,0,0.12)");
+              }
+
+              const tabStyles: React.CSSProperties = {
+                boxShadow: shadows.join(", ") || "none",
+              };
+
+              return (
+                <button
+                  key={config.type}
+                  onClick={() => setSelectedType(config.type)}
+                  className={cn(
+                    "flex-1 flex flex-col gap-1 px-5 py-4 pb-2 transition-colors rounded-t-3xl",
+                    isSelected
+                      ? "bg-[#f4f4f4]"
+                      : "hover:bg-black/5"
+                  )}
+                  style={tabStyles}
+                >
+                  <span className="text-sm text-black/60 font-medium text-left">
+                    {config.label}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {isLoading ? (
+                      <div className="h-10 w-16 bg-black/10 rounded animate-pulse" />
+                    ) : (
+                      <span
+                        className={cn(
+                          "text-[38px] font-medium font-mono tabular-nums leading-none",
+                          isSelected ? "text-black" : "text-black/60"
+                        )}
+                      >
+                        {config.getTotalValue(data)}
+                      </span>
+                    )}
+                    <div
+                      className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center ml-auto",
+                        isSelected ? "bg-black/10" : "border border-black/10"
+                      )}
+                    >
+                      <span className={isSelected ? "text-black" : "text-black/60"}>
+                        {config.icon}
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Grid section */}
+          <div className="bg-[#f4f4f4]">
+            {/* Day labels row - outside AnimatePresence to prevent re-render */}
+            <div className="grid grid-cols-7 px-3 pt-6">
               {DAY_LABELS.map((label, index) => (
                 <div
                   key={index}
-                  className="text-xs text-text-tertiary flex items-center justify-center"
+                  className="h-[27px] text-sm text-black/45 font-medium flex items-center justify-center"
                 >
                   {label}
                 </div>
               ))}
             </div>
 
-            {/* Activity grid - 7 columns for days */}
-            <div className="grid grid-cols-7 gap-2">
-              {grid[0].map((_, weekIndex) =>
-                grid.map((dayRow, dayIndex) => (
-                  <ActivityDot
-                    key={`${weekIndex}-${dayIndex}`}
-                    date={dayRow[weekIndex]}
-                    day={dayRow[weekIndex] ? data.days[dayRow[weekIndex]] || null : null}
-                    selectedType={selectedType}
-                    activityConfig={selectedConfig}
-                  />
-                ))
-              )}
-            </div>
-          </motion.div>
-        </AnimatePresence>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${currentYear}-${currentMonth}-${selectedType}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="px-3"
+              >
+                {/* Activity grid - 7 columns for days */}
+                <div className="grid grid-cols-7">
+                  {isLoading ? (
+                    // Skeleton grid - 6 weeks x 7 days
+                    Array.from({ length: 42 }).map((_, i) => (
+                      <div key={i} className="h-[27px] flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-black/10 animate-pulse" />
+                      </div>
+                    ))
+                  ) : (
+                    grid[0].map((_, weekIndex) =>
+                      grid.map((dayRow, dayIndex) => (
+                        <ActivityDot
+                          key={`${weekIndex}-${dayIndex}`}
+                          date={dayRow[weekIndex]}
+                          day={dayRow[weekIndex] ? data.days[dayRow[weekIndex]] || null : null}
+                          selectedType={selectedType}
+                          activityConfig={selectedConfig}
+                        />
+                      ))
+                    )
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
 
-        {/* Bottom navigation */}
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate("prev")}
-              className="p-1 rounded-md hover:bg-overlay-subtle transition-colors text-text-secondary"
-              aria-label="Previous"
-            >
-              <IconChevronLeft size={18} stroke={1.5} />
-            </button>
-            <span className="text-sm text-text-secondary font-medium min-w-[120px] text-center">
-              {zoomLevel === "month"
-                ? `${MONTH_LABELS_FULL[currentMonth]} ${currentYear}`
-                : `${currentYear}`}
-            </span>
-            <button
-              onClick={() => navigate("next")}
-              className="p-1 rounded-md hover:bg-overlay-subtle transition-colors text-text-secondary"
-              aria-label="Next"
-            >
-              <IconChevronRight size={18} stroke={1.5} />
-            </button>
+            {/* Bottom navigation */}
+            <div className="flex items-center justify-center px-1.5 py-1.5 border-t border-black/12">
+              <button
+                onClick={() => navigate("prev")}
+                className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors text-black/60"
+                aria-label="Previous"
+              >
+                <IconChevronLeft size={16} stroke={2} />
+              </button>
+              <span className="text-sm text-black/60 font-medium min-w-[100px] text-center">
+                {MONTH_LABELS_FULL[currentMonth]} {currentYear}
+              </span>
+              <button
+                onClick={() => navigate("next")}
+                disabled={isAtCurrentPeriod}
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                  isAtCurrentPeriod
+                    ? "text-black/20 cursor-not-allowed"
+                    : "text-black/60 hover:bg-black/5"
+                )}
+                aria-label="Next"
+              >
+                <IconChevronRight size={16} stroke={2} />
+              </button>
+            </div>
           </div>
-          <button
-            onClick={() => setZoomLevel(z => z === "month" ? "year" : "month")}
-            className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary transition-colors"
-          >
-            {zoomLevel === "month" ? "Month" : "Year"}
-            <IconChevronDown size={16} stroke={1.5} />
-          </button>
         </div>
       </div>
     </TooltipPrimitive.Provider>

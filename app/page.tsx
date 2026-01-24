@@ -232,8 +232,7 @@ export default function Home() {
           <AustinLink href="https://papercrowns.com/">Paper Crowns</AustinLink>.
         </Text>
       </section>
-      <section id="activity" className="flex flex-col gap-4">
-        <Heading size="h3">Activity</Heading>
+      <section id="activity">
         <ActivitySection />
       </section>
       <section id="contact" className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
