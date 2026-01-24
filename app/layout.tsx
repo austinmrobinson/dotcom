@@ -8,6 +8,7 @@ import { cn } from "./utils/cn";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Toaster } from "sonner";
+import { AgentationProvider } from "./components/agentationProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -53,6 +54,7 @@ export default function RootLayout({
           <SpeedInsights />
         </main>
         <Toaster theme="dark" position="bottom-center" />
+        <AgentationProvider />
       </body>
     </html>
   );
