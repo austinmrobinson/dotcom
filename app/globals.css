@@ -161,6 +161,7 @@
 
   /* Badge background */
   --badge-bg: oklch(0.869 0 0);
+
 }
 
 .dark {
@@ -227,6 +228,7 @@
 
   /* Badge background */
   --badge-bg: oklch(0.439 0 0);
+
 }
 
 /*
