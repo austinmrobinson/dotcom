@@ -14,6 +14,7 @@ import {
   IconArrowUpRight,
   IconCopy,
 } from "@tabler/icons-react";
+import { ActivitySection } from "./components/activity";
 
 const iconVariants = {
   initial: { scale: 0.5, opacity: 0, filter: "blur(4px)" },
@@ -220,6 +221,10 @@ export default function Home() {
           a designer and engineer for{" "}
           <AustinLink href="https://papercrowns.com/">Paper Crowns</AustinLink>.
         </Text>
+      </section>
+      <section id="activity" className="flex flex-col gap-4">
+        <Heading size="h3">Activity</Heading>
+        <ActivitySection />
       </section>
       <section id="contact" className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <CopyCTACard
