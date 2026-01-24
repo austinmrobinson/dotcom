@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heading, Text } from "./components/text";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,7 +10,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   IconMail,
   IconBrandX,
-  IconBrandInstagram,
+  IconBrandLinkedin,
   IconArrowUpRight,
   IconCopy,
 } from "@tabler/icons-react";
@@ -33,6 +33,14 @@ const reducedMotionVariants = {
   animate: { opacity: 1 },
   exit: { opacity: 0 },
 };
+
+function useCanHover() {
+  const [canHover, setCanHover] = useState(false);
+  useEffect(() => {
+    setCanHover(window.matchMedia("(hover: hover)").matches);
+  }, []);
+  return canHover;
+}
 
 interface CTACardContentProps {
   isActive: boolean;
@@ -58,7 +66,7 @@ function CTACardContent({
 
   return (
     <>
-      <span className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center rounded-full bg-black/10 sm:mb-auto relative">
+      <span className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center rounded-full bg-overlay-light sm:mb-auto relative">
         <AnimatePresence mode="popLayout" initial={false}>
           {isActive ? (
             <motion.span
@@ -135,15 +143,16 @@ interface CTACardProps {
 
 function CTACard({ href, icon, title, subtitle, hoverSubtitle }: CTACardProps) {
   const [isActive, setIsActive] = useState(false);
+  const canHover = useCanHover();
 
   return (
     <Link
       href={href}
-      className="flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0 sm:justify-between p-4 sm:p-6 rounded-2xl sm:rounded-3xl border-[0.5px] border-black/20 flex-1 min-w-0 hover:bg-black/5 transition-colors"
-      onMouseEnter={() => setIsActive(true)}
-      onMouseLeave={() => setIsActive(false)}
-      onFocus={() => setIsActive(true)}
-      onBlur={() => setIsActive(false)}
+      className="flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0 sm:justify-between p-4 sm:p-6 rounded-2xl sm:rounded-3xl border-[0.5px] border-border-medium flex-1 min-w-0 hover:bg-overlay-subtle transition-colors"
+      onMouseEnter={() => canHover && setIsActive(true)}
+      onMouseLeave={() => canHover && setIsActive(false)}
+      onFocus={() => canHover && setIsActive(true)}
+      onBlur={() => canHover && setIsActive(false)}
     >
       <CTACardContent
         isActive={isActive}
@@ -167,18 +176,19 @@ interface CopyCTACardProps {
 
 function CopyCTACard({ text, icon, title, subtitle, hoverSubtitle }: CopyCTACardProps) {
   const [isActive, setIsActive] = useState(false);
+  const canHover = useCanHover();
 
   return (
     <Copy
       text={text}
       type="Email"
-      onFocus={() => setIsActive(true)}
-      onBlur={() => setIsActive(false)}
+      onFocus={() => canHover && setIsActive(true)}
+      onBlur={() => canHover && setIsActive(false)}
     >
       <div
-        className="flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0 sm:justify-between p-4 sm:p-6 rounded-2xl sm:rounded-3xl border-[0.5px] border-black/20 flex-1 min-w-0 hover:bg-black/5 transition-colors h-full cursor-pointer"
-        onMouseEnter={() => setIsActive(true)}
-        onMouseLeave={() => setIsActive(false)}
+        className="flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0 sm:justify-between p-4 sm:p-6 rounded-2xl sm:rounded-3xl border-[0.5px] border-border-medium flex-1 min-w-0 hover:bg-overlay-subtle transition-colors h-full cursor-pointer"
+        onMouseEnter={() => canHover && setIsActive(true)}
+        onMouseLeave={() => canHover && setIsActive(false)}
       >
         <CTACardContent
           isActive={isActive}
@@ -242,9 +252,9 @@ export default function Home() {
           hoverSubtitle="Navigate"
         />
         <CTACard
-          href="https://instagram.com/robinsonaustin"
-          icon={<IconBrandInstagram size={20} stroke={1.5} />}
-          title="Instagram"
+          href="https://www.linkedin.com/in/robinsonaustin/"
+          icon={<IconBrandLinkedin size={20} stroke={1.5} />}
+          title="LinkedIn"
           subtitle="/robinsonaustin"
           hoverSubtitle="Navigate"
         />
