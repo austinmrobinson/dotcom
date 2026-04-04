@@ -56,7 +56,7 @@ export default function RootLayout({
     <html lang="en" className={cn(lora.variable, merriweatherHeading.variable, "font-serif")}>
       <body
         className={cn(
-          "flex flex-col items-center min-h-[100vh] text-sm transition-colors duration-300 text-text-secondary bg-background"
+          "relative flex flex-col items-center min-h-[100vh] text-sm transition-colors duration-300 text-text-secondary bg-background"
         )}
       >
         <PaperTexture />

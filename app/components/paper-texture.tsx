@@ -3,7 +3,7 @@ export function PaperTexture() {
     <>
       {/* Coarse paper grain */}
       <svg
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full opacity-[0.12] sm:opacity-[0.07] dark:opacity-[0.10] dark:sm:opacity-[0.06]"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-[0.06] sm:opacity-[0.04] dark:opacity-[0.05] dark:sm:opacity-[0.035]"
         aria-hidden="true"
       >
         <filter id="paper-grain" colorInterpolationFilters="sRGB">
@@ -24,7 +24,7 @@ export function PaperTexture() {
       </svg>
       {/* Fine noise */}
       <svg
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full opacity-[0.10] sm:opacity-[0.06] dark:opacity-[0.08] dark:sm:opacity-[0.05]"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-[0.05] sm:opacity-[0.035] dark:opacity-[0.04] dark:sm:opacity-[0.03]"
         aria-hidden="true"
       >
         <filter id="paper-noise" colorInterpolationFilters="sRGB">
