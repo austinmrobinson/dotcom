@@ -6,6 +6,7 @@ import { Metadata } from "next";
 import { Project } from "../types";
 import { Heading, Text } from "../components/text";
 import { Button } from "../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import Copy from "../components/copy";
 
 export const metadata: Metadata = {
@@ -27,24 +28,24 @@ export default async function Projects() {
       <TopOfPage title="Projects" />
       <Animate className="flex flex-col gap-16">
         {sortedProjects && <WorkGrid items={sortedProjects} />}
-        <div className="px-6 py-6 sm:px-9 sm:py-8 rounded-xl flex flex-col gap-4 border-2 border-border-subtle items-start">
-          <div className="flex flex-col gap-1">
-            <Heading size="h4" as="h2">
-              More Coming Soon
-            </Heading>
-            <Text>
+        <Card>
+          <CardHeader>
+            <CardTitle>More Coming Soon</CardTitle>
+            <CardDescription>
               I have over 30 projects to share across my roles at Tesla, HP,
               and Paper Crowns. These projects show my experience with
               design systems and engineering. Please contact me if you would
               like to see more!
-            </Text>
-          </div>
-          <Copy text="austinrobinsondesign@gmail.com" type="Email">
-            <Button as="div" variant="secondary" size="small">
-              Contact
-            </Button>
-          </Copy>
-        </div>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Copy text="austinrobinsondesign@gmail.com" type="Email">
+              <Button variant="secondary" size="sm" render={<div />} nativeButton={false}>
+                Contact
+              </Button>
+            </Copy>
+          </CardContent>
+        </Card>
       </Animate>
     </section>
   );

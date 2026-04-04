@@ -1,14 +1,25 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Lora, Merriweather } from "next/font/google";
 import "./globals.css";
 import Header from "./components/header";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "./utils/cn";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
-import { Toaster } from "sonner";
+import { Toaster } from "@/app/components/ui/sonner";
 import { AgentationProvider } from "./components/agentationProvider";
+
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
+const merriweatherHeading = Merriweather({
+  weight: ["300", "400", "700", "900"],
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -41,7 +52,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={cn(lora.variable, merriweatherHeading.variable, "font-serif")}>
       <body
         className={cn(
           "flex flex-col items-center min-h-[100vh] text-sm transition-colors duration-300 text-text-secondary bg-background"

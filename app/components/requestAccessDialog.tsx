@@ -18,9 +18,10 @@ import {
 } from "@/app/components/ui/select";
 import { Button } from "@/app/components/ui/button";
 import { Label } from "@/app/components/ui/label";
+import { cn } from "../utils/cn";
 import TextInput from "./input";
 import { Heading, Text } from "./text";
-import { IconCheck, IconLoader2, IconAlertCircle } from "@tabler/icons-react";
+import { RiCheckLine, RiLoader2Line, RiErrorWarningLine } from "@remixicon/react";
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
@@ -110,19 +111,16 @@ export default function RequestAccessDialog() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button as="div" variant="text">
-          Request Access
-        </Button>
+      <DialogTrigger render={<Button variant="ghost" />}>
+        Request Access
       </DialogTrigger>
       <DialogContent className="sm:max-w-[400px]">
         {status === "success" ? (
           <div className="flex flex-col items-center justify-center gap-4 py-8">
-            <div className="p-3 rounded-full bg-green-100 dark:bg-green-900/30">
-              <IconCheck
-                className="text-green-600 dark:text-green-400"
+            <div className="p-3 rounded-full bg-success/10">
+              <RiCheckLine
+                className="text-success"
                 size={24}
-                stroke={1.5}
               />
             </div>
             <div className="text-center">
@@ -158,25 +156,21 @@ export default function RequestAccessDialog() {
                 </Label>
                 <Select
                   value={reason}
-                  onValueChange={setReason}
+                  onValueChange={(val) => setReason(val ?? "")}
                   disabled={status === "loading"}
                 >
                   <SelectTrigger
                     id="request-reason"
-                    className={`w-full h-10 px-4 py-2.5 bg-neutral-900/[0.05] dark:bg-white/[0.05] rounded-full font-medium text-neutral-900 dark:text-white ${
-                      reasonError
-                        ? "border-2 border-red-600 dark:border-red-400"
-                        : "border-2 border-transparent"
-                    }`}
+                    className="w-full"
+                    aria-invalid={!!reasonError || undefined}
                   >
                     <SelectValue placeholder="Select a reason..." />
                   </SelectTrigger>
-                  <SelectContent className="bg-neutral-900 dark:bg-white border-none rounded-2xl overflow-hidden">
+                  <SelectContent>
                     {REASON_OPTIONS.map((option) => (
                       <SelectItem
                         key={option.value}
                         value={option.value}
-                        className="text-white dark:text-neutral-900 focus:bg-white/10 dark:focus:bg-neutral-900/10 focus:text-white dark:focus:text-neutral-900 rounded-xl"
                       >
                         {option.label}
                       </SelectItem>
@@ -187,7 +181,7 @@ export default function RequestAccessDialog() {
                   <Text
                     weight="medium"
                     size="caption"
-                    className="text-red-600 dark:text-red-400"
+                    className="text-destructive"
                   >
                     {reasonError}
                   </Text>
@@ -195,8 +189,8 @@ export default function RequestAccessDialog() {
               </div>
 
               {status === "error" && errorMessage && (
-                <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-                  <IconAlertCircle size={16} stroke={1.5} />
+                <div className="flex items-center gap-2 text-destructive">
+                  <RiErrorWarningLine size={16} />
                   <Text size="caption" weight="medium">
                     {errorMessage}
                   </Text>
@@ -206,7 +200,7 @@ export default function RequestAccessDialog() {
               <Button type="submit" disabled={status === "loading"} className="mt-2">
                 {status === "loading" ? (
                   <>
-                    <IconLoader2 size={16} stroke={1.5} className="animate-spin" />
+                    <RiLoader2Line size={16} className="animate-spin" />
                     Sending...
                   </>
                 ) : (

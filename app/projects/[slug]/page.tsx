@@ -7,6 +7,7 @@ import StickyHeader from "@/app/components/stickyHeader";
 import { formatDateMonth } from "@/app/utils/formatDate";
 import Animate from "@/app/components/animate";
 import ImageZoom, { ImageZoomGallery } from "@/app/components/image";
+import { Badge } from "@/app/components/ui/badge";
 import { Metadata } from "next";
 
 export async function generateMetadata({
@@ -72,11 +73,8 @@ export default async function ProjectPage({ params }: any) {
             </Heading>
             <ul className="flex flex-wrap gap-2">
               {project.categories.map((category: string, index: number) => (
-                <li
-                  className="flex items-center justify-center px-3 py-1 rounded-full bg-overlay-light border border-border-subtle"
-                  key={index}
-                >
-                  {category}
+                <li key={index}>
+                  <Badge variant="outline">{category}</Badge>
                 </li>
               ))}
             </ul>

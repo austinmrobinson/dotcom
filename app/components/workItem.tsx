@@ -3,6 +3,8 @@ import formatDate, { formatDateMonth } from "../utils/formatDate";
 import { Heading, Text } from "./text";
 import Image from "next/image";
 import { Project } from "../types";
+import { Badge } from "./ui/badge";
+import { Skeleton } from "./ui/skeleton";
 
 interface WorkItemProps {
   item: any;
@@ -25,7 +27,7 @@ export default function WorkItem({ item, type, skeleton }: WorkItemProps) {
     return (
       <div className="w-full">
         <div className="flex flex-col gap-4 h-full">
-          <div className="w-full aspect-[16/9] rounded-xl animate-pulse bg-overlay-light"></div>
+          <Skeleton className="w-full aspect-[16/9] rounded-xl" />
           <div className="flex flex-col gap-1">
             <div className="flex gap-3 items-center justify-between">
               <Heading size="h4" skeleton />
@@ -44,9 +46,9 @@ export default function WorkItem({ item, type, skeleton }: WorkItemProps) {
       >
         <article className="flex flex-col gap-4 h-full" key={item.slug}>
           <figure className="relative">
-            <span className="absolute top-2 left-2 flex items-center text-sm justify-center text-text-secondary px-2 py-[2px] rounded-md bg-badge-bg">
+            <Badge variant="secondary" className="absolute top-2 left-2">
               {item.company}
-            </span>
+            </Badge>
             <Image
               width="640"
               height="360"

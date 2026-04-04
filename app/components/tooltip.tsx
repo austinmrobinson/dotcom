@@ -14,7 +14,8 @@ interface TooltipProps {
 export default function Tooltip({ children, label }: TooltipProps) {
   return (
     <ShadcnTooltip>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipTrigger render={children as React.ReactElement}>
+      </TooltipTrigger>
       <TooltipContent>
         {label}
       </TooltipContent>

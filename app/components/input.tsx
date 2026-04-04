@@ -1,11 +1,16 @@
 "use client";
 
-import { IconEye, IconEyeOff } from "@tabler/icons-react";
-import { IconButton } from "@/app/components/ui/button";
+import { RiEyeLine, RiEyeOffLine } from "@remixicon/react";
 import { Text } from "./text";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { cn } from "../utils/cn";
 import { Label } from "@/app/components/ui/label";
+import { Input } from "@/app/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/app/components/ui/input-group";
 
 interface TextInputProps
   extends Omit<
@@ -33,12 +38,50 @@ export default function TextInput({
   trailing,
   ...rest
 }: TextInputProps) {
+  if (trailing) {
+    return (
+      <div className="flex flex-col gap-1">
+        {hiddenLabel ? (
+          <Label htmlFor={id} className="sr-only">{label}</Label>
+        ) : (
+          label && (
+            <Label htmlFor={id}>
+              <Text>{label}</Text>
+            </Label>
+          )
+        )}
+        <InputGroup className={cn(error && "border-destructive")} aria-invalid={!!error || undefined}>
+          <InputGroupInput
+            id={id}
+            value={value}
+            type={type ?? "text"}
+            placeholder={placeholder}
+            onChange={onChange}
+            data-1p-ignore
+            className={className}
+            {...rest}
+          />
+          <InputGroupAddon align="inline-end">
+            {trailing}
+          </InputGroupAddon>
+        </InputGroup>
+        {error && (
+          <Text
+            weight="medium"
+            size="caption"
+            className="text-destructive mb-2"
+          >
+            {error}
+          </Text>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-1">
       {hiddenLabel ? (
-        <VisuallyHidden.Root>
-          <Label htmlFor={id}>{label}</Label>
-        </VisuallyHidden.Root>
+        <Label htmlFor={id} className="sr-only">{label}</Label>
       ) : (
         label && (
           <Label htmlFor={id}>
@@ -46,30 +89,24 @@ export default function TextInput({
           </Label>
         )
       )}
-      <div className="relative">
-        <input
-          id={id}
-          value={value}
-          type={type ?? "text"}
-          placeholder={placeholder}
-          onChange={onChange}
-          data-1p-ignore
-          className={cn(
-            "w-full h-10 px-4 py-2.5 border-2 bg-overlay-subtle flex text-base sm:text-sm rounded-full font-medium text-foreground outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-[color,box-shadow]",
-            error ? "border-destructive" : "border-transparent",
-            className
-          )}
-          {...rest}
-        />
-        {trailing && <div className="absolute right-1 top-1">{trailing}</div>}
-      </div>
+      <Input
+        id={id}
+        value={value}
+        type={type ?? "text"}
+        placeholder={placeholder}
+        onChange={onChange}
+        data-1p-ignore
+        aria-invalid={!!error || undefined}
+        className={className}
+        {...rest}
+      />
       {error && (
         <Text
           weight="medium"
           size="caption"
           className="text-destructive mb-2"
         >
-          {error ?? "Invalid. Enter correct value"}
+          {error}
         </Text>
       )}
     </div>
@@ -87,18 +124,17 @@ export function PasswordInput({ id, show, setShow, ...rest }: PasswordInputProps
       id={id}
       type={show ? "text" : "password"}
       trailing={
-        <IconButton
-          variant="text"
-          size="medium"
-          type="button"
-          label={show ? "Hide Password" : "Show Password"}
+        <InputGroupButton
+          variant="ghost"
+          size="icon-sm"
+          aria-label={show ? "Hide Password" : "Show Password"}
           onClick={(e: React.MouseEvent) => {
             e.preventDefault();
             setShow(!show);
           }}
         >
-          {show ? <IconEyeOff size={16} stroke={1.5} /> : <IconEye size={16} stroke={1.5} />}
-        </IconButton>
+          {show ? <RiEyeOffLine /> : <RiEyeLine />}
+        </InputGroupButton>
       }
       {...rest}
     />
