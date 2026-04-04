@@ -2,7 +2,7 @@
 
 import { Heading } from "./text";
 import { IconButton } from "./ui/button";
-import { IconArrowUp } from "@tabler/icons-react";
+import { RiArrowUpLine } from "@remixicon/react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 interface StickyHeaderProps {
@@ -33,7 +33,7 @@ export default function StickyHeader({ title, children }: StickyHeaderProps) {
         borderBottomWidth: "0.5px",
       }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 z-10 bg-neutral-100/80 backdrop-blur-md border-neutral-200 dark:bg-neutral-900/80 dark:border-neutral-800"
+      className="fixed top-0 left-0 right-0 z-10 bg-background/80 backdrop-blur-md border-border"
     >
       <div className="max-w-screen-sm px-6 mx-auto flex relative items-center">
         <motion.div
@@ -51,7 +51,7 @@ export default function StickyHeader({ title, children }: StickyHeaderProps) {
             size="small"
             label="Scroll to top"
           >
-<IconArrowUp size={16} stroke={1.5} />
+<RiArrowUpLine size={16} />
           </IconButton>
           <Heading size="h3" className="truncate">
             {title}

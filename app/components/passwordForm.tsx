@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import TextInput, { PasswordInput } from "./input";
 import { Button } from "@/app/components/ui/button";
 import { Heading, Text } from "./text";
-import { IconLock } from "@tabler/icons-react";
+import { RiLockLine } from "@remixicon/react";
 import Animate from "./animate";
 import RequestAccessDialog from "./requestAccessDialog";
 
@@ -55,8 +55,8 @@ export default function PasswordForm() {
   return (
     <Animate className="flex flex-col justify-center gap-10 w-full max-w-[364px] sm:max-w-[264px] grow mx-auto mb-32">
       <div className="flex flex-col gap-5 items-center text-center">
-        <div className="p-3 w-12 h-12 rounded-full bg-overlay-light">
-          <IconLock size={24} stroke={1.5} />
+        <div className="p-3 size-12 rounded-full bg-overlay-light">
+          <RiLockLine size={24} />
         </div>
         <div className="flex flex-col gap-1">
           <Heading size="h3" as="h1">

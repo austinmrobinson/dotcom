@@ -1,5 +1,5 @@
 import { IconButton } from "@/app/components/ui/button";
-import { IconArrowLeft } from "@tabler/icons-react";
+import { RiArrowLeftLine } from "@remixicon/react";
 import { Heading } from "./text";
 
 interface TopOfPageProps {
@@ -20,7 +20,7 @@ export default function TopOfPage({ back, title, children }: TopOfPageProps) {
             className="-ml-2 md:absolute md:-left-7"
             label="Back"
           >
-            <IconArrowLeft size={16} stroke={1.5} />
+            <RiArrowLeftLine size={16} />
           </IconButton>
         )}
         <Heading size="h1">{title}</Heading>

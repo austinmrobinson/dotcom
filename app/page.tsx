@@ -8,12 +8,12 @@ import AustinLink from "./components/link";
 import Copy from "./components/copy";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  IconMail,
-  IconBrandX,
-  IconBrandLinkedin,
-  IconArrowUpRight,
-  IconCopy,
-} from "@tabler/icons-react";
+  RiMailLine,
+  RiTwitterXLine,
+  RiLinkedinLine,
+  RiArrowRightUpLine,
+  RiFileCopyLine,
+} from "@remixicon/react";
 
 const iconVariants = {
   initial: { scale: 0.5, opacity: 0, filter: "blur(4px)" },
@@ -65,7 +65,7 @@ function CTACardContent({
 
   return (
     <>
-      <span className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 flex items-center justify-center rounded-full bg-overlay-light sm:mb-auto relative">
+      <span className="size-10 sm:size-12 shrink-0 flex items-center justify-center rounded-full bg-overlay-light sm:mb-auto relative">
         <AnimatePresence mode="popLayout" initial={false}>
           {isActive ? (
             <motion.span
@@ -156,7 +156,7 @@ function CTACard({ href, icon, title, subtitle, hoverSubtitle }: CTACardProps) {
       <CTACardContent
         isActive={isActive}
         icon={icon}
-        activeIcon={<IconArrowUpRight size={20} stroke={1.5} />}
+        activeIcon={<RiArrowRightUpLine size={20} />}
         title={title}
         subtitle={subtitle}
         hoverSubtitle={hoverSubtitle}
@@ -192,7 +192,7 @@ function CopyCTACard({ text, icon, title, subtitle, hoverSubtitle }: CopyCTACard
         <CTACardContent
           isActive={isActive}
           icon={icon}
-          activeIcon={<IconCopy size={20} stroke={1.5} />}
+          activeIcon={<RiFileCopyLine size={20} />}
           title={title}
           subtitle={subtitle}
           hoverSubtitle={hoverSubtitle}
@@ -206,7 +206,7 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-14 sm:gap-16">
       <section id="introduction" className="flex flex-col gap-4 justify-start">
-        <div className="w-14 h-14 relative rounded-full overflow-hidden shrink-0 mb-2 bg-skeleton">
+        <div className="size-14 relative rounded-full overflow-hidden shrink-0 mb-2 bg-skeleton">
           <Image
             src="/austin.jpg"
             alt="Austin Robinson"
@@ -234,21 +234,21 @@ export default function Home() {
       <section id="contact" className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <CopyCTACard
           text="austinrobinsondesign@gmail.com"
-          icon={<IconMail size={20} stroke={1.5} />}
+          icon={<RiMailLine size={20} />}
           title="Email"
           subtitle="austinrobinsondesign@gmail.com"
           hoverSubtitle="Copy email"
         />
         <CTACard
           href="https://twitter.com/austinmrobinson"
-          icon={<IconBrandX size={20} stroke={1.5} />}
+          icon={<RiTwitterXLine size={20} />}
           title="Twitter"
           subtitle="@austinmrobinson"
           hoverSubtitle="Navigate"
         />
         <CTACard
           href="https://www.linkedin.com/in/robinsonaustin/"
-          icon={<IconBrandLinkedin size={20} stroke={1.5} />}
+          icon={<RiLinkedinLine size={20} />}
           title="LinkedIn"
           subtitle="/robinsonaustin"
           hoverSubtitle="Navigate"

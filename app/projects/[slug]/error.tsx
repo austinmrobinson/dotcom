@@ -4,7 +4,7 @@ import Animate from "@/app/components/animate";
 import { Button } from "@/app/components/ui/button";
 import { Heading, Text } from "@/app/components/text";
 import { useEffect } from "react";
-import { IconAlertCircle } from "@tabler/icons-react";
+import { RiErrorWarningLine } from "@remixicon/react";
 
 export default function Error({
   error,
@@ -21,8 +21,8 @@ export default function Error({
   return (
     <Animate className="flex flex-col justify-center gap-10 w-full max-w-[264px] grow mx-auto mb-32">
       <div className="flex flex-col gap-5 items-center text-center">
-        <div className="p-3 w-12 h-12 rounded-full bg-overlay-light">
-          <IconAlertCircle size={24} stroke={1.5} />
+        <div className="p-3 size-12 rounded-full bg-overlay-light">
+          <RiErrorWarningLine size={24} />
         </div>
         <div className="flex flex-col gap-1">
           <Heading size="h3" as="h1">

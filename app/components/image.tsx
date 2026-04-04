@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from "@/app/components/ui/dialog";
 import { IconButton } from "@/app/components/ui/button";
-import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
+import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Image as ImageType } from "../types";
@@ -36,20 +36,22 @@ export default function ImageZoom({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button
-          aria-label="Zoom in on image"
-          className={`flex cursor-zoom-in not-prose transition-opacity hover:opacity-70 ${buttonClassName}`}
-        >
-          <Image
-            width={width ?? 480}
-            height={height ?? 270}
-            className={className}
-            src={src}
-            alt={alt}
-            priority={priority}
+      <DialogTrigger
+        render={
+          <button
+            aria-label="Zoom in on image"
+            className={`flex cursor-zoom-in not-prose transition-opacity hover:opacity-70 ${buttonClassName}`}
           />
-        </button>
+        }
+      >
+        <Image
+          width={width ?? 480}
+          height={height ?? 270}
+          className={className}
+          src={src}
+          alt={alt}
+          priority={priority}
+        />
       </DialogTrigger>
       <DialogPortal>
         <DialogOverlay className="data-[state=open]:animate-overlayShow bg-overlay-strong backdrop-blur-sm cursor-zoom-out" />
@@ -107,22 +109,25 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {images.map((img: ImageType, idx) => (
-          <DialogTrigger asChild key={idx}>
-            <button
-              aria-label="Zoom in on image"
-              onClick={() => {
-                setImage(img);
-              }}
-              className="flex w-full cursor-zoom-in transition-opacity hover:opacity-80"
-            >
-              <Image
-                width={256}
-                height={144}
-                src={img.src}
-                alt={img.alt}
-                className="rounded-xl w-full h-full object-cover m-0 bg-overlay-light border border-border-hairline"
+          <DialogTrigger
+            key={idx}
+            render={
+              <button
+                aria-label="Zoom in on image"
+                onClick={() => {
+                  setImage(img);
+                }}
+                className="flex w-full cursor-zoom-in transition-opacity hover:opacity-80"
               />
-            </button>
+            }
+          >
+            <Image
+              width={256}
+              height={144}
+              src={img.src}
+              alt={img.alt}
+              className="rounded-xl w-full h-full object-cover m-0 bg-overlay-light border border-border-hairline"
+            />
           </DialogTrigger>
         ))}
       </div>
@@ -150,7 +155,7 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
                   size="medium"
                   disabled={!notFirst}
                 >
-                  <IconArrowLeft size={16} stroke={1.5} />
+                  <RiArrowLeftLine size={16} />
                 </IconButton>
               </div>
             )}
@@ -162,7 +167,7 @@ export function ImageZoomGallery({ images }: ImageZoomGalleryProps) {
                   onClick={() => nextImage && setImage(nextImage)}
                   size="medium"
                 >
-                  <IconArrowRight size={16} stroke={1.5} />
+                  <RiArrowRightLine size={16} />
                 </IconButton>
               </div>
             )}

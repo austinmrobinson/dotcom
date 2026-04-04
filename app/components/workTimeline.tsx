@@ -1,5 +1,5 @@
 import { Project } from "../types";
-import { Text } from "./text";
+import { Badge } from "./ui/badge";
 import WorkItem from "./workItem";
 
 interface WorkYearProps {
@@ -13,13 +13,13 @@ const WorkYear = ({ year, items }: WorkYearProps) => {
   return (
     <div className="flex gap-6">
       <div className="relative flex flex-col items-center">
-        <div className="sticky z-0 mb-9 top-20 flex items-center justify-center h-8 p-4 rounded-full bg-background border border-border-medium">
-          <Text as="h2" responsive>
+        <Badge variant="outline" className="sticky z-0 mb-9 top-20 h-8 px-4 rounded-full">
+          <h2>
             {formattedDate.toLocaleDateString("en-US", {
               year: "numeric",
             })}
-          </Text>
-        </div>
+          </h2>
+        </Badge>
         <span className="absolute -z-10 inset-y-0 w-[1px] bg-border-medium" />
       </div>
       <div className="mt-14 mb-9 grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-6">

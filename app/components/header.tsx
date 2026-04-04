@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { IconMoon, IconSun } from "@tabler/icons-react";
+import { RiMoonLine, RiSunLine } from "@remixicon/react";
 import { IconButton } from "@/app/components/ui/button";
 import Logo from "./logo";
 import { AnimatePresence, motion } from "framer-motion";
