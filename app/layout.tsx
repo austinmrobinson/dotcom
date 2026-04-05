@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Lora, Merriweather } from "next/font/google";
 import "./globals.css";
-import Header from "./components/header";
+
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "./utils/cn";
 import { Toaster } from "@/app/components/ui/sonner";
-import { AgentationProvider } from "./components/agentationProvider";
+
 import { PaperTexture } from "./components/paper-texture";
 
 const lora = Lora({
@@ -60,14 +60,12 @@ export default function RootLayout({
         )}
       >
         <PaperTexture />
-        <Header />
-        <main className="flex flex-col grow h-full mt-14 container max-w-screen-sm px-6 pt-8 sm:pt-[72px] pb-16 sm:pb-32">
+        <main className="flex flex-col grow h-full w-full p-6 sm:p-10">
           {children}
           <Analytics />
           <SpeedInsights />
         </main>
         <Toaster theme="dark" position="bottom-center" />
-        <AgentationProvider />
       </body>
     </html>
   );
