@@ -94,8 +94,8 @@ export default function AustinLink({
   if (!preview) return anchor;
 
   return (
-    <TooltipPrimitive.Root delay={300}>
-      <TooltipPrimitive.Trigger render={anchor} />
+    <TooltipPrimitive.Root>
+      <TooltipPrimitive.Trigger render={anchor} delay={300} />
       <TooltipPrimitive.Portal>
         <TooltipPrimitive.Positioner
           side="top"
