@@ -114,7 +114,7 @@
   --secondary: oklch(0.955 0.008 75);
   --secondary-foreground: oklch(0.216 0.012 65);
   --muted: oklch(0.955 0.008 75);
-  --muted-foreground: oklch(0.540 0.022 65);
+  --muted-foreground: oklch(0.480 0.035 50);
   --accent: oklch(0.955 0.008 75);
   --accent-foreground: oklch(0.216 0.012 65);
   --destructive: oklch(0.577 0.245 27.325);
@@ -138,29 +138,29 @@
   --sidebar-ring: oklch(0.710 0.018 65);
 
   /* Custom semantic colors - text */
-  --text-secondary: oklch(0.439 0.006 65);
-  --text-tertiary: oklch(0.556 0.006 65);
+  --text-secondary: oklch(0.439 0.028 50);
+  --text-tertiary: oklch(0.556 0.024 50);
 
-  /* Overlay backgrounds (warm neutral with opacity) */
-  --overlay-subtle: oklch(0.205 0.006 65 / 0.05);
-  --overlay-light: oklch(0.205 0.006 65 / 0.1);
-  --overlay-medium: oklch(0.205 0.006 65 / 0.15);
-  --overlay-strong: oklch(0.205 0.006 65 / 0.2);
-  --overlay-white: oklch(0.985 0.008 80 / 0.2);
+  /* Overlay backgrounds (warm brown with opacity) */
+  --overlay-subtle: oklch(0.350 0.035 50 / 0.05);
+  --overlay-light: oklch(0.350 0.035 50 / 0.08);
+  --overlay-medium: oklch(0.350 0.035 50 / 0.12);
+  --overlay-strong: oklch(0.350 0.035 50 / 0.18);
+  --overlay-white: oklch(0.985 0.016 65 / 0.2);
 
   /* Borders with opacity */
-  --border-hairline: oklch(0.869 0.006 75 / 0.005);
-  --border-subtle: oklch(0.205 0.006 65 / 0.05);
-  --border-light: oklch(0.205 0.006 65 / 0.1);
-  --border-medium: oklch(0.205 0.006 65 / 0.2);
-  --border-strong: oklch(0.205 0.006 65 / 0.3);
+  --border-hairline: oklch(0.869 0.020 55 / 0.005);
+  --border-subtle: oklch(0.350 0.035 50 / 0.05);
+  --border-light: oklch(0.350 0.035 50 / 0.1);
+  --border-medium: oklch(0.350 0.035 50 / 0.2);
+  --border-strong: oklch(0.350 0.035 50 / 0.3);
 
   /* Status colors */
   --success: oklch(0.627 0.178 149.2);
   --success-foreground: oklch(1 0 0);
 
   /* Skeleton loading */
-  --skeleton: oklch(0.205 0.006 65 / 0.15);
+  --skeleton: oklch(0.350 0.035 50 / 0.15);
 
   /* Elevated surfaces */
   --surface-elevated: oklch(0.993 0.006 80);
