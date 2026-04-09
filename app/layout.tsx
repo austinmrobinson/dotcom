@@ -7,8 +7,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "./utils/cn";
 import { Toaster } from "@/app/components/ui/sonner";
 
-import { PaperTexture } from "./components/paper-texture";
-
 const lora = Lora({
   subsets: ["latin"],
   variable: "--font-serif",
@@ -56,10 +54,9 @@ export default function RootLayout({
     <html lang="en" className={cn(lora.variable, merriweatherHeading.variable, "font-serif")}>
       <body
         className={cn(
-          "relative flex flex-col items-center min-h-[100vh] text-sm transition-colors duration-300 text-text-secondary bg-background"
+          "flex flex-col items-center min-h-[100vh] text-sm transition-colors duration-300 text-text-secondary bg-background"
         )}
       >
-        <PaperTexture />
         <main className="flex flex-col grow h-full w-full p-6 sm:p-10">
           {children}
           <Analytics />
