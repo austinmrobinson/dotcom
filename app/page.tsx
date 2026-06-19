@@ -9,7 +9,12 @@ import {
   useState,
   type RefObject,
 } from "react";
-import { LayoutGroup, useReducedMotion } from "framer-motion";
+import {
+  AnimatePresence,
+  LayoutGroup,
+  motion,
+  useReducedMotion,
+} from "framer-motion";
 import { Text } from "./components/text";
 import AustinLink from "./components/link";
 import { toast } from "sonner";
@@ -23,9 +28,8 @@ import {
   ItemGroup,
 } from "@/app/components/ui/item";
 import { MediaCarousel, Kbd } from "./components/media-carousel";
-import { ProfileCard } from "./components/profile-card";
+import { ProfileCardStack } from "./components/profile-card-stack";
 import { RiArrowUpSLine, RiArrowDownSLine } from "@remixicon/react";
-import { MouseSafeArea } from "./components/mouse-safe-area";
 import {
   ListItemRow,
   ListItemRowLink,
@@ -46,8 +50,19 @@ import { prefetchOgMetadata } from "./hooks/use-og-metadata";
 import { cn } from "@/app/lib/utils";
 
 const DESELECT_DELAY = 400;
+const HIGHLIGHT_EXIT_DELAY_MS = 150;
 const AUTO_ADVANCE_MS = 4000;
 const MANUAL_PAUSE_MS = 8000;
+
+const blurEase = [0.25, 0.46, 0.45, 0.94] as const;
+const previewBlurTransition = { duration: 0.4, ease: blurEase };
+const previewBlur = "12px";
+
+function getPanelKey(panel: PanelContent) {
+  if (panel.type === "media") return `media-${panel.workIndex}`;
+  if (panel.type === "profile") return "profile-stack";
+  return panel.type;
+}
 
 const contactProfiles = {
   twitter: {
@@ -77,6 +92,12 @@ const contactProfiles = {
   },
 } satisfies Record<string, Omit<ProfilePanelContent, "type">>;
 
+const contactProfileList = [
+  contactProfiles.twitter,
+  contactProfiles.linkedin,
+  contactProfiles.email,
+];
+
 function normalizeUrl(url: string) {
   try {
     const parsed = new URL(url);
@@ -104,6 +125,7 @@ interface WorkEntryProps {
 interface WorkEntryComponentProps extends WorkEntryProps {
   itemId: string;
   highlightId: string | null;
+  isPreviewActive?: boolean;
   onHover?: () => void;
 }
 
@@ -114,6 +136,7 @@ function WorkEntry({
   description,
   itemId,
   highlightId,
+  isPreviewActive,
   onHover,
 }: WorkEntryComponentProps) {
   return (
@@ -121,6 +144,7 @@ function WorkEntry({
       id={itemId}
       highlightId={highlightId}
       highlightLayoutId={LIST_HIGHLIGHT_LAYOUT_ID}
+      isPreviewActive={isPreviewActive}
       role="listitem"
       className="flex flex-col gap-3"
       onMouseEnter={onHover}
@@ -147,6 +171,7 @@ interface ContactEntryProps {
   title: string;
   trailing: string;
   highlightId: string | null;
+  isPreviewActive?: boolean;
   onHover?: () => void;
 }
 
@@ -156,6 +181,7 @@ function ContactEntry({
   title,
   trailing,
   highlightId,
+  isPreviewActive,
   onHover,
 }: ContactEntryProps) {
   return (
@@ -163,6 +189,7 @@ function ContactEntry({
       id={itemId}
       highlightId={highlightId}
       highlightLayoutId={LIST_HIGHLIGHT_LAYOUT_ID}
+      isPreviewActive={isPreviewActive}
       href={href}
       onMouseEnter={onHover}
       onFocus={onHover}
@@ -183,11 +210,13 @@ function CopyEmailButton({
   email,
   itemId,
   highlightId,
+  isPreviewActive,
   onHover,
 }: {
   email: string;
   itemId: string;
   highlightId: string | null;
+  isPreviewActive?: boolean;
   onHover?: () => void;
 }) {
   const [, copy] = useCopyToClipboard();
@@ -197,6 +226,7 @@ function CopyEmailButton({
       id={itemId}
       highlightId={highlightId}
       highlightLayoutId={LIST_HIGHLIGHT_LAYOUT_ID}
+      isPreviewActive={isPreviewActive}
       onClick={() => {
         copy(email)
           .then(() => toast.success("Copied Email"))
@@ -365,7 +395,6 @@ function usePreviewPanel(): PreviewPanelContextValue {
       clearDeselectTimer();
       manualPauseUntil.current = 0;
       setPanel({ type: "profile", ...content });
-      setMediaIndex(0);
     },
     [clearDeselectTimer]
   );
@@ -524,49 +553,142 @@ function PreviewPanel({
   }
 
   if (panel.type === "profile") {
-    const isSocial =
-      panel.platform === "twitter" || panel.platform === "linkedin";
-
     return (
-      <div
-        className={
-          isSocial
-            ? "flex aspect-video w-full min-w-0 items-center justify-center overflow-visible rounded-xl bg-profile-preview"
-            : "aspect-video w-full min-w-0"
-        }
-      >
-        <ProfileCard
-          platform={panel.platform}
-          name={panel.name}
-          handle={panel.handle}
-          avatar={panel.avatar}
-          banner={panel.banner}
-          bannerClassName={panel.bannerClassName}
-          verified={panel.verified}
-        />
-      </div>
+      <ProfileCardStack
+        profiles={contactProfileList}
+        activeId={panel.id}
+      />
     );
   }
 
   return null;
 }
 
+function PreviewPanelSlot({
+  panel,
+  isOpen,
+  mediaIndex,
+  onMediaIndexChange,
+  panelRef,
+  clearDeselectTimer,
+  startDeselectTimer,
+  onContentExitComplete,
+}: {
+  panel: PanelContent;
+  isOpen: boolean;
+  mediaIndex: number;
+  onMediaIndexChange: (index: number) => void;
+  panelRef: RefObject<HTMLDivElement | null>;
+  clearDeselectTimer: () => void;
+  startDeselectTimer: () => void;
+  onContentExitComplete: () => void;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+
+  const contentMotion = prefersReducedMotion
+    ? {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 },
+      }
+    : {
+        initial: { opacity: 0, filter: `blur(${previewBlur})` },
+        animate: { opacity: 1, filter: "blur(0px)" },
+        exit: { opacity: 0, filter: `blur(${previewBlur})` },
+      };
+
+  return (
+    <div
+      ref={panelRef}
+      className="hidden lg:flex flex-1 min-w-0 sticky top-6 sm:top-10 self-start items-center h-[calc(100dvh-theme(spacing.12))] sm:h-[calc(100dvh-theme(spacing.20))]"
+    >
+      <div
+        className="relative w-full min-w-0 aspect-video"
+        onMouseEnter={clearDeselectTimer}
+        onMouseLeave={startDeselectTimer}
+      >
+        <AnimatePresence initial={false} onExitComplete={onContentExitComplete}>
+          {isOpen && (
+            <motion.div
+              key={getPanelKey(panel)}
+              {...contentMotion}
+              transition={previewBlurTransition}
+              className="absolute inset-0 w-full min-w-0"
+            >
+              <PreviewPanel
+                panel={panel}
+                mediaIndex={mediaIndex}
+                onMediaIndexChange={onMediaIndexChange}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const previewPanel = usePreviewPanel();
   const [hoveredListItemId, setHoveredListItemId] = useState<string | null>(null);
+  const [highlightVisible, setHighlightVisible] = useState(true);
+  const [slotPanel, setSlotPanel] = useState<PanelContent | null>(null);
+  const highlightExitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activePanelRef = useRef<PanelContent | null>(null);
 
-  const highlightId =
+  const activeHighlightId =
     hoveredListItemId ?? getListHighlightId(previewPanel.panel);
+  const highlightId = highlightVisible ? activeHighlightId : null;
+  const displayedPanel = previewPanel.panel ?? slotPanel;
+
+  useEffect(() => {
+    activePanelRef.current = previewPanel.panel;
+  }, [previewPanel.panel]);
+
+  function clearHighlightExitTimer() {
+    if (highlightExitTimer.current) {
+      clearTimeout(highlightExitTimer.current);
+      highlightExitTimer.current = null;
+    }
+  }
 
   function handleListItemHover(id: string, activate: () => void) {
+    clearHighlightExitTimer();
+    setHighlightVisible(true);
     setHoveredListItemId(id);
     activate();
+  }
+
+  function handleListSectionEnter() {
+    clearHighlightExitTimer();
+    setHighlightVisible(true);
   }
 
   function handleListSectionLeave() {
     setHoveredListItemId(null);
     previewPanel.startDeselectTimer();
+    clearHighlightExitTimer();
+    highlightExitTimer.current = setTimeout(() => {
+      setHighlightVisible(false);
+    }, HIGHLIGHT_EXIT_DELAY_MS);
   }
+
+  useEffect(() => {
+    return () => clearHighlightExitTimer();
+  }, []);
+
+  useEffect(() => {
+    if (previewPanel.panel) {
+      setSlotPanel(previewPanel.panel);
+    }
+  }, [previewPanel.panel]);
+
+  useEffect(() => {
+    if (!previewPanel.panel) {
+      setHighlightVisible(true);
+      clearHighlightExitTimer();
+    }
+  }, [previewPanel.panel]);
 
   useEffect(() => {
     prefetchOgMetadata(workEntries.map((entry) => entry.href));
@@ -580,11 +702,7 @@ export default function Home() {
   return (
     <PreviewPanelContext.Provider value={contextValue}>
       <div className="flex flex-col lg:flex-row lg:gap-12 xl:gap-16">
-        <div className="relative flex flex-col gap-14 sm:gap-16 w-full lg:w-[38.2%] lg:min-w-80 shrink-0 lg:shrink">
-          {previewPanel.panel && (
-            <MouseSafeArea parentRef={previewPanel.carouselRef} />
-          )}
-
+        <div className="relative flex flex-col gap-14 sm:gap-16 w-full lg:w-[480px] lg:shrink-0">
           <section
             id="introduction"
             className="flex flex-col gap-4 justify-start"
@@ -638,7 +756,10 @@ export default function Home() {
             </HomeEnterSection>
           </section>
 
-          <div onMouseLeave={handleListSectionLeave}>
+          <div
+            onMouseEnter={handleListSectionEnter}
+            onMouseLeave={handleListSectionLeave}
+          >
             <LayoutGroup id="home-list">
               <div className={cn("relative", listSectionClassName)}>
                 <HomeEnterSection index={3}>
@@ -660,19 +781,26 @@ export default function Home() {
 
                 <HomeEnterSection index={4}>
                   <ItemGroup className="gap-0 w-full">
-                    {workEntries.map((entry, index) => (
-                      <WorkEntry
-                        key={entry.company}
-                        {...entry}
-                        itemId={`work-${index}`}
-                        highlightId={highlightId}
-                        onHover={() =>
-                          handleListItemHover(`work-${index}`, () =>
-                            previewPanel.activateWork(index)
-                          )
-                        }
-                      />
-                    ))}
+                    {workEntries.map((entry, index) => {
+                      const itemId = `work-${index}`;
+
+                      return (
+                        <WorkEntry
+                          key={entry.company}
+                          {...entry}
+                          itemId={itemId}
+                          highlightId={highlightId}
+                          isPreviewActive={
+                            !!previewPanel.panel && highlightId === itemId
+                          }
+                          onHover={() =>
+                            handleListItemHover(itemId, () =>
+                              previewPanel.activateWork(index)
+                            )
+                          }
+                        />
+                      );
+                    })}
                     <div className="pt-14 sm:pt-16 pb-2">
                       <HomeEnterSection index={5}>
                         <h2
@@ -689,6 +817,9 @@ export default function Home() {
                       title="Twitter"
                       trailing="@austinmrobinson"
                       highlightId={highlightId}
+                      isPreviewActive={
+                        !!previewPanel.panel && highlightId === "contact-twitter"
+                      }
                       onHover={() =>
                         handleListItemHover("contact-twitter", () =>
                           previewPanel.activateProfile(contactProfiles.twitter)
@@ -701,6 +832,9 @@ export default function Home() {
                       title="LinkedIn"
                       trailing="robinsonaustin"
                       highlightId={highlightId}
+                      isPreviewActive={
+                        !!previewPanel.panel && highlightId === "contact-linkedin"
+                      }
                       onHover={() =>
                         handleListItemHover("contact-linkedin", () =>
                           previewPanel.activateProfile(contactProfiles.linkedin)
@@ -711,6 +845,9 @@ export default function Home() {
                       itemId="contact-email"
                       email="austinrobinsondesign@gmail.com"
                       highlightId={highlightId}
+                      isPreviewActive={
+                        !!previewPanel.panel && highlightId === "contact-email"
+                      }
                       onHover={() =>
                         handleListItemHover("contact-email", () =>
                           previewPanel.activateProfile(contactProfiles.email)
@@ -724,21 +861,21 @@ export default function Home() {
           </div>
         </div>
 
-        {previewPanel.panel && (
-          <div
-            ref={previewPanel.carouselRef as RefObject<HTMLDivElement>}
-            className="hidden lg:flex lg:w-[61.8%] flex-1 min-w-0 sticky top-6 sm:top-10 self-start items-center h-[calc(100dvh-theme(spacing.12))] sm:h-[calc(100dvh-theme(spacing.20))]"
-            onMouseEnter={previewPanel.clearDeselectTimer}
-            onMouseLeave={previewPanel.startDeselectTimer}
-          >
-            <HomeEnterSection index={7} className="flex h-full w-full items-center">
-              <PreviewPanel
-                panel={previewPanel.panel}
-                mediaIndex={previewPanel.mediaIndex}
-                onMediaIndexChange={previewPanel.setMediaIndex}
-              />
-            </HomeEnterSection>
-          </div>
+        {displayedPanel && (
+          <PreviewPanelSlot
+            panel={displayedPanel}
+            isOpen={!!previewPanel.panel}
+            mediaIndex={previewPanel.mediaIndex}
+            onMediaIndexChange={previewPanel.setMediaIndex}
+            panelRef={previewPanel.carouselRef}
+            clearDeselectTimer={previewPanel.clearDeselectTimer}
+            startDeselectTimer={previewPanel.startDeselectTimer}
+            onContentExitComplete={() => {
+              if (!activePanelRef.current) {
+                setSlotPanel(null);
+              }
+            }}
+          />
         )}
       </div>
     </PreviewPanelContext.Provider>

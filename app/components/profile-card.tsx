@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import {
-  RiVerifiedBadgeFill,
   RiTwitterXFill,
   RiLinkedinFill,
   RiMailFill,
@@ -60,7 +59,7 @@ interface ProfileCardBaseProps extends Omit<ProfileCardProps, "platform"> {
 }
 
 interface SocialProfileCardProps extends ProfileCardBaseProps {
-  platform: Exclude<ProfilePlatform, "email">;
+  platform: ProfilePlatform;
 }
 
 function SocialProfileCard({
@@ -69,13 +68,14 @@ function SocialProfileCard({
   handle,
   avatar,
   banner,
-  bannerClassName = "bg-black",
+  bannerClassName,
   className,
 }: SocialProfileCardProps) {
   const {
     icon: PlatformIcon,
     iconBadgeClassName,
     iconClassName,
+    bannerClassName: platformBannerClassName,
   } = platformConfig[platform];
 
   return (
@@ -86,11 +86,11 @@ function SocialProfileCard({
       )}
     >
       <div className="relative aspect-video w-full rounded-[24px] shadow-profile-card">
-        <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[24px] border-hairline border-border-subtle bg-profile-card-surface">
+        <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[24px] bg-profile-card-surface">
           <div
             className={cn(
               "relative h-16 shrink-0 overflow-hidden rounded-t-[12px]",
-              !banner && bannerClassName
+              !banner && (bannerClassName ?? platformBannerClassName)
             )}
           >
             {banner && (
@@ -138,92 +138,11 @@ function SocialProfileCard({
           </div>
         </div>
       </div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-10 rounded-[40px] border-hairline border-border-light"
-      />
-    </div>
-  );
-}
-
-function EmailProfileCard({
-  name,
-  handle,
-  avatar,
-  banner,
-  bannerClassName = "bg-muted-foreground",
-  verified,
-}: ProfileCardBaseProps) {
-  const { icon: PlatformIcon, label: platformLabel } = platformConfig.email;
-
-  return (
-    <div className="w-full rounded-2xl border-hairline border-border-light bg-background p-6 sm:p-8">
-      <div className="relative flex aspect-video w-full flex-col overflow-hidden rounded-xl border-hairline border-border-hairline bg-background">
-        <div
-          className={cn(
-            "relative h-[40%] shrink-0",
-            !banner && bannerClassName
-          )}
-        >
-          {banner && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={banner}
-              alt=""
-              className="absolute inset-0 size-full object-cover"
-            />
-          )}
-          <div className="absolute top-5 right-5 flex items-center gap-2 text-white/90">
-            <PlatformIcon className="size-7" aria-hidden />
-            <span className="text-sm font-medium">{platformLabel}</span>
-          </div>
-        </div>
-
-        <div className="relative flex flex-1 flex-col px-8 pb-8">
-          <div className="absolute -top-14 left-8 size-28 overflow-hidden rounded-full border-[5px] border-background bg-skeleton shadow-sm">
-            <Image
-              src={avatar}
-              alt={name}
-              fill
-              className="object-cover object-top"
-              sizes="112px"
-              priority
-            />
-          </div>
-
-          <div className="mt-[4.25rem] flex min-w-0 flex-col gap-1.5">
-            <div className="flex min-w-0 items-center gap-1.5">
-              <span className="truncate text-2xl font-bold leading-tight text-foreground">
-                {name}
-              </span>
-              {verified && (
-                <RiVerifiedBadgeFill
-                  className="size-6 shrink-0 text-[#1d9bf0]"
-                  aria-label="Verified"
-                />
-              )}
-            </div>
-            <div className="flex min-w-0 items-center gap-2">
-              <PlatformIcon
-                className="size-4 shrink-0 text-muted-foreground"
-                aria-hidden
-              />
-              <span className="truncate text-base text-muted-foreground">
-                {handle}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
 
 export function ProfileCard({ platform, ...props }: ProfileCardProps) {
-  if (platform === "email") {
-    return <EmailProfileCard {...props} />;
-  }
-
   const { bannerClassName: platformBannerClassName } = platformConfig[platform];
 
   return (

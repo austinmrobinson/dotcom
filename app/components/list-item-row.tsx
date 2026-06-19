@@ -9,7 +9,7 @@ export const LIST_HIGHLIGHT_LAYOUT_ID = "list-highlight";
 export const listSectionClassName = "relative overflow-visible";
 
 export const listItemRowClassName =
-  "relative min-w-0 w-[calc(100%+2rem)] -mx-4 px-4 py-4 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 before:absolute before:top-0 before:inset-x-4 before:h-px before:bg-border-light before:transition-opacity";
+  "relative min-w-0 w-[calc(100%+2rem)] -mx-4 px-4 py-4 rounded-lg cursor-default text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 before:absolute before:top-0 before:inset-x-4 before:h-px before:bg-border-light before:transition-opacity";
 
 const listItemTextClassName =
   "[&_[data-slot=item-title]]:w-full [&_[data-slot=item-title]]:text-muted-foreground [&_[data-slot=item-description]]:text-muted-foreground [&_.text-muted-foreground]:text-muted-foreground [&_p.text-muted-foreground]:text-muted-foreground [&_[data-slot=item-title]]:transition-colors [&_[data-slot=item-description]]:transition-colors [&_.text-muted-foreground]:transition-colors [&_p.text-muted-foreground]:transition-colors duration-150";
@@ -17,10 +17,15 @@ const listItemTextClassName =
 const listItemActiveTextClassName =
   "[&_[data-slot=item-title]]:text-foreground [&_[data-slot=item-description]]:text-text-secondary [&_.text-muted-foreground]:text-text-secondary [&_p.text-muted-foreground]:text-text-secondary";
 
-const highlightTransition = {
+const highlightLayoutTransition = {
   type: "spring" as const,
   stiffness: 200,
   damping: 20,
+};
+
+const highlightBlurTransition = {
+  duration: 0.3,
+  ease: [0.25, 0.46, 0.45, 0.94] as const,
 };
 
 function getListItemRowClassName(isHighlighted: boolean, className?: string) {
@@ -37,6 +42,7 @@ interface ListItemRowProps {
   id: string;
   highlightId: string | null;
   highlightLayoutId: string;
+  isPreviewActive?: boolean;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   onFocus?: () => void;
@@ -44,12 +50,19 @@ interface ListItemRowProps {
   className?: string;
 }
 
+function getListItemRowStacking(isHighlighted: boolean, isPreviewActive: boolean) {
+  return cn(
+    "isolate",
+    isHighlighted && isPreviewActive && "z-10"
+  );
+}
+
 function ListItemHighlight({ layoutId }: { layoutId: string }) {
   const prefersReducedMotion = useReducedMotion();
 
   if (prefersReducedMotion) {
     return (
-      <div className="absolute inset-x-0 inset-y-0 z-0 rounded-lg bg-overlay-light" />
+      <div className="absolute inset-0 -z-10 rounded-lg bg-overlay-light" />
     );
   }
 
@@ -59,8 +72,11 @@ function ListItemHighlight({ layoutId }: { layoutId: string }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={highlightTransition}
-      className="absolute inset-x-0 inset-y-0 z-0 rounded-lg bg-overlay-light"
+      transition={{
+        layout: highlightLayoutTransition,
+        opacity: highlightBlurTransition,
+      }}
+      className="absolute inset-0 -z-10 rounded-lg bg-overlay-light"
     />
   );
 }
@@ -85,6 +101,7 @@ function ListItemRowBase({
   id,
   highlightId,
   highlightLayoutId,
+  isPreviewActive = false,
   onMouseEnter,
   onMouseLeave,
   onFocus,
@@ -100,13 +117,16 @@ function ListItemRowBase({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onFocus={onFocus}
-      className={getListItemRowClassName(isHighlighted, className)}
+      className={cn(
+        getListItemRowClassName(isHighlighted, className),
+        getListItemRowStacking(isHighlighted, isPreviewActive)
+      )}
     >
       <ListItemHighlightLayer
         isHighlighted={isHighlighted}
         highlightLayoutId={highlightLayoutId}
       />
-      <div className="relative z-10 w-full min-w-0">{children}</div>
+      <div className="relative z-0 w-full min-w-0">{children}</div>
     </div>
   );
 }
@@ -126,6 +146,7 @@ export function ListItemRowLink({
     id,
     highlightId,
     highlightLayoutId,
+    isPreviewActive = false,
     onMouseEnter,
     onMouseLeave,
     onFocus,
@@ -141,13 +162,17 @@ export function ListItemRowLink({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onFocus={onFocus}
-      className={getListItemRowClassName(isHighlighted, className)}
+      className={cn(
+        getListItemRowClassName(isHighlighted, className),
+        getListItemRowStacking(isHighlighted, isPreviewActive),
+        "cursor-pointer"
+      )}
     >
       <ListItemHighlightLayer
         isHighlighted={isHighlighted}
         highlightLayoutId={highlightLayoutId}
       />
-      <div className="relative z-10 w-full min-w-0">{children}</div>
+      <div className="relative z-0 w-full min-w-0">{children}</div>
     </a>
   );
 }
@@ -164,6 +189,7 @@ export function ListItemRowButton({
     id,
     highlightId,
     highlightLayoutId,
+    isPreviewActive = false,
     onMouseEnter,
     onMouseLeave,
     onFocus,
@@ -179,13 +205,16 @@ export function ListItemRowButton({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onFocus={onFocus}
-      className={getListItemRowClassName(isHighlighted, cn("cursor-pointer", className))}
+      className={cn(
+        getListItemRowClassName(isHighlighted, cn("cursor-pointer", className)),
+        getListItemRowStacking(isHighlighted, isPreviewActive)
+      )}
     >
       <ListItemHighlightLayer
         isHighlighted={isHighlighted}
         highlightLayoutId={highlightLayoutId}
       />
-      <div className="relative z-10 w-full min-w-0">{children}</div>
+      <div className="relative z-0 w-full min-w-0">{children}</div>
     </button>
   );
 }
