@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { cn } from "@/app/lib/utils";
-import { RiArrowUpSLine, RiArrowDownSLine, RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react";
+import { RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react";
 
 export function Kbd({
   children,
@@ -43,7 +43,6 @@ export function MediaCarousel({
   media,
   activeIndex,
   onIndexChange,
-  companyName,
 }: MediaCarouselProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -54,16 +53,30 @@ export function MediaCarousel({
     }
   }, [activeIndex]);
 
+  function goToPrevious() {
+    onIndexChange(
+      media.length > 0
+        ? (activeIndex - 1 + media.length) % media.length
+        : 0
+    );
+  }
+
+  function goToNext() {
+    onIndexChange(
+      media.length > 0 ? (activeIndex + 1) % media.length : 0
+    );
+  }
+
   if (media.length === 0) {
     return (
-      <div className="relative size-full rounded-xl overflow-hidden border border-border-light bg-overlay-subtle flex items-center justify-center">
+      <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-border-light bg-overlay-subtle flex items-center justify-center">
         <span className="text-muted-foreground text-sm">No media</span>
       </div>
     );
   }
 
   return (
-    <div className="relative h-full rounded-xl overflow-hidden border border-border-light bg-overlay-subtle">
+    <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-border-light bg-overlay-subtle">
       {media.map((item, index) => (
         <div
           key={item.src}
@@ -88,7 +101,7 @@ export function MediaCarousel({
                 loop
                 playsInline
                 autoPlay={index === activeIndex}
-                className="relative size-full object-contain"
+                className="relative size-full object-cover"
               />
             </>
           ) : (
@@ -106,7 +119,7 @@ export function MediaCarousel({
                 alt={item.alt}
                 fill
                 sizes="(min-width: 1024px) 60vw, 0vw"
-                className="object-contain"
+                className="object-cover"
                 priority={index === 0}
               />
             </>
@@ -116,11 +129,19 @@ export function MediaCarousel({
 
       {media.length > 1 && (
         <div className="absolute bottom-0 inset-x-0 z-20 flex items-center justify-center gap-3 px-4 py-4">
-          <Kbd variant="overlay"><RiArrowLeftSLine /></Kbd>
+          <button
+            type="button"
+            onClick={goToPrevious}
+            aria-label="Previous image"
+            className="cursor-pointer"
+          >
+            <Kbd variant="overlay"><RiArrowLeftSLine /></Kbd>
+          </button>
           <div className="flex items-center gap-1.5">
             {media.map((_, index) => (
               <button
                 key={index}
+                type="button"
                 onClick={() => onIndexChange(index)}
                 className={cn(
                   "size-1.5 rounded-full transition-all duration-200 cursor-pointer",
@@ -132,7 +153,14 @@ export function MediaCarousel({
               />
             ))}
           </div>
-          <Kbd variant="overlay"><RiArrowRightSLine /></Kbd>
+          <button
+            type="button"
+            onClick={goToNext}
+            aria-label="Next image"
+            className="cursor-pointer"
+          >
+            <Kbd variant="overlay"><RiArrowRightSLine /></Kbd>
+          </button>
         </div>
       )}
     </div>

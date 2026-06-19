@@ -54,7 +54,7 @@ export default function RootLayout({
     <html lang="en" className={cn(lora.variable, merriweatherHeading.variable, "font-serif")}>
       <body
         className={cn(
-          "flex flex-col items-center min-h-[100vh] text-sm transition-colors duration-300 text-text-secondary bg-background"
+          "flex flex-col items-center min-h-[100vh] text-sm antialiased transition-colors duration-300 text-text-secondary bg-background"
         )}
       >
         <main className="flex flex-col grow h-full w-full p-6 sm:p-10">
