@@ -6,29 +6,27 @@ import { cn } from "@/app/lib/utils";
 
 export type ProfilePlatform = "twitter" | "linkedin" | "email";
 
-const profileCardColors = {
-  surface: "#fffaf3",
-  pillBg: "#f0eae3",
-  pillText: "#6e584c",
-} as const;
-
 function iconBannerRadial(stops: string) {
   return `radial-gradient(ellipse 85% 115% at 50% 100%, ${stops})`;
 }
 
 const bannerStyles = {
   email: {
-    backgroundColor: "#f6f0e9",
-    backgroundImage: iconBannerRadial("#ede7e0 0%, #f6f0e9 100%"),
+    backgroundColor: "var(--profile-card-banner-base)",
+    backgroundImage: iconBannerRadial(
+      "var(--profile-card-banner-highlight) 0%, var(--profile-card-banner-base) 100%"
+    ),
   },
   twitter: {
-    backgroundColor: "color-mix(in srgb, #000 5%, #fffaf3)",
+    backgroundColor:
+      "color-mix(in srgb, #000 5%, var(--profile-card-surface-bg))",
     backgroundImage: iconBannerRadial(
       "rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.05) 100%"
     ),
   },
   linkedin: {
-    backgroundColor: "color-mix(in srgb, #0a66c2 5%, #fffaf3)",
+    backgroundColor:
+      "color-mix(in srgb, #0a66c2 5%, var(--profile-card-surface-bg))",
     backgroundImage: iconBannerRadial(
       "rgba(10, 102, 194, 0.1) 0%, rgba(10, 102, 194, 0.05) 100%"
     ),
@@ -77,11 +75,11 @@ function ProfileCardFrame({
         className
       )}
     >
-      <div className="relative aspect-video w-full rounded-[20px] shadow-profile-card xl:rounded-[24px]">
-        <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[20px] bg-[#fffaf3] xl:rounded-[24px]">
+      <div className="relative aspect-video w-full rounded-[20px] shadow-profile-card dark:shadow-raised-container-lg xl:rounded-[24px]">
+        <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[20px] bg-profile-card-surface xl:rounded-[24px]">
           <div className="relative min-h-0 flex-1 px-2 pt-2">
             <div
-              className="relative h-full rounded-[12px] border border-[#6e584c]/10"
+              className="relative h-full rounded-[12px] border border-border-light dark:shadow-container"
               style={bannerStyle}
             />
             <div className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-1/2">
@@ -108,15 +106,11 @@ function ProfileHandlePill({
   return (
     <div
       className={cn(
-        "w-fit max-w-full rounded-full px-3 py-0.5 xl:px-3.5 xl:py-1",
+        "w-fit max-w-full rounded-full bg-profile-card-handle px-3 py-0.5 xl:px-3.5 xl:py-1",
         className
       )}
-      style={{ backgroundColor: profileCardColors.pillBg }}
     >
-      <span
-        className="block truncate text-sm xl:text-base"
-        style={{ color: profileCardColors.pillText }}
-      >
+      <span className="block truncate text-sm text-text-secondary xl:text-base">
         {handle}
       </span>
     </div>
@@ -135,7 +129,7 @@ function PlatformAppIcon({
   return (
     <div
       className={cn(
-        "flex size-[78px] items-center justify-center rounded-[18px] shadow-profile-card xl:size-[98px] xl:rounded-[22px]",
+        "flex size-[78px] items-center justify-center rounded-[18px] shadow-profile-card dark:shadow-raised-container-sm xl:size-[98px] xl:rounded-[22px]",
         iconClassName,
         className
       )}
@@ -158,7 +152,7 @@ function EmailEnvelopeIllustration({ className }: { className?: string }) {
         <img
           src="/email-envelope.svg"
           alt=""
-          className="block size-full max-w-none"
+          className="block size-full max-w-none dark:brightness-[0.72] dark:saturate-0"
         />
       </div>
     </div>
