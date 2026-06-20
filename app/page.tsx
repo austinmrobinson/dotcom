@@ -28,7 +28,7 @@ import {
   ItemGroup,
 } from "@/app/components/ui/item";
 import { MediaCarousel, Kbd } from "./components/media-carousel";
-import { ProfileCardStack } from "./components/profile-card-stack";
+import { ProfileCardStack, type ProfileStackItem } from "./components/profile-card-stack";
 import { RiArrowUpSLine, RiArrowDownSLine } from "@remixicon/react";
 import {
   ListItemRow,
@@ -534,10 +534,14 @@ function PreviewPanel({
   panel,
   mediaIndex,
   onMediaIndexChange,
+  onSelectProfile,
+  onCopyEmail,
 }: {
   panel: PanelContent;
   mediaIndex: number;
   onMediaIndexChange: (index: number) => void;
+  onSelectProfile: (profile: ProfileStackItem) => void;
+  onCopyEmail: (email: string) => void;
 }) {
   if (panel.type === "media") {
     return (
@@ -557,6 +561,8 @@ function PreviewPanel({
       <ProfileCardStack
         profiles={contactProfileList}
         activeId={panel.id}
+        onSelectProfile={onSelectProfile}
+        onCopyEmail={onCopyEmail}
       />
     );
   }
@@ -573,6 +579,8 @@ function PreviewPanelSlot({
   clearDeselectTimer,
   startDeselectTimer,
   onContentExitComplete,
+  onSelectProfile,
+  onCopyEmail,
 }: {
   panel: PanelContent;
   isOpen: boolean;
@@ -582,6 +590,8 @@ function PreviewPanelSlot({
   clearDeselectTimer: () => void;
   startDeselectTimer: () => void;
   onContentExitComplete: () => void;
+  onSelectProfile: (profile: ProfileStackItem) => void;
+  onCopyEmail: (email: string) => void;
 }) {
   const prefersReducedMotion = useReducedMotion();
 
@@ -619,6 +629,8 @@ function PreviewPanelSlot({
                 panel={panel}
                 mediaIndex={mediaIndex}
                 onMediaIndexChange={onMediaIndexChange}
+                onSelectProfile={onSelectProfile}
+                onCopyEmail={onCopyEmail}
               />
             </motion.div>
           )}
@@ -630,6 +642,7 @@ function PreviewPanelSlot({
 
 export default function Home() {
   const previewPanel = usePreviewPanel();
+  const [, copyEmail] = useCopyToClipboard();
   const [hoveredListItemId, setHoveredListItemId] = useState<string | null>(null);
   const [highlightVisible, setHighlightVisible] = useState(true);
   const [slotPanel, setSlotPanel] = useState<PanelContent | null>(null);
@@ -657,6 +670,22 @@ export default function Home() {
     setHighlightVisible(true);
     setHoveredListItemId(id);
     activate();
+  }
+
+  function handlePreviewCardSelect(profile: ProfileStackItem) {
+    clearHighlightExitTimer();
+    setHighlightVisible(true);
+    setHoveredListItemId(`contact-${profile.id}`);
+    previewPanel.clearDeselectTimer();
+    previewPanel.activateProfile(
+      contactProfiles[profile.id as keyof typeof contactProfiles]
+    );
+  }
+
+  function handlePreviewCopyEmail(email: string) {
+    copyEmail(email)
+      .then(() => toast.success("Copied Email"))
+      .catch(() => toast.error("Failed to copy"));
   }
 
   function handleListSectionEnter() {
@@ -870,6 +899,8 @@ export default function Home() {
             panelRef={previewPanel.carouselRef}
             clearDeselectTimer={previewPanel.clearDeselectTimer}
             startDeselectTimer={previewPanel.startDeselectTimer}
+            onSelectProfile={handlePreviewCardSelect}
+            onCopyEmail={handlePreviewCopyEmail}
             onContentExitComplete={() => {
               if (!activePanelRef.current) {
                 setSlotPanel(null);

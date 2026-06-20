@@ -81,15 +81,15 @@ function SocialProfileCard({
   return (
     <div
       className={cn(
-        "relative mx-auto w-full max-w-[480px] overflow-visible p-4",
+        "relative mx-auto w-full max-w-[400px] overflow-visible p-3 xl:max-w-[480px] xl:p-4",
         className
       )}
     >
-      <div className="relative aspect-video w-full rounded-[24px] shadow-profile-card">
-        <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[24px] bg-profile-card-surface">
+      <div className="relative aspect-video w-full rounded-[20px] shadow-profile-card xl:rounded-[24px]">
+        <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[20px] bg-profile-card-surface xl:rounded-[24px]">
           <div
             className={cn(
-              "relative h-16 shrink-0 overflow-hidden rounded-t-[12px]",
+              "relative h-12 shrink-0 overflow-hidden rounded-t-[10px] xl:h-16 xl:rounded-t-[12px]",
               !banner && (bannerClassName ?? platformBannerClassName)
             )}
           >
@@ -104,33 +104,36 @@ function SocialProfileCard({
 
             <div
               className={cn(
-                "absolute top-3.5 right-3.5 flex items-center justify-center rounded-full p-2.5",
+                "absolute top-2.5 right-2.5 flex items-center justify-center rounded-full p-2 xl:top-3.5 xl:right-3.5 xl:p-2.5",
                 iconBadgeClassName
               )}
             >
-              <PlatformIcon className={cn("size-4", iconClassName)} aria-hidden />
+              <PlatformIcon
+                className={cn("size-3.5 xl:size-4", iconClassName)}
+                aria-hidden
+              />
             </div>
           </div>
 
-          <div className="relative flex min-h-0 flex-1 flex-col justify-end px-8 pb-8">
-            <div className="pointer-events-none absolute -top-8 left-8 z-10 size-20 overflow-hidden rounded-full border-[6px] border-profile-card-avatar-border bg-skeleton image-outline">
+          <div className="relative flex min-h-0 flex-1 flex-col justify-end px-5 pb-5 xl:px-8 xl:pb-8">
+            <div className="pointer-events-none absolute -top-6 left-5 z-10 size-16 overflow-hidden rounded-full border-[5px] border-profile-card-avatar-border bg-skeleton image-outline xl:-top-8 xl:left-8 xl:size-20 xl:border-[6px]">
               <Image
                 src={avatar}
                 alt={name}
                 fill
                 className="object-cover object-top"
-                sizes="80px"
+                sizes="(min-width: 1280px) 80px, 64px"
                 priority
               />
             </div>
 
-            <div className="flex flex-col gap-2 pt-10">
-              <p className="font-serif text-2xl font-normal leading-snug tracking-[-0.48px] text-card-foreground">
+            <div className="flex flex-col gap-1.5 pt-8 xl:gap-2 xl:pt-10">
+              <p className="font-serif text-xl font-normal leading-snug tracking-[-0.4px] text-card-foreground xl:text-2xl xl:tracking-[-0.48px]">
                 {name}
               </p>
 
-              <div className="w-fit max-w-full rounded-full bg-profile-card-handle px-3.5 py-1">
-                <span className="block truncate text-base text-text-secondary">
+              <div className="w-fit max-w-full rounded-full bg-profile-card-handle px-3 py-0.5 xl:px-3.5 xl:py-1">
+                <span className="block truncate text-sm text-text-secondary xl:text-base">
                   {handle}
                 </span>
               </div>
