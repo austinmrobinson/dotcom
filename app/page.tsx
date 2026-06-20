@@ -88,7 +88,6 @@ const contactProfiles = {
     name: "Austin Robinson",
     handle: "austinrobinsondesign@gmail.com",
     avatar: "/austin.jpg",
-    bannerClassName: "bg-neutral-700",
   },
 } satisfies Record<string, Omit<ProfilePanelContent, "type">>;
 

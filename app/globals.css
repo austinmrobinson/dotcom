@@ -156,9 +156,12 @@
   --overlay-white: oklch(0.985 0.016 65 / 0.2);
 
   /* Profile card shadow */
-  --profile-card-shadow-sm: oklch(0.350 0.035 50 / 0.08);
-  --profile-card-shadow-md: oklch(0.350 0.035 50 / 0.12);
-  --profile-card-shadow-lg: oklch(0.350 0.035 50 / 0.18);
+  --profile-card-shadow-1: oklch(0.350 0.035 50 / 0.2);
+  --profile-card-shadow-2: oklch(0.350 0.035 50 / 0.17);
+  --profile-card-shadow-3: oklch(0.350 0.035 50 / 0.14);
+  --profile-card-shadow-4: oklch(0.350 0.035 50 / 0.11);
+  --profile-card-shadow-5: oklch(0.350 0.035 50 / 0.08);
+  --profile-card-shadow-6: oklch(0.350 0.035 50 / 0.05);
 
   /* Profile card elevation (preview slot vs card surface) */
   --profile-preview-bg: color-mix(in oklch, var(--primary) 5%, transparent);
@@ -241,9 +244,12 @@
   --overlay-white: oklch(0.985 0.008 80 / 0.2);
 
   /* Profile card shadow */
-  --profile-card-shadow-sm: oklch(0 0 0 / 0.4);
-  --profile-card-shadow-md: oklch(0 0 0 / 0.5);
-  --profile-card-shadow-lg: oklch(0 0 0 / 0.6);
+  --profile-card-shadow-1: oklch(0 0 0 / 0.2);
+  --profile-card-shadow-2: oklch(0 0 0 / 0.17);
+  --profile-card-shadow-3: oklch(0 0 0 / 0.14);
+  --profile-card-shadow-4: oklch(0 0 0 / 0.11);
+  --profile-card-shadow-5: oklch(0 0 0 / 0.08);
+  --profile-card-shadow-6: oklch(0 0 0 / 0.05);
 
   /* Profile card elevation */
   --profile-preview-bg: color-mix(in oklch, var(--primary) 2.5%, transparent);
@@ -324,9 +330,12 @@
     --overlay-white: oklch(0.985 0.008 80 / 0.2);
 
     /* Profile card shadow */
-    --profile-card-shadow-sm: oklch(0 0 0 / 0.4);
-    --profile-card-shadow-md: oklch(0 0 0 / 0.5);
-    --profile-card-shadow-lg: oklch(0 0 0 / 0.6);
+    --profile-card-shadow-1: oklch(0 0 0 / 0.2);
+    --profile-card-shadow-2: oklch(0 0 0 / 0.17);
+    --profile-card-shadow-3: oklch(0 0 0 / 0.14);
+    --profile-card-shadow-4: oklch(0 0 0 / 0.11);
+    --profile-card-shadow-5: oklch(0 0 0 / 0.08);
+    --profile-card-shadow-6: oklch(0 0 0 / 0.05);
 
     /* Profile card elevation */
     --profile-preview-bg: color-mix(in oklch, var(--primary) 2.5%, transparent);
@@ -382,9 +391,12 @@ body {
 
 @utility shadow-profile-card {
   box-shadow:
-    0 1px 2px var(--profile-card-shadow-sm),
-    0 4px 12px -2px var(--profile-card-shadow-md),
-    0 12px 32px -4px var(--profile-card-shadow-lg);
+    0 0 0 0.5px var(--profile-card-shadow-1),
+    0 1px 3px -0.5px var(--profile-card-shadow-2),
+    0 3px 6px -1.5px var(--profile-card-shadow-3),
+    0 6px 12px -3px var(--profile-card-shadow-4),
+    0 12px 24px -6px var(--profile-card-shadow-5),
+    0 24px 48px -12px var(--profile-card-shadow-6);
 }
 
 .profile-banner-noise::after {

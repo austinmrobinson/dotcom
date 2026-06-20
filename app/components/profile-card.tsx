@@ -1,47 +1,50 @@
 "use client";
 
-import Image from "next/image";
-import {
-  RiTwitterXFill,
-  RiLinkedinFill,
-  RiMailFill,
-} from "@remixicon/react";
+import type { CSSProperties, ReactNode } from "react";
+import { RiTwitterXFill, RiLinkedinFill } from "@remixicon/react";
 import { cn } from "@/app/lib/utils";
 
 export type ProfilePlatform = "twitter" | "linkedin" | "email";
 
-const platformConfig = {
+const profileCardColors = {
+  surface: "#fffaf3",
+  pillBg: "#f0eae3",
+  pillText: "#6e584c",
+} as const;
+
+function iconBannerRadial(stops: string) {
+  return `radial-gradient(ellipse 85% 115% at 50% 100%, ${stops})`;
+}
+
+const bannerStyles = {
+  email: {
+    backgroundColor: "#f6f0e9",
+    backgroundImage: iconBannerRadial("#ede7e0 0%, #f6f0e9 100%"),
+  },
   twitter: {
-    icon: RiTwitterXFill,
-    label: "X",
-    bannerClassName: "bg-black",
-    iconBadgeClassName: "bg-overlay-white",
-    iconClassName: "text-white/50",
+    backgroundColor: "color-mix(in srgb, #000 5%, #fffaf3)",
+    backgroundImage: iconBannerRadial(
+      "rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.05) 100%"
+    ),
   },
   linkedin: {
-    icon: RiLinkedinFill,
-    label: "LinkedIn",
-    bannerClassName: "bg-[#0a66c2]",
-    iconBadgeClassName: "bg-overlay-white",
-    iconClassName: "text-white/50",
+    backgroundColor: "color-mix(in srgb, #0a66c2 5%, #fffaf3)",
+    backgroundImage: iconBannerRadial(
+      "rgba(10, 102, 194, 0.1) 0%, rgba(10, 102, 194, 0.05) 100%"
+    ),
   },
-  email: {
-    icon: RiMailFill,
-    label: "Email",
-    bannerClassName: "bg-muted-foreground",
-    iconBadgeClassName: "bg-overlay-white",
-    iconClassName: "text-white/50",
+} as const satisfies Record<ProfilePlatform, CSSProperties>;
+
+const platformAppConfig = {
+  twitter: {
+    iconClassName: "bg-black text-white",
+    Icon: RiTwitterXFill,
   },
-} satisfies Record<
-  ProfilePlatform,
-  {
-    icon: typeof RiTwitterXFill;
-    label: string;
-    bannerClassName: string;
-    iconBadgeClassName: string;
-    iconClassName: string;
-  }
->;
+  linkedin: {
+    iconClassName: "bg-[#0a66c2] text-white",
+    Icon: RiLinkedinFill,
+  },
+} as const;
 
 export interface ProfileCardProps {
   platform: ProfilePlatform;
@@ -54,30 +57,19 @@ export interface ProfileCardProps {
   className?: string;
 }
 
-interface ProfileCardBaseProps extends Omit<ProfileCardProps, "platform"> {
+interface ProfileCardFrameProps {
   className?: string;
+  bannerStyle?: CSSProperties;
+  hero: ReactNode;
+  footer: ReactNode;
 }
 
-interface SocialProfileCardProps extends ProfileCardBaseProps {
-  platform: ProfilePlatform;
-}
-
-function SocialProfileCard({
-  platform,
-  name,
-  handle,
-  avatar,
-  banner,
-  bannerClassName,
+function ProfileCardFrame({
   className,
-}: SocialProfileCardProps) {
-  const {
-    icon: PlatformIcon,
-    iconBadgeClassName,
-    iconClassName,
-    bannerClassName: platformBannerClassName,
-  } = platformConfig[platform];
-
+  bannerStyle = bannerStyles.email,
+  hero,
+  footer,
+}: ProfileCardFrameProps) {
   return (
     <div
       className={cn(
@@ -86,58 +78,19 @@ function SocialProfileCard({
       )}
     >
       <div className="relative aspect-video w-full rounded-[20px] shadow-profile-card xl:rounded-[24px]">
-        <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[20px] bg-profile-card-surface xl:rounded-[24px]">
-          <div
-            className={cn(
-              "relative h-12 shrink-0 overflow-hidden rounded-t-[10px] xl:h-16 xl:rounded-t-[12px]",
-              !banner && (bannerClassName ?? platformBannerClassName)
-            )}
-          >
-            {banner && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={banner}
-                alt=""
-                className="absolute inset-0 size-full object-cover"
-              />
-            )}
-
+        <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[20px] bg-[#fffaf3] xl:rounded-[24px]">
+          <div className="relative min-h-0 flex-1 px-2 pt-2">
             <div
-              className={cn(
-                "absolute top-2.5 right-2.5 flex items-center justify-center rounded-full p-2 xl:top-3.5 xl:right-3.5 xl:p-2.5",
-                iconBadgeClassName
-              )}
-            >
-              <PlatformIcon
-                className={cn("size-3.5 xl:size-4", iconClassName)}
-                aria-hidden
-              />
+              className="relative h-full rounded-[12px] border border-[#6e584c]/10"
+              style={bannerStyle}
+            />
+            <div className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-1/2">
+              {hero}
             </div>
           </div>
 
-          <div className="relative flex min-h-0 flex-1 flex-col justify-end px-5 pb-5 xl:px-8 xl:pb-8">
-            <div className="pointer-events-none absolute -top-6 left-5 z-10 size-16 overflow-hidden rounded-full border-[5px] border-profile-card-avatar-border bg-skeleton image-outline xl:-top-8 xl:left-8 xl:size-20 xl:border-[6px]">
-              <Image
-                src={avatar}
-                alt={name}
-                fill
-                className="object-cover object-top"
-                sizes="(min-width: 1280px) 80px, 64px"
-                priority
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5 pt-8 xl:gap-2 xl:pt-10">
-              <p className="font-serif text-xl font-normal leading-snug tracking-[-0.4px] text-card-foreground xl:text-2xl xl:tracking-[-0.48px]">
-                {name}
-              </p>
-
-              <div className="w-fit max-w-full rounded-full bg-profile-card-handle px-3 py-0.5 xl:px-3.5 xl:py-1">
-                <span className="block truncate text-sm text-text-secondary xl:text-base">
-                  {handle}
-                </span>
-              </div>
-            </div>
+          <div className="flex min-h-0 flex-1 items-end justify-center px-5 pb-5 xl:px-8 xl:pb-8">
+            {footer}
           </div>
         </div>
       </div>
@@ -145,14 +98,121 @@ function SocialProfileCard({
   );
 }
 
+function ProfileHandlePill({
+  handle,
+  className,
+}: {
+  handle: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "w-fit max-w-full rounded-full px-3 py-0.5 xl:px-3.5 xl:py-1",
+        className
+      )}
+      style={{ backgroundColor: profileCardColors.pillBg }}
+    >
+      <span
+        className="block truncate text-sm xl:text-base"
+        style={{ color: profileCardColors.pillText }}
+      >
+        {handle}
+      </span>
+    </div>
+  );
+}
+
+function PlatformAppIcon({
+  platform,
+  className,
+}: {
+  platform: keyof typeof platformAppConfig;
+  className?: string;
+}) {
+  const { Icon, iconClassName } = platformAppConfig[platform];
+
+  return (
+    <div
+      className={cn(
+        "flex size-[78px] items-center justify-center rounded-[18px] shadow-profile-card xl:size-[98px] xl:rounded-[22px]",
+        iconClassName,
+        className
+      )}
+    >
+      <Icon className="size-9 xl:size-11" aria-hidden />
+    </div>
+  );
+}
+
+function EmailEnvelopeIllustration({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "relative h-[54px] w-[83px] xl:h-[68px] xl:w-[104px]",
+        className
+      )}
+    >
+      <div className="absolute inset-[-36.03%_-46.63%_-106.62%_-46.63%]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/email-envelope.svg"
+          alt=""
+          className="block size-full max-w-none"
+        />
+      </div>
+    </div>
+  );
+}
+
+function EmailProfileCard({
+  handle,
+  className,
+}: {
+  handle: string;
+  className?: string;
+}) {
+  return (
+    <ProfileCardFrame
+      className={className}
+      bannerStyle={bannerStyles.email}
+      hero={<EmailEnvelopeIllustration />}
+      footer={<ProfileHandlePill handle={handle} />}
+    />
+  );
+}
+
+function SocialProfileCard({
+  platform,
+  handle,
+  className,
+}: {
+  platform: keyof typeof platformAppConfig;
+  handle: string;
+  className?: string;
+}) {
+  return (
+    <ProfileCardFrame
+      className={className}
+      bannerStyle={bannerStyles[platform]}
+      hero={<PlatformAppIcon platform={platform} />}
+      footer={<ProfileHandlePill handle={handle} />}
+    />
+  );
+}
+
 export function ProfileCard({ platform, ...props }: ProfileCardProps) {
-  const { bannerClassName: platformBannerClassName } = platformConfig[platform];
+  if (platform === "email") {
+    return (
+      <EmailProfileCard handle={props.handle} className={props.className} />
+    );
+  }
 
   return (
     <SocialProfileCard
       platform={platform}
-      {...props}
-      bannerClassName={props.bannerClassName ?? platformBannerClassName}
+      handle={props.handle}
+      className={props.className}
     />
   );
 }
