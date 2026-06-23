@@ -59,7 +59,7 @@ interface ListItemRowProps {
   disabled?: boolean;
   hideTopDivider?: boolean;
   onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
+  onMouseLeave?: React.MouseEventHandler<HTMLElement>;
   onFocus?: () => void;
   onBlur?: (event: React.FocusEvent<HTMLElement>) => void;
   children: React.ReactNode;
@@ -175,6 +175,7 @@ export function ListItemRowLink({
 
   return (
     <a
+      id={id}
       href={href}
       target={target}
       aria-disabled={disabled || undefined}
@@ -225,6 +226,7 @@ export function ListItemRowButton({
 
   return (
     <button
+      id={id}
       type={type}
       onClick={onClick}
       disabled={disabled}

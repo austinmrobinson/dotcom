@@ -627,23 +627,40 @@ function usePreviewPanel(isWorkSectionEngaged: boolean) {
     isWorkSectionEngaged,
   ]);
 
-  return {
-    panel,
-    mediaIndex,
-    pressedArrowKey,
-    carouselRef,
-    activateWork,
-    activateHref,
-    activateProfile,
-    setMediaIndex: handleMediaIndexChange,
-    advanceToNextMedia,
-    setIsCarouselHovered,
-    clearDeselectTimer,
-    startDeselectTimer,
-    isWorkActive,
-    isHrefActive,
-    isProfileActive,
-  };
+  return useMemo(
+    () => ({
+      panel,
+      mediaIndex,
+      pressedArrowKey,
+      carouselRef,
+      activateWork,
+      activateHref,
+      activateProfile,
+      setMediaIndex: handleMediaIndexChange,
+      advanceToNextMedia,
+      setIsCarouselHovered,
+      clearDeselectTimer,
+      startDeselectTimer,
+      isWorkActive,
+      isHrefActive,
+      isProfileActive,
+    }),
+    [
+      panel,
+      mediaIndex,
+      pressedArrowKey,
+      activateWork,
+      activateHref,
+      activateProfile,
+      handleMediaIndexChange,
+      advanceToNextMedia,
+      clearDeselectTimer,
+      startDeselectTimer,
+      isWorkActive,
+      isHrefActive,
+      isProfileActive,
+    ]
+  );
 }
 
 function PreviewPanel({
@@ -1169,6 +1186,7 @@ export default function Home() {
                         )
                       }
                       onBlur={handleListItemBlur}
+                      onMouseLeave={handleListItemMouseLeave}
                     />
                   </ItemGroup>
                 </HomeEnterSection>
