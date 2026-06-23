@@ -78,10 +78,12 @@ function ProfileCardFrame({
       <div className="relative aspect-video w-full rounded-[20px] shadow-profile-card dark:shadow-raised-container-lg xl:rounded-[24px]">
         <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[20px] bg-profile-card-surface xl:rounded-[24px]">
           <div className="relative min-h-0 flex-1 px-2 pt-2">
-            <div
-              className="profile-card-banner-inset relative h-full rounded-[12px] border border-border-light dark:shadow-container"
-              style={bannerStyle}
-            />
+            <div className="relative h-full rounded-[calc(20px-8px)] bg-border-light p-px xl:rounded-[calc(24px-8px)] dark:shadow-container">
+              <div
+                className="profile-card-banner-inset h-full w-full overflow-hidden rounded-[calc(20px-8px-1px)] xl:rounded-[calc(24px-8px-1px)]"
+                style={bannerStyle}
+              />
+            </div>
             <div className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-1/2">
               {hero}
             </div>

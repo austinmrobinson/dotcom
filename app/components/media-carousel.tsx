@@ -41,7 +41,7 @@ interface MediaCarouselProps {
   activeIndex: number;
   onIndexChange: (index: number) => void;
   onActiveVideoEnded?: () => void;
-  onHoverChange?: (hovered: boolean) => void;
+  isPaused?: boolean;
   companyName?: string;
   pressedArrowKey?: string | null;
 }
@@ -51,19 +51,34 @@ export function MediaCarousel({
   activeIndex,
   onIndexChange,
   onActiveVideoEnded,
-  onHoverChange,
+  isPaused = false,
   pressedArrowKey,
 }: MediaCarouselProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current) {
-      const item = media[activeIndex];
-      videoRef.current.playbackRate = item?.playbackRate ?? 1;
-      videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(() => {});
+    if (!videoRef.current) return;
+
+    const item = media[activeIndex];
+    const video = videoRef.current;
+    video.playbackRate = item?.playbackRate ?? 1;
+    video.currentTime = 0;
+
+    if (!isPaused) {
+      video.play().catch(() => {});
     }
-  }, [activeIndex, media]);
+  }, [activeIndex, media, isPaused]);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    if (isPaused) {
+      videoRef.current.pause();
+      return;
+    }
+
+    videoRef.current.play().catch(() => {});
+  }, [isPaused]);
 
   function goToPrevious() {
     onIndexChange(
@@ -96,12 +111,7 @@ export function MediaCarousel({
   }
 
   return (
-    <div
-      className="flex w-full flex-col gap-3"
-      data-preview-target
-      onMouseEnter={() => onHoverChange?.(true)}
-      onMouseLeave={() => onHoverChange?.(false)}
-    >
+    <div className="flex w-full flex-col gap-3" data-preview-target>
       <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle">
         {media.map((item, index) => (
           <div
@@ -129,7 +139,6 @@ export function MediaCarousel({
                   src={item.src}
                   muted
                   playsInline
-                  autoPlay={index === activeIndex}
                   className="relative size-full object-cover"
                   onLoadedData={(event) => {
                     event.currentTarget.playbackRate = item.playbackRate ?? 1;
@@ -145,6 +154,7 @@ export function MediaCarousel({
                   src={item.src}
                   alt=""
                   fill
+                  quality={100}
                   sizes="(min-width: 1024px) 60vw, 0vw"
                   className="object-cover blur-2xl scale-200"
                   aria-hidden="true"
@@ -153,6 +163,7 @@ export function MediaCarousel({
                   src={item.src}
                   alt={item.alt}
                   fill
+                  quality={100}
                   sizes="(min-width: 1024px) 60vw, 0vw"
                   className="object-cover"
                   priority={index === 0}

@@ -382,7 +382,7 @@ function usePreviewPanel(isWorkSectionEngaged: boolean) {
   const [panel, setPanel] = useState<PanelContent | null>(null);
   const [mediaIndex, setMediaIndex] = useState(0);
   const [pressedArrowKey, setPressedArrowKey] = useState<string | null>(null);
-  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
+  const [isPreviewHovered, setIsPreviewHovered] = useState(false);
   const deselectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoAdvanceTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const manualPauseUntil = useRef<number>(0);
@@ -522,7 +522,7 @@ function usePreviewPanel(isWorkSectionEngaged: boolean) {
       panel?.type !== "media" ||
       activeMedia.length <= 1 ||
       activeSlideType === "video" ||
-      isCarouselHovered
+      isPreviewHovered
     ) {
       return;
     }
@@ -541,7 +541,7 @@ function usePreviewPanel(isWorkSectionEngaged: boolean) {
     mediaIndex,
     activeMedia.length,
     activeSlideType,
-    isCarouselHovered,
+    isPreviewHovered,
     prefersReducedMotion,
     clearAutoAdvanceTimer,
   ]);
@@ -633,12 +633,13 @@ function usePreviewPanel(isWorkSectionEngaged: boolean) {
       mediaIndex,
       pressedArrowKey,
       carouselRef,
+      isPreviewHovered,
       activateWork,
       activateHref,
       activateProfile,
       setMediaIndex: handleMediaIndexChange,
       advanceToNextMedia,
-      setIsCarouselHovered,
+      setIsPreviewHovered,
       clearDeselectTimer,
       startDeselectTimer,
       isWorkActive,
@@ -649,6 +650,7 @@ function usePreviewPanel(isWorkSectionEngaged: boolean) {
       panel,
       mediaIndex,
       pressedArrowKey,
+      isPreviewHovered,
       activateWork,
       activateHref,
       activateProfile,
@@ -668,7 +670,7 @@ function PreviewPanel({
   mediaIndex,
   onMediaIndexChange,
   onActiveVideoEnded,
-  onCarouselHoverChange,
+  isPreviewHovered,
   onSelectProfile,
   onCopyEmail,
   pressedArrowKey,
@@ -677,7 +679,7 @@ function PreviewPanel({
   mediaIndex: number;
   onMediaIndexChange: (index: number) => void;
   onActiveVideoEnded?: () => void;
-  onCarouselHoverChange?: (hovered: boolean) => void;
+  isPreviewHovered?: boolean;
   onSelectProfile: (profile: ProfileStackItem) => void;
   onCopyEmail: (email: string) => void;
   pressedArrowKey?: string | null;
@@ -690,7 +692,7 @@ function PreviewPanel({
           activeIndex={mediaIndex}
           onIndexChange={onMediaIndexChange}
           onActiveVideoEnded={onActiveVideoEnded}
-          onHoverChange={onCarouselHoverChange}
+          isPaused={isPreviewHovered}
           companyName={workEntries[panel.workIndex]?.company}
           pressedArrowKey={pressedArrowKey}
         />
@@ -718,7 +720,8 @@ function PreviewPanelSlot({
   mediaIndex,
   onMediaIndexChange,
   onActiveVideoEnded,
-  onCarouselHoverChange,
+  isPreviewHovered,
+  onPreviewHoverChange,
   panelRef,
   startDeselectTimer,
   onPreviewEnter,
@@ -732,7 +735,8 @@ function PreviewPanelSlot({
   mediaIndex: number;
   onMediaIndexChange: (index: number) => void;
   onActiveVideoEnded?: () => void;
-  onCarouselHoverChange?: (hovered: boolean) => void;
+  isPreviewHovered?: boolean;
+  onPreviewHoverChange?: (hovered: boolean) => void;
   panelRef: RefObject<HTMLDivElement | null>;
   startDeselectTimer: () => void;
   onPreviewEnter: () => void;
@@ -761,8 +765,14 @@ function PreviewPanelSlot({
         <div
           ref={panelRef as RefObject<HTMLDivElement>}
           className="w-full min-w-0"
-          onMouseEnter={onPreviewEnter}
-          onMouseLeave={startDeselectTimer}
+          onMouseEnter={() => {
+            onPreviewEnter();
+            onPreviewHoverChange?.(true);
+          }}
+          onMouseLeave={() => {
+            onPreviewHoverChange?.(false);
+            startDeselectTimer();
+          }}
         >
           <AnimatePresence
             initial={false}
@@ -782,7 +792,7 @@ function PreviewPanelSlot({
                   mediaIndex={mediaIndex}
                   onMediaIndexChange={onMediaIndexChange}
                   onActiveVideoEnded={onActiveVideoEnded}
-                  onCarouselHoverChange={onCarouselHoverChange}
+                  isPreviewHovered={isPreviewHovered}
                   onSelectProfile={onSelectProfile}
                   onCopyEmail={onCopyEmail}
                   pressedArrowKey={pressedArrowKey}
@@ -1202,7 +1212,8 @@ export default function Home() {
             mediaIndex={previewPanel.mediaIndex}
             onMediaIndexChange={previewPanel.setMediaIndex}
             onActiveVideoEnded={previewPanel.advanceToNextMedia}
-            onCarouselHoverChange={previewPanel.setIsCarouselHovered}
+            isPreviewHovered={previewPanel.isPreviewHovered}
+            onPreviewHoverChange={previewPanel.setIsPreviewHovered}
             panelRef={previewPanel.carouselRef}
             startDeselectTimer={previewPanel.startDeselectTimer}
             onPreviewEnter={handlePreviewEnter}
