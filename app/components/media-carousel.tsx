@@ -41,7 +41,6 @@ interface MediaCarouselProps {
   activeIndex: number;
   onIndexChange: (index: number) => void;
   onActiveVideoEnded?: () => void;
-  isPaused?: boolean;
   companyName?: string;
   pressedArrowKey?: string | null;
 }
@@ -51,7 +50,6 @@ export function MediaCarousel({
   activeIndex,
   onIndexChange,
   onActiveVideoEnded,
-  isPaused = false,
   pressedArrowKey,
 }: MediaCarouselProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -63,22 +61,8 @@ export function MediaCarousel({
     const video = videoRef.current;
     video.playbackRate = item?.playbackRate ?? 1;
     video.currentTime = 0;
-
-    if (!isPaused) {
-      video.play().catch(() => {});
-    }
-  }, [activeIndex, media, isPaused]);
-
-  useEffect(() => {
-    if (!videoRef.current) return;
-
-    if (isPaused) {
-      videoRef.current.pause();
-      return;
-    }
-
-    videoRef.current.play().catch(() => {});
-  }, [isPaused]);
+    video.play().catch(() => {});
+  }, [activeIndex, media]);
 
   function goToPrevious() {
     onIndexChange(

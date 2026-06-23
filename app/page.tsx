@@ -670,7 +670,6 @@ function PreviewPanel({
   mediaIndex,
   onMediaIndexChange,
   onActiveVideoEnded,
-  isPreviewHovered,
   onSelectProfile,
   onCopyEmail,
   pressedArrowKey,
@@ -679,7 +678,6 @@ function PreviewPanel({
   mediaIndex: number;
   onMediaIndexChange: (index: number) => void;
   onActiveVideoEnded?: () => void;
-  isPreviewHovered?: boolean;
   onSelectProfile: (profile: ProfileStackItem) => void;
   onCopyEmail: (email: string) => void;
   pressedArrowKey?: string | null;
@@ -692,7 +690,6 @@ function PreviewPanel({
           activeIndex={mediaIndex}
           onIndexChange={onMediaIndexChange}
           onActiveVideoEnded={onActiveVideoEnded}
-          isPaused={isPreviewHovered}
           companyName={workEntries[panel.workIndex]?.company}
           pressedArrowKey={pressedArrowKey}
         />
@@ -720,7 +717,6 @@ function PreviewPanelSlot({
   mediaIndex,
   onMediaIndexChange,
   onActiveVideoEnded,
-  isPreviewHovered,
   onPreviewHoverChange,
   panelRef,
   startDeselectTimer,
@@ -735,7 +731,6 @@ function PreviewPanelSlot({
   mediaIndex: number;
   onMediaIndexChange: (index: number) => void;
   onActiveVideoEnded?: () => void;
-  isPreviewHovered?: boolean;
   onPreviewHoverChange?: (hovered: boolean) => void;
   panelRef: RefObject<HTMLDivElement | null>;
   startDeselectTimer: () => void;
@@ -792,7 +787,6 @@ function PreviewPanelSlot({
                   mediaIndex={mediaIndex}
                   onMediaIndexChange={onMediaIndexChange}
                   onActiveVideoEnded={onActiveVideoEnded}
-                  isPreviewHovered={isPreviewHovered}
                   onSelectProfile={onSelectProfile}
                   onCopyEmail={onCopyEmail}
                   pressedArrowKey={pressedArrowKey}
@@ -1212,7 +1206,6 @@ export default function Home() {
             mediaIndex={previewPanel.mediaIndex}
             onMediaIndexChange={previewPanel.setMediaIndex}
             onActiveVideoEnded={previewPanel.advanceToNextMedia}
-            isPreviewHovered={previewPanel.isPreviewHovered}
             onPreviewHoverChange={previewPanel.setIsPreviewHovered}
             panelRef={previewPanel.carouselRef}
             startDeselectTimer={previewPanel.startDeselectTimer}
