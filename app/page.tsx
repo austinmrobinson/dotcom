@@ -1,10 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
+import {
+  AnimatePresence,
+  LayoutGroup,
+  motion,
+  useReducedMotion,
+} from "framer-motion";
 import { Text } from "./components/text";
 import AustinLink from "./components/link";
-import { prefetchOgMetadata } from "./hooks/use-og-metadata";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
 import {
@@ -15,50 +27,89 @@ import {
   ItemActions,
   ItemGroup,
 } from "@/app/components/ui/item";
-import { MediaCarousel, Kbd } from "./components/media-carousel";
-import { RiArrowUpSLine, RiArrowDownSLine } from "@remixicon/react";
-import { MouseSafeArea } from "./components/mouse-safe-area";
+import { MediaCarousel } from "./components/media-carousel";
+import { ProfileCardStack, type ProfileStackItem } from "./components/profile-card-stack";
+import {
+  ListItemRow,
+  ListItemRowLink,
+  ListItemRowButton,
+  ListItemTrailing,
+  getListHighlightId,
+  listSectionClassName,
+  LIST_HIGHLIGHT_LAYOUT_ID,
+} from "./components/list-item-row";
+import { HomeEnterSection } from "./components/home-enter";
+import {
+  PreviewPanelContext,
+  type PanelContent,
+  type PreviewPanelContextValue,
+  type ProfilePanelContent,
+} from "./context/preview-panel-context";
+import { prefetchOgMetadata } from "./hooks/use-og-metadata";
+import { cn } from "@/app/lib/utils";
 
-const ENABLE_WORK_CAROUSEL = false;
+const DESELECT_DELAY = 400;
+const HIGHLIGHT_EXIT_DELAY_MS = 150;
+const AUTO_ADVANCE_MS = 2500;
+const MANUAL_PAUSE_MS = 8000;
 
-const PREFETCH_URLS = [
-  "https://nominal.io",
-  "https://tesla.com",
-  "https://papercrowns.com",
-  "https://hp.com",
+const blurEase = [0.25, 0.46, 0.45, 0.94] as const;
+const previewBlurTransition = { duration: 0.4, ease: blurEase };
+const previewBlur = "12px";
+
+function getPanelKey(panel: PanelContent) {
+  if (panel.type === "media") return `media-${panel.workIndex}`;
+  if (panel.type === "profile") return "profile-stack";
+  return panel.type;
+}
+
+const contactProfiles = {
+  twitter: {
+    id: "twitter",
+    platform: "twitter",
+    href: "https://twitter.com/austinmrobinson",
+    name: "Austin Robinson",
+    handle: "@austinmrobinson",
+    avatar: "/austin.jpg",
+    verified: true,
+  },
+  linkedin: {
+    id: "linkedin",
+    platform: "linkedin",
+    href: "https://www.linkedin.com/in/robinsonaustin/",
+    name: "Austin Robinson",
+    handle: "robinsonaustin",
+    avatar: "/austin.jpg",
+  },
+  email: {
+    id: "email",
+    platform: "email",
+    name: "Austin Robinson",
+    handle: "austinrobinsondesign@gmail.com",
+    avatar: "/austin.jpg",
+  },
+} satisfies Record<string, Omit<ProfilePanelContent, "type">>;
+
+const contactProfileList = [
+  contactProfiles.twitter,
+  contactProfiles.linkedin,
+  contactProfiles.email,
 ];
 
-const outdentedItem =
-  "relative -mx-4 px-4 py-4 rounded-lg transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 before:absolute before:top-0 before:inset-x-4 before:h-px before:bg-border-light before:transition-opacity";
-
-function CopyEmailButton({ email }: { email: string }) {
-  const [, copy] = useCopyToClipboard();
-
-  return (
-    <button
-      onClick={() => {
-        copy(email)
-          .then(() => toast.success("Copied Email"))
-          .catch(() => toast.error("Failed to copy"));
-      }}
-      className={`cursor-pointer text-left hover:bg-overlay-light hover:before:opacity-0 [&:hover+*]:before:opacity-0 ${outdentedItem}`}
-    >
-      <Item className="px-0 py-0">
-        <ItemContent>
-          <ItemTitle>Email</ItemTitle>
-        </ItemContent>
-        <ItemActions>
-          <span className="text-muted-foreground">{email}</span>
-        </ItemActions>
-      </Item>
-    </button>
-  );
+function normalizeUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    return `${parsed.origin}${parsed.pathname.replace(/\/$/, "")}`;
+  } catch {
+    return url;
+  }
 }
 
 interface MediaItem {
   src: string;
   alt: string;
   type: "image" | "video";
+  playbackRate?: number;
 }
 
 interface WorkEntryProps {
@@ -68,50 +119,161 @@ interface WorkEntryProps {
   dateRange: string;
   description: string;
   media?: MediaItem[];
+  disabled?: boolean;
 }
 
 interface WorkEntryComponentProps extends WorkEntryProps {
-  isActive?: boolean;
+  itemId: string;
+  highlightId: string | null;
+  isPreviewActive?: boolean;
+  hideTopDivider?: boolean;
   onHover?: () => void;
+  onMouseLeave?: (event: React.MouseEvent<HTMLElement>) => void;
+  onBlur?: (event: React.FocusEvent<HTMLElement>) => void;
 }
 
 function WorkEntry({
   company,
-  href,
   role,
   dateRange,
   description,
-  isActive,
+  itemId,
+  highlightId,
+  isPreviewActive,
+  disabled,
+  hideTopDivider,
   onHover,
+  onMouseLeave,
+  onBlur,
 }: WorkEntryComponentProps) {
-  const interactive = ENABLE_WORK_CAROUSEL;
-  const Tag = interactive ? "div" : "a";
-  const linkProps = interactive ? {} : { href, target: "_blank" as const };
-
   return (
-    <Tag
+    <ListItemRow
+      id={itemId}
+      highlightId={highlightId}
+      highlightLayoutId={LIST_HIGHLIGHT_LAYOUT_ID}
+      isPreviewActive={isPreviewActive}
+      disabled={disabled}
+      hideTopDivider={hideTopDivider}
       role="listitem"
-      onMouseEnter={interactive ? onHover : undefined}
-      className={`group/entry relative flex flex-col gap-3 ${outdentedItem} ${
-        interactive && isActive
-          ? "bg-overlay-light before:opacity-0 [&+*]:before:opacity-0"
-          : "hover:bg-overlay-light hover:before:opacity-0 [&:hover+*]:before:opacity-0"
-      }`}
-      {...linkProps}
+      className="flex flex-col gap-3"
+      onMouseEnter={disabled ? undefined : onHover}
+      onMouseLeave={disabled ? undefined : onMouseLeave}
+      onFocus={disabled ? undefined : onHover}
+      onBlur={disabled ? undefined : onBlur}
     >
-      <Item className="px-0 py-0 items-start">
-        <ItemContent>
-          <ItemTitle>{company}</ItemTitle>
+      <Item className="px-0 py-0 w-full min-w-0 flex-nowrap items-start justify-between">
+        <ItemContent className="min-w-0">
+          <ItemTitle className="w-full">{company}</ItemTitle>
           <ItemDescription>{role}</ItemDescription>
         </ItemContent>
         <ItemActions className="mt-0.5">
-          <span className="text-muted-foreground whitespace-nowrap">
+          <span className="tabular-nums text-muted-foreground whitespace-nowrap">
             {dateRange}
           </span>
         </ItemActions>
       </Item>
       <Text className="text-pretty">{description}</Text>
-    </Tag>
+    </ListItemRow>
+  );
+}
+
+interface ContactEntryProps {
+  itemId: string;
+  href: string;
+  title: string;
+  trailing: string;
+  highlightId: string | null;
+  isPreviewActive?: boolean;
+  hideTopDivider?: boolean;
+  onHover?: () => void;
+  onMouseLeave?: (event: React.MouseEvent<HTMLElement>) => void;
+  onBlur?: (event: React.FocusEvent<HTMLElement>) => void;
+}
+
+function ContactEntry({
+  itemId,
+  href,
+  title,
+  trailing,
+  highlightId,
+  isPreviewActive,
+  hideTopDivider,
+  onHover,
+  onMouseLeave,
+  onBlur,
+}: ContactEntryProps) {
+  return (
+    <ListItemRowLink
+      id={itemId}
+      highlightId={highlightId}
+      highlightLayoutId={LIST_HIGHLIGHT_LAYOUT_ID}
+      isPreviewActive={isPreviewActive}
+      hideTopDivider={hideTopDivider}
+      href={href}
+      onMouseEnter={onHover}
+      onMouseLeave={onMouseLeave}
+      onFocus={onHover}
+      onBlur={onBlur}
+    >
+      <Item className="px-0 py-0 w-full min-w-0 flex-nowrap items-center justify-between">
+        <ItemContent className="min-w-0">
+          <ItemTitle className="w-full">{title}</ItemTitle>
+        </ItemContent>
+        <ListItemTrailing active={highlightId === itemId}>
+          {trailing}
+        </ListItemTrailing>
+      </Item>
+    </ListItemRowLink>
+  );
+}
+
+function CopyEmailButton({
+  email,
+  itemId,
+  highlightId,
+  isPreviewActive,
+  hideTopDivider,
+  onHover,
+  onMouseLeave,
+  onBlur,
+}: {
+  email: string;
+  itemId: string;
+  highlightId: string | null;
+  isPreviewActive?: boolean;
+  hideTopDivider?: boolean;
+  onHover?: () => void;
+  onMouseLeave?: (event: React.MouseEvent<HTMLElement>) => void;
+  onBlur?: (event: React.FocusEvent<HTMLElement>) => void;
+}) {
+  const [, copy] = useCopyToClipboard();
+
+  return (
+    <ListItemRowButton
+      id={itemId}
+      highlightId={highlightId}
+      highlightLayoutId={LIST_HIGHLIGHT_LAYOUT_ID}
+      isPreviewActive={isPreviewActive}
+      hideTopDivider={hideTopDivider}
+      onClick={() => {
+        copy(email)
+          .then(() => toast.success("Copied Email"))
+          .catch(() => toast.error("Failed to copy"));
+      }}
+      onMouseEnter={onHover}
+      onMouseLeave={onMouseLeave}
+      onFocus={onHover}
+      onBlur={onBlur}
+    >
+      <Item className="px-0 py-0 w-full min-w-0 flex-nowrap items-center justify-between">
+        <ItemContent className="min-w-0">
+          <ItemTitle className="w-full">Email</ItemTitle>
+        </ItemContent>
+        <ListItemTrailing active={highlightId === itemId}>
+          {email}
+        </ListItemTrailing>
+      </Item>
+    </ListItemRowButton>
   );
 }
 
@@ -124,7 +286,16 @@ const workEntries: WorkEntryProps[] = [
     description:
       "Building out the design team across product, web, and brand.",
     media: [
-      { src: "/placeholder-image.jpg", alt: "Nominal – placeholder", type: "image" },
+      {
+        src: "/projects/nominal/nominal_02.mp4",
+        alt: "Nominal design work",
+        type: "video",
+      },
+      {
+        src: "/projects/nominal/nominal_01.mp4",
+        alt: "Nominal product interface",
+        type: "video",
+      },
     ],
   },
   {
@@ -135,24 +306,17 @@ const workEntries: WorkEntryProps[] = [
     description:
       "Unified the visual style across all platforms and products.",
     media: [
-      { src: "/projects/tds-website/tds-website_01.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_02.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_03.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_04.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_05.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_06.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_07.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_08.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_09.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_10.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_11.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_12.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_13.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_14.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_15.mp4", alt: "Tesla Design System website demo", type: "video" },
-      { src: "/projects/tds-website/tds-website_16.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_17.jpg", alt: "Tesla Design System website", type: "image" },
-      { src: "/projects/tds-website/tds-website_18.jpg", alt: "Tesla Design System website", type: "image" },
+      { src: "/projects/tesla-home/tesla-home_04.png", alt: "Cross-platform Tesla digital experiences", type: "image" },
+      {
+        src: "/projects/cross-platform-color/cross-platform-color_05.mp4",
+        alt: "Harmonious color palette generation",
+        type: "video",
+        playbackRate: 1.5,
+      },
+      { src: "/projects/tesla-home/tesla-home_01.png", alt: "Tesla Design System component library", type: "image" },
+      { src: "/projects/tesla-home/tesla-home_02.png", alt: "TDS Helper design system linter", type: "image" },
+      { src: "/projects/tesla-home/tesla-home_03.png", alt: "Primitive, semantic, and component color tokens", type: "image" },
+      { src: "/projects/tesla-home/tesla-home_05.png", alt: "System, light, and dark theme modes", type: "image" },
     ],
   },
   {
@@ -163,7 +327,16 @@ const workEntries: WorkEntryProps[] = [
     description:
       "Shipped websites for Activision Blizzard (Call of Duty, Overwatch), Supercell, and more.",
     media: [
-      { src: "/placeholder-image.jpg", alt: "Paper Crowns – placeholder", type: "image" },
+      {
+        src: "/projects/paper-crowns/paper-crowns_01.mp4",
+        alt: "Call of Duty League Pick'em 2.0 showcase",
+        type: "video",
+      },
+      {
+        src: "/projects/paper-crowns/paper-crowns_02.mp4",
+        alt: "Overwatch League Pick'em promo",
+        type: "video",
+      },
     ],
   },
   {
@@ -173,24 +346,58 @@ const workEntries: WorkEntryProps[] = [
     dateRange: "2017 — 2021",
     description:
       "Scaled the design system across organizations and platforms.",
-    media: [
-      { src: "/placeholder-image.jpg", alt: "HP – placeholder", type: "image" },
-    ],
+    disabled: true,
   },
 ];
 
-const DESELECT_DELAY = 400;
+function shouldHideListItemTopDivider(
+  itemId: string,
+  hoveredItemId: string | null,
+  previousItemId: string | null
+) {
+  return (
+    hoveredItemId !== null &&
+    (hoveredItemId === itemId || hoveredItemId === previousItemId)
+  );
+}
 
-function useWorkCarousel() {
-  const [activeCompanyIndex, setActiveCompanyIndex] = useState<number | null>(null);
-  const [activeMediaIndex, setActiveMediaIndex] = useState<number>(0);
+function getAdjacentWorkIndex(current: number, direction: 1 | -1) {
+  if (workEntries.length === 0) return 0;
+
+  let index = current;
+  for (let step = 0; step < workEntries.length; step++) {
+    index = (index + direction + workEntries.length) % workEntries.length;
+    if (!workEntries[index]?.disabled) return index;
+  }
+
+  return current;
+}
+
+function findWorkIndexByHref(href: string) {
+  const normalized = normalizeUrl(href);
+  return workEntries.findIndex(
+    (entry) => normalizeUrl(entry.href) === normalized
+  );
+}
+
+function usePreviewPanel(isWorkSectionEngaged: boolean) {
+  const prefersReducedMotion = useReducedMotion();
+  const [panel, setPanel] = useState<PanelContent | null>(null);
+  const [mediaIndex, setMediaIndex] = useState(0);
+  const [pressedArrowKey, setPressedArrowKey] = useState<string | null>(null);
+  const [isPreviewHovered, setIsPreviewHovered] = useState(false);
   const deselectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoAdvanceTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const manualPauseUntil = useRef<number>(0);
+  const lastWorkIndexRef = useRef(0);
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const activeMedia =
-    activeCompanyIndex !== null
-      ? workEntries[activeCompanyIndex]?.media ?? []
+    panel?.type === "media"
+      ? workEntries[panel.workIndex]?.media ?? []
       : [];
+
+  const activeSlideType = activeMedia[mediaIndex]?.type;
 
   const clearDeselectTimer = useCallback(() => {
     if (deselectTimer.current) {
@@ -199,220 +406,824 @@ function useWorkCarousel() {
     }
   }, []);
 
+  const clearAutoAdvanceTimer = useCallback(() => {
+    if (autoAdvanceTimer.current) {
+      clearInterval(autoAdvanceTimer.current);
+      autoAdvanceTimer.current = null;
+    }
+  }, []);
+
+  const pauseAutoAdvance = useCallback(() => {
+    manualPauseUntil.current = Date.now() + MANUAL_PAUSE_MS;
+    clearAutoAdvanceTimer();
+  }, [clearAutoAdvanceTimer]);
+
   const startDeselectTimer = useCallback(() => {
     clearDeselectTimer();
     deselectTimer.current = setTimeout(() => {
-      setActiveCompanyIndex(null);
-      setActiveMediaIndex(0);
+      setPanel(null);
+      setMediaIndex(0);
     }, DESELECT_DELAY);
   }, [clearDeselectTimer]);
 
-  const handleCompanyHover = useCallback(
+  const activateWork = useCallback(
     (index: number) => {
+      if (workEntries[index]?.disabled) return;
+
+      lastWorkIndexRef.current = index;
       clearDeselectTimer();
-      setActiveCompanyIndex(index);
-      setActiveMediaIndex(0);
+      manualPauseUntil.current = 0;
+      setPanel({ type: "media", workIndex: index });
+      setMediaIndex(0);
     },
     [clearDeselectTimer]
   );
 
-  const handleWorkSectionLeave = useCallback(() => {
-    startDeselectTimer();
-  }, [startDeselectTimer]);
+  const activateHref = useCallback(
+    (href: string) => {
+      clearDeselectTimer();
+      manualPauseUntil.current = 0;
+      const workIndex = findWorkIndexByHref(href);
+      if (workIndex >= 0) {
+        if (workEntries[workIndex]?.disabled) return;
+
+        lastWorkIndexRef.current = workIndex;
+        setPanel({ type: "media", workIndex });
+      } else {
+        setPanel({ type: "og", href });
+      }
+      setMediaIndex(0);
+    },
+    [clearDeselectTimer]
+  );
+
+  const activateProfile = useCallback(
+    (content: Omit<ProfilePanelContent, "type">) => {
+      clearDeselectTimer();
+      manualPauseUntil.current = 0;
+      setPanel({ type: "profile", ...content });
+    },
+    [clearDeselectTimer]
+  );
+
+  const handleMediaIndexChange = useCallback(
+    (index: number) => {
+      pauseAutoAdvance();
+      setMediaIndex(index);
+    },
+    [pauseAutoAdvance]
+  );
+
+  const advanceToNextMedia = useCallback(() => {
+    setMediaIndex((prev) => {
+      const media =
+        panel?.type === "media"
+          ? workEntries[panel.workIndex]?.media ?? []
+          : [];
+
+      return media.length > 0 ? (prev + 1) % media.length : 0;
+    });
+  }, [panel]);
+
+  const isWorkActive = useCallback(
+    (index: number) => panel?.type === "media" && panel.workIndex === index,
+    [panel]
+  );
+
+  const isHrefActive = useCallback(
+    (href: string) => {
+      if (!panel) return false;
+      const normalized = normalizeUrl(href);
+      if (panel.type === "profile" && panel.href) {
+        return normalizeUrl(panel.href) === normalized;
+      }
+      if (panel.type === "media") {
+        const entry = workEntries[panel.workIndex];
+        if (entry?.disabled) return false;
+
+        return normalizeUrl(entry?.href ?? "") === normalized;
+      }
+      return false;
+    },
+    [panel]
+  );
+
+  const isProfileActive = useCallback(
+    (id: string) => panel?.type === "profile" && panel.id === id,
+    [panel]
+  );
 
   useEffect(() => {
     return () => clearDeselectTimer();
   }, [clearDeselectTimer]);
 
   useEffect(() => {
-    if (!ENABLE_WORK_CAROUSEL) return;
+    clearAutoAdvanceTimer();
 
+    if (
+      prefersReducedMotion ||
+      panel?.type !== "media" ||
+      activeMedia.length <= 1 ||
+      activeSlideType === "video" ||
+      isPreviewHovered
+    ) {
+      return;
+    }
+
+    autoAdvanceTimer.current = setInterval(() => {
+      if (Date.now() < manualPauseUntil.current) return;
+
+      setMediaIndex((prev) =>
+        activeMedia.length > 0 ? (prev + 1) % activeMedia.length : 0
+      );
+    }, AUTO_ADVANCE_MS);
+
+    return clearAutoAdvanceTimer;
+  }, [
+    panel,
+    mediaIndex,
+    activeMedia.length,
+    activeSlideType,
+    isPreviewHovered,
+    prefersReducedMotion,
+    clearAutoAdvanceTimer,
+  ]);
+
+  useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
+      const canUseWorkKeys = isWorkSectionEngaged || panel?.type === "media";
+      if (!canUseWorkKeys) return;
+
       if (e.key === "ArrowDown") {
         e.preventDefault();
         clearDeselectTimer();
-        setActiveCompanyIndex((prev) => {
-          const next = prev === null ? 0 : (prev + 1) % workEntries.length;
-          setActiveMediaIndex(0);
-          return next;
+        manualPauseUntil.current = 0;
+        setPanel((prev) => {
+          const currentIndex =
+            prev?.type === "media"
+              ? prev.workIndex
+              : lastWorkIndexRef.current;
+          const next = getAdjacentWorkIndex(currentIndex, 1);
+          lastWorkIndexRef.current = next;
+          setMediaIndex(0);
+          return { type: "media", workIndex: next };
         });
+        setPressedArrowKey(e.key);
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         clearDeselectTimer();
-        setActiveCompanyIndex((prev) => {
-          const next =
-            prev === null
-              ? workEntries.length - 1
-              : (prev - 1 + workEntries.length) % workEntries.length;
-          setActiveMediaIndex(0);
-          return next;
+        manualPauseUntil.current = 0;
+        setPanel((prev) => {
+          const currentIndex =
+            prev?.type === "media"
+              ? prev.workIndex
+              : lastWorkIndexRef.current;
+          const next = getAdjacentWorkIndex(currentIndex, -1);
+          lastWorkIndexRef.current = next;
+          setMediaIndex(0);
+          return { type: "media", workIndex: next };
         });
-      } else if (e.key === "ArrowRight" && activeCompanyIndex !== null) {
-        e.preventDefault();
-        setActiveMediaIndex((prev) =>
-          activeMedia.length > 0 ? (prev + 1) % activeMedia.length : 0
-        );
-      } else if (e.key === "ArrowLeft" && activeCompanyIndex !== null) {
-        e.preventDefault();
-        setActiveMediaIndex((prev) =>
-          activeMedia.length > 0
-            ? (prev - 1 + activeMedia.length) % activeMedia.length
-            : 0
-        );
+        setPressedArrowKey(e.key);
+      } else if (panel?.type === "media") {
+        if (e.key === "ArrowRight" && activeMedia.length > 1) {
+          e.preventDefault();
+          pauseAutoAdvance();
+          setMediaIndex((prev) =>
+            activeMedia.length > 0 ? (prev + 1) % activeMedia.length : 0
+          );
+          setPressedArrowKey(e.key);
+        } else if (e.key === "ArrowLeft" && activeMedia.length > 1) {
+          e.preventDefault();
+          pauseAutoAdvance();
+          setMediaIndex((prev) =>
+            activeMedia.length > 0
+              ? (prev - 1 + activeMedia.length) % activeMedia.length
+              : 0
+          );
+          setPressedArrowKey(e.key);
+        }
+      }
+    }
+
+    function handleKeyUp(e: KeyboardEvent) {
+      if (
+        e.key === "ArrowUp" ||
+        e.key === "ArrowDown" ||
+        e.key === "ArrowLeft" ||
+        e.key === "ArrowRight"
+      ) {
+        setPressedArrowKey((current) => (current === e.key ? null : current));
       }
     }
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeMedia.length, activeCompanyIndex, clearDeselectTimer]);
-
-  return {
-    activeCompanyIndex,
-    activeMediaIndex,
-    setActiveMediaIndex,
-    activeMedia,
-    carouselRef,
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [
+    panel,
+    activeMedia.length,
     clearDeselectTimer,
-    startDeselectTimer,
-    handleCompanyHover,
-    handleWorkSectionLeave,
-  };
+    pauseAutoAdvance,
+    isWorkSectionEngaged,
+  ]);
+
+  return useMemo(
+    () => ({
+      panel,
+      mediaIndex,
+      pressedArrowKey,
+      carouselRef,
+      isPreviewHovered,
+      activateWork,
+      activateHref,
+      activateProfile,
+      setMediaIndex: handleMediaIndexChange,
+      advanceToNextMedia,
+      setIsPreviewHovered,
+      clearDeselectTimer,
+      startDeselectTimer,
+      isWorkActive,
+      isHrefActive,
+      isProfileActive,
+    }),
+    [
+      panel,
+      mediaIndex,
+      pressedArrowKey,
+      isPreviewHovered,
+      activateWork,
+      activateHref,
+      activateProfile,
+      handleMediaIndexChange,
+      advanceToNextMedia,
+      clearDeselectTimer,
+      startDeselectTimer,
+      isWorkActive,
+      isHrefActive,
+      isProfileActive,
+    ]
+  );
+}
+
+function PreviewPanel({
+  panel,
+  mediaIndex,
+  onMediaIndexChange,
+  onActiveVideoEnded,
+  onSelectProfile,
+  onCopyEmail,
+  pressedArrowKey,
+}: {
+  panel: PanelContent;
+  mediaIndex: number;
+  onMediaIndexChange: (index: number) => void;
+  onActiveVideoEnded?: () => void;
+  onSelectProfile: (profile: ProfileStackItem) => void;
+  onCopyEmail: (email: string) => void;
+  pressedArrowKey?: string | null;
+}) {
+  if (panel.type === "media") {
+    return (
+      <div className="w-full min-w-0">
+        <MediaCarousel
+          media={workEntries[panel.workIndex]?.media ?? []}
+          activeIndex={mediaIndex}
+          onIndexChange={onMediaIndexChange}
+          onActiveVideoEnded={onActiveVideoEnded}
+          companyName={workEntries[panel.workIndex]?.company}
+          pressedArrowKey={pressedArrowKey}
+        />
+      </div>
+    );
+  }
+
+  if (panel.type === "profile") {
+    return (
+      <ProfileCardStack
+        profiles={contactProfileList}
+        activeId={panel.id}
+        onSelectProfile={onSelectProfile}
+        onCopyEmail={onCopyEmail}
+      />
+    );
+  }
+
+  return null;
+}
+
+function PreviewPanelSlot({
+  panel,
+  isOpen,
+  mediaIndex,
+  onMediaIndexChange,
+  onActiveVideoEnded,
+  onPreviewHoverChange,
+  panelRef,
+  startDeselectTimer,
+  onPreviewEnter,
+  onContentExitComplete,
+  onSelectProfile,
+  onCopyEmail,
+  pressedArrowKey,
+}: {
+  panel: PanelContent;
+  isOpen: boolean;
+  mediaIndex: number;
+  onMediaIndexChange: (index: number) => void;
+  onActiveVideoEnded?: () => void;
+  onPreviewHoverChange?: (hovered: boolean) => void;
+  panelRef: RefObject<HTMLDivElement | null>;
+  startDeselectTimer: () => void;
+  onPreviewEnter: () => void;
+  onContentExitComplete: () => void;
+  onSelectProfile: (profile: ProfileStackItem) => void;
+  onCopyEmail: (email: string) => void;
+  pressedArrowKey?: string | null;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+
+  const contentMotion = prefersReducedMotion
+    ? {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 },
+      }
+    : {
+        initial: { opacity: 0, filter: `blur(${previewBlur})` },
+        animate: { opacity: 1, filter: "blur(0px)" },
+        exit: { opacity: 0, filter: `blur(${previewBlur})` },
+      };
+
+  return (
+    <div className="hidden lg:block flex-1 min-w-0 self-start">
+      <div className="sticky top-0 flex h-dvh w-full items-center">
+        <div
+          ref={panelRef as RefObject<HTMLDivElement>}
+          className="w-full min-w-0"
+          onMouseEnter={() => {
+            onPreviewEnter();
+            onPreviewHoverChange?.(true);
+          }}
+          onMouseLeave={() => {
+            onPreviewHoverChange?.(false);
+            startDeselectTimer();
+          }}
+        >
+          <AnimatePresence
+            initial={false}
+            mode="popLayout"
+            onExitComplete={onContentExitComplete}
+          >
+            {isOpen && (
+              <motion.div
+                key={getPanelKey(panel)}
+                layout={false}
+                {...contentMotion}
+                transition={previewBlurTransition}
+                className="w-full min-w-0"
+              >
+                <PreviewPanel
+                  panel={panel}
+                  mediaIndex={mediaIndex}
+                  onMediaIndexChange={onMediaIndexChange}
+                  onActiveVideoEnded={onActiveVideoEnded}
+                  onSelectProfile={onSelectProfile}
+                  onCopyEmail={onCopyEmail}
+                  pressedArrowKey={pressedArrowKey}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function Home() {
-  const carousel = useWorkCarousel();
+  const workSectionRef = useRef<HTMLDivElement>(null);
+  const listSectionRef = useRef<HTMLDivElement>(null);
+  const [isWorkSectionEngaged, setIsWorkSectionEngaged] = useState(false);
+  const [suppressListHighlight, setSuppressListHighlight] = useState(false);
+  const previewPanel = usePreviewPanel(isWorkSectionEngaged);
+  const [, copyEmail] = useCopyToClipboard();
+  const [hoveredListItemId, setHoveredListItemId] = useState<string | null>(null);
+  const [highlightVisible, setHighlightVisible] = useState(true);
+  const [slotPanel, setSlotPanel] = useState<PanelContent | null>(null);
+  const highlightExitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activePanelRef = useRef<PanelContent | null>(null);
+
+  const activeHighlightId = suppressListHighlight
+    ? hoveredListItemId
+    : hoveredListItemId ?? getListHighlightId(previewPanel.panel);
+  const highlightId = highlightVisible ? activeHighlightId : null;
+  const displayedPanel = previewPanel.panel ?? slotPanel;
+
+  useEffect(() => {
+    activePanelRef.current = previewPanel.panel;
+  }, [previewPanel.panel]);
+
+  function clearHighlightExitTimer() {
+    if (highlightExitTimer.current) {
+      clearTimeout(highlightExitTimer.current);
+      highlightExitTimer.current = null;
+    }
+  }
+
+  function isMovingToPreview(relatedTarget: EventTarget | null) {
+    return (
+      relatedTarget instanceof Node &&
+      previewPanel.carouselRef.current?.contains(relatedTarget)
+    );
+  }
+
+  function dismissListInteraction() {
+    previewPanel.startDeselectTimer();
+    clearHighlightExitTimer();
+    highlightExitTimer.current = setTimeout(() => {
+      setHighlightVisible(false);
+    }, HIGHLIGHT_EXIT_DELAY_MS);
+  }
+
+  function handleListItemHover(id: string, activate: () => void) {
+    const active = document.activeElement;
+    if (
+      active instanceof HTMLElement &&
+      active.id !== id &&
+      listSectionRef.current?.contains(active)
+    ) {
+      active.blur();
+    }
+
+    clearHighlightExitTimer();
+    setSuppressListHighlight(false);
+    setHighlightVisible(true);
+    setHoveredListItemId(id);
+    activate();
+  }
+
+  function handleListItemMouseLeave(event: React.MouseEvent<HTMLElement>) {
+    const relatedTarget = event.relatedTarget;
+
+    if (
+      relatedTarget instanceof Node &&
+      (listSectionRef.current?.contains(relatedTarget) ||
+        isMovingToPreview(relatedTarget))
+    ) {
+      return;
+    }
+
+    setHoveredListItemId(null);
+
+    if (event.currentTarget === document.activeElement) {
+      event.currentTarget.blur();
+    }
+
+    dismissListInteraction();
+  }
+
+  function handleListGapEnter() {
+    setHoveredListItemId(null);
+    setSuppressListHighlight(true);
+  }
+
+  function handleWorkSectionFocusIn() {
+    setIsWorkSectionEngaged(true);
+  }
+
+  function handleWorkSectionFocusOut(event: React.FocusEvent<HTMLDivElement>) {
+    if (!workSectionRef.current?.contains(event.relatedTarget as Node | null)) {
+      setIsWorkSectionEngaged(false);
+    }
+  }
+
+  function handlePreviewCardSelect(profile: ProfileStackItem) {
+    clearHighlightExitTimer();
+    setHighlightVisible(true);
+    setHoveredListItemId(`contact-${profile.id}`);
+    previewPanel.clearDeselectTimer();
+    previewPanel.activateProfile(
+      contactProfiles[profile.id as keyof typeof contactProfiles]
+    );
+  }
+
+  function handlePreviewCopyEmail(email: string) {
+    copyEmail(email)
+      .then(() => toast.success("Copied Email"))
+      .catch(() => toast.error("Failed to copy"));
+  }
+
+  function handleListSectionEnter() {
+    clearHighlightExitTimer();
+    setHighlightVisible(true);
+    setSuppressListHighlight(false);
+  }
+
+  function blurActiveListItem() {
+    const active = document.activeElement;
+    if (
+      active instanceof HTMLElement &&
+      listSectionRef.current?.contains(active)
+    ) {
+      active.blur();
+    }
+  }
+
+  function handleListItemBlur(event: React.FocusEvent<HTMLElement>) {
+    const relatedTarget = event.relatedTarget;
+    if (
+      relatedTarget instanceof Node &&
+      listSectionRef.current?.contains(relatedTarget)
+    ) {
+      return;
+    }
+
+    setHoveredListItemId(null);
+  }
+
+  function handlePreviewEnter() {
+    previewPanel.clearDeselectTimer();
+    clearHighlightExitTimer();
+    setHighlightVisible(true);
+    blurActiveListItem();
+  }
+
+  function handleListSectionLeave(event: React.MouseEvent<HTMLDivElement>) {
+    setHoveredListItemId(null);
+    blurActiveListItem();
+
+    if (isMovingToPreview(event.relatedTarget)) {
+      clearHighlightExitTimer();
+      return;
+    }
+
+    dismissListInteraction();
+  }
+
+  useEffect(() => {
+    return () => clearHighlightExitTimer();
+  }, []);
+
+  useEffect(() => {
+    if (previewPanel.panel) {
+      setSlotPanel(previewPanel.panel);
+    }
+  }, [previewPanel.panel]);
+
+  useEffect(() => {
+    if (previewPanel.panel) {
+      setHighlightVisible(true);
+      clearHighlightExitTimer();
+      return;
+    }
+
+    clearHighlightExitTimer();
+    highlightExitTimer.current = setTimeout(() => {
+      setHighlightVisible(false);
+    }, HIGHLIGHT_EXIT_DELAY_MS);
+  }, [previewPanel.panel]);
+
+  useEffect(() => {
+    prefetchOgMetadata(workEntries.map((entry) => entry.href));
+  }, []);
+
+  const contextValue = useMemo(
+    () => previewPanel,
+    [previewPanel]
+  );
 
   return (
-    <div className="flex flex-col lg:flex-row lg:gap-12 xl:gap-16">
-      <div className="flex flex-col gap-14 sm:gap-16 w-full lg:w-[38.2%] lg:min-w-80 lg:max-w-md shrink-0 lg:shrink">
-        <section
-          id="introduction"
-          className="flex flex-col gap-4 justify-start"
-        >
-          <div className="flex items-center gap-3">
-            <div className="size-10 relative rounded-full overflow-hidden shrink-0 bg-skeleton">
-              <Image
-                src="/austin.jpg"
-                alt="Austin Robinson"
-                fill
-                className="object-cover object-top"
-              />
-            </div>
-            <div className="flex flex-col">
-              <h1 className="font-medium text-foreground">Austin Robinson</h1>
-              <Text>Design at Nominal</Text>
-            </div>
-          </div>
-          <Text className="text-pretty">
-            I&apos;m a software designer and engineer living in Austin, TX,
-            currently building software to accelerate hardware testing at{" "}
-            <AustinLink href="https://nominal.io" preview>
-              Nominal
-            </AustinLink>
-            .
-          </Text>
-          <Text className="text-pretty">
-            Previously, I led design systems at{" "}
-            <AustinLink href="https://tesla.com" preview>
-              Tesla
-            </AustinLink>{" "}
-            and{" "}
-            <AustinLink href="https://hp.com" preview>
-              HP
-            </AustinLink>
-            , and moonlighted as a designer and engineer for{" "}
-            <AustinLink href="https://papercrowns.com/" preview>
-              Paper Crowns
-            </AustinLink>
-            .
-          </Text>
-        </section>
+    <PreviewPanelContext.Provider value={contextValue}>
+      <div className="flex flex-col lg:flex-row lg:gap-12 xl:gap-16">
+        <div className="relative flex flex-col gap-14 sm:gap-16 w-full lg:w-[480px] lg:shrink-0">
+          <section
+            id="introduction"
+            className="flex flex-col gap-4 justify-start"
+          >
+            <HomeEnterSection index={0}>
+              <div className="flex items-center gap-3">
+                <div className="size-10 relative rounded-full overflow-hidden shrink-0 bg-skeleton image-outline">
+                  <Image
+                    src="/austin.jpg"
+                    alt="Austin Robinson"
+                    fill
+                    className="object-cover object-top"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="text-balance font-medium text-foreground">
+                    Austin Robinson
+                  </h1>
+                  <Text>Design at Nominal</Text>
+                </div>
+              </div>
+            </HomeEnterSection>
 
-        <section id="work" className="flex flex-col">
-          <div className="flex items-center justify-between pb-2">
-            <h2 className="font-medium text-muted-foreground">Work</h2>
-            {ENABLE_WORK_CAROUSEL && carousel.activeCompanyIndex !== null && (
-              <span className="hidden lg:flex items-center gap-1 text-xs text-muted-foreground/60">
-                <Kbd><RiArrowUpSLine /></Kbd>
-                <Kbd><RiArrowDownSLine /></Kbd>
-              </span>
-            )}
-          </div>
-          <div className="relative">
-            <ItemGroup
-              className="gap-0"
-              onMouseLeave={ENABLE_WORK_CAROUSEL ? carousel.handleWorkSectionLeave : undefined}
-            >
-              {workEntries.map((entry, index) => (
-                <WorkEntry
-                  key={entry.company}
-                  {...entry}
-                  isActive={ENABLE_WORK_CAROUSEL ? carousel.activeCompanyIndex === index : undefined}
-                  onHover={ENABLE_WORK_CAROUSEL ? () => carousel.handleCompanyHover(index) : undefined}
-                />
-              ))}
-              {ENABLE_WORK_CAROUSEL && carousel.activeCompanyIndex !== null && (
-                <MouseSafeArea parentRef={carousel.carouselRef} />
-              )}
-            </ItemGroup>
-          </div>
-        </section>
+            <HomeEnterSection index={1}>
+              <Text className="text-pretty">
+                I&apos;m a software designer and engineer living in Austin, TX,
+                currently building software to accelerate hardware testing at{" "}
+                <AustinLink href="https://nominal.io" preview>
+                  Nominal
+                </AustinLink>
+                .
+              </Text>
+            </HomeEnterSection>
 
-        <section id="contact" className="flex flex-col">
-          <h2 className="font-medium text-muted-foreground pb-2">Contact</h2>
-          <ItemGroup className="gap-0">
-            <a
-              href="https://twitter.com/austinmrobinson"
-              target="_blank"
-              className={`hover:bg-overlay-light hover:before:opacity-0 [&:hover+*]:before:opacity-0 ${outdentedItem}`}
-            >
-              <Item className="px-0 py-0">
-                <ItemContent>
-                  <ItemTitle>Twitter</ItemTitle>
-                </ItemContent>
-                <ItemActions>
-                  <span className="text-muted-foreground">
-                    @austinmrobinson
-                  </span>
-                </ItemActions>
-              </Item>
-            </a>
-            <a
-              href="https://www.linkedin.com/in/robinsonaustin/"
-              target="_blank"
-              className={`hover:bg-overlay-light hover:before:opacity-0 [&:hover+*]:before:opacity-0 ${outdentedItem}`}
-            >
-              <Item className="px-0 py-0">
-                <ItemContent>
-                  <ItemTitle>LinkedIn</ItemTitle>
-                </ItemContent>
-                <ItemActions>
-                  <span className="text-muted-foreground">robinsonaustin</span>
-                </ItemActions>
-              </Item>
-            </a>
-            <CopyEmailButton email="austinrobinsondesign@gmail.com" />
-          </ItemGroup>
-        </section>
-      </div>
+            <HomeEnterSection index={2}>
+              <Text className="text-pretty">
+                Previously, I led design systems at{" "}
+                <AustinLink href="https://tesla.com" preview>
+                  Tesla
+                </AustinLink>{" "}
+                and{" "}
+                <AustinLink href="https://hp.com" preview>
+                  HP
+                </AustinLink>
+                , and moonlighted as a designer and engineer for{" "}
+                <AustinLink href="https://papercrowns.com/" preview>
+                  Paper Crowns
+                </AustinLink>
+                .
+              </Text>
+            </HomeEnterSection>
+          </section>
 
-      {ENABLE_WORK_CAROUSEL && carousel.activeCompanyIndex !== null && (
-        <div
-          ref={carousel.carouselRef}
-          className="hidden lg:block lg:w-[61.8%] flex-1 min-w-0"
-          onMouseEnter={carousel.clearDeselectTimer}
-          onMouseLeave={carousel.startDeselectTimer}
-        >
-          <div className="sticky top-6 sm:top-10 h-[calc(100dvh-theme(spacing.12))] sm:h-[calc(100dvh-theme(spacing.20))]">
-            <MediaCarousel
-              media={carousel.activeMedia}
-              activeIndex={carousel.activeMediaIndex}
-              onIndexChange={carousel.setActiveMediaIndex}
-              companyName={workEntries[carousel.activeCompanyIndex]?.company}
-            />
+          <div
+            ref={listSectionRef}
+            onMouseEnter={handleListSectionEnter}
+            onMouseLeave={handleListSectionLeave}
+          >
+            <LayoutGroup id="home-list">
+              <div className={cn("relative", listSectionClassName)}>
+                <div
+                  ref={workSectionRef}
+                  onMouseEnter={() => setIsWorkSectionEngaged(true)}
+                  onMouseLeave={() => setIsWorkSectionEngaged(false)}
+                  onFocusCapture={handleWorkSectionFocusIn}
+                  onBlurCapture={handleWorkSectionFocusOut}
+                >
+                  <HomeEnterSection index={3}>
+                    <div className="pb-2">
+                      <h2
+                        id="work"
+                        className="text-balance font-medium text-muted-foreground"
+                      >
+                        Work
+                      </h2>
+                    </div>
+                  </HomeEnterSection>
+
+                  <HomeEnterSection index={4}>
+                    <ItemGroup className="gap-0 w-full">
+                      {workEntries.map((entry, index) => {
+                        const itemId = `work-${index}`;
+                        const previousItemId =
+                          index > 0 ? `work-${index - 1}` : null;
+
+                        return (
+                          <WorkEntry
+                            key={entry.company}
+                            {...entry}
+                            itemId={itemId}
+                            highlightId={highlightId}
+                            isPreviewActive={
+                              !!previewPanel.panel && highlightId === itemId
+                            }
+                            hideTopDivider={shouldHideListItemTopDivider(
+                              itemId,
+                              hoveredListItemId,
+                              previousItemId
+                            )}
+                            onHover={
+                              entry.disabled
+                                ? undefined
+                                : () =>
+                                    handleListItemHover(itemId, () =>
+                                      previewPanel.activateWork(index)
+                                    )
+                            }
+                            onBlur={handleListItemBlur}
+                            onMouseLeave={handleListItemMouseLeave}
+                          />
+                        );
+                      })}
+                    </ItemGroup>
+                  </HomeEnterSection>
+                </div>
+
+                <div
+                  className="pt-14 sm:pt-16 pb-2"
+                  onMouseEnter={handleListGapEnter}
+                >
+                  <HomeEnterSection index={5}>
+                    <h2
+                      id="contact"
+                      className="text-balance font-medium text-muted-foreground"
+                    >
+                      Contact
+                    </h2>
+                  </HomeEnterSection>
+                </div>
+
+                <HomeEnterSection index={6}>
+                  <ItemGroup className="gap-0 w-full">
+                    <ContactEntry
+                      itemId="contact-twitter"
+                      href="https://twitter.com/austinmrobinson"
+                      title="Twitter"
+                      trailing="@austinmrobinson"
+                      highlightId={highlightId}
+                      isPreviewActive={
+                        !!previewPanel.panel && highlightId === "contact-twitter"
+                      }
+                      hideTopDivider={shouldHideListItemTopDivider(
+                        "contact-twitter",
+                        hoveredListItemId,
+                        `work-${workEntries.length - 1}`
+                      )}
+                      onHover={() =>
+                        handleListItemHover("contact-twitter", () =>
+                          previewPanel.activateProfile(contactProfiles.twitter)
+                        )
+                      }
+                      onBlur={handleListItemBlur}
+                      onMouseLeave={handleListItemMouseLeave}
+                    />
+                    <ContactEntry
+                      itemId="contact-linkedin"
+                      href="https://www.linkedin.com/in/robinsonaustin/"
+                      title="LinkedIn"
+                      trailing="robinsonaustin"
+                      highlightId={highlightId}
+                      isPreviewActive={
+                        !!previewPanel.panel && highlightId === "contact-linkedin"
+                      }
+                      hideTopDivider={shouldHideListItemTopDivider(
+                        "contact-linkedin",
+                        hoveredListItemId,
+                        "contact-twitter"
+                      )}
+                      onHover={() =>
+                        handleListItemHover("contact-linkedin", () =>
+                          previewPanel.activateProfile(contactProfiles.linkedin)
+                        )
+                      }
+                      onBlur={handleListItemBlur}
+                      onMouseLeave={handleListItemMouseLeave}
+                    />
+                    <CopyEmailButton
+                      itemId="contact-email"
+                      email="austinrobinsondesign@gmail.com"
+                      highlightId={highlightId}
+                      isPreviewActive={
+                        !!previewPanel.panel && highlightId === "contact-email"
+                      }
+                      hideTopDivider={shouldHideListItemTopDivider(
+                        "contact-email",
+                        hoveredListItemId,
+                        "contact-linkedin"
+                      )}
+                      onHover={() =>
+                        handleListItemHover("contact-email", () =>
+                          previewPanel.activateProfile(contactProfiles.email)
+                        )
+                      }
+                      onBlur={handleListItemBlur}
+                      onMouseLeave={handleListItemMouseLeave}
+                    />
+                  </ItemGroup>
+                </HomeEnterSection>
+              </div>
+            </LayoutGroup>
           </div>
         </div>
-      )}
-    </div>
+
+        {displayedPanel && (
+          <PreviewPanelSlot
+            panel={displayedPanel}
+            isOpen={!!previewPanel.panel}
+            mediaIndex={previewPanel.mediaIndex}
+            onMediaIndexChange={previewPanel.setMediaIndex}
+            onActiveVideoEnded={previewPanel.advanceToNextMedia}
+            onPreviewHoverChange={previewPanel.setIsPreviewHovered}
+            panelRef={previewPanel.carouselRef}
+            startDeselectTimer={previewPanel.startDeselectTimer}
+            onPreviewEnter={handlePreviewEnter}
+            onSelectProfile={handlePreviewCardSelect}
+            onCopyEmail={handlePreviewCopyEmail}
+            pressedArrowKey={previewPanel.pressedArrowKey}
+            onContentExitComplete={() => {
+              if (!activePanelRef.current) {
+                setSlotPanel(null);
+              }
+            }}
+          />
+        )}
+      </div>
+    </PreviewPanelContext.Provider>
   );
 }
