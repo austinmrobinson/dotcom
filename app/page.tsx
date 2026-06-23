@@ -352,10 +352,13 @@ const workEntries: WorkEntryProps[] = [
 
 function shouldHideListItemTopDivider(
   itemId: string,
-  highlightId: string | null,
+  hoveredItemId: string | null,
   previousItemId: string | null
 ) {
-  return highlightId === itemId || highlightId === previousItemId;
+  return (
+    hoveredItemId !== null &&
+    (hoveredItemId === itemId || hoveredItemId === previousItemId)
+  );
 }
 
 function getAdjacentWorkIndex(current: number, direction: 1 | -1) {
@@ -1092,7 +1095,7 @@ export default function Home() {
                             }
                             hideTopDivider={shouldHideListItemTopDivider(
                               itemId,
-                              highlightId,
+                              hoveredListItemId,
                               previousItemId
                             )}
                             onHover={
@@ -1139,7 +1142,7 @@ export default function Home() {
                       }
                       hideTopDivider={shouldHideListItemTopDivider(
                         "contact-twitter",
-                        highlightId,
+                        hoveredListItemId,
                         `work-${workEntries.length - 1}`
                       )}
                       onHover={() =>
@@ -1161,7 +1164,7 @@ export default function Home() {
                       }
                       hideTopDivider={shouldHideListItemTopDivider(
                         "contact-linkedin",
-                        highlightId,
+                        hoveredListItemId,
                         "contact-twitter"
                       )}
                       onHover={() =>
@@ -1181,7 +1184,7 @@ export default function Home() {
                       }
                       hideTopDivider={shouldHideListItemTopDivider(
                         "contact-email",
-                        highlightId,
+                        hoveredListItemId,
                         "contact-linkedin"
                       )}
                       onHover={() =>
