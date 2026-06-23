@@ -14,21 +14,21 @@ const bannerStyles = {
   email: {
     backgroundColor: "var(--profile-card-banner-base)",
     backgroundImage: iconBannerRadial(
-      "var(--profile-card-banner-highlight) 0%, var(--profile-card-banner-base) 100%"
+      "var(--profile-card-banner-highlight) 0%, var(--profile-card-banner-base) 68%"
     ),
   },
   twitter: {
     backgroundColor:
       "color-mix(in srgb, #000 5%, var(--profile-card-surface-bg))",
     backgroundImage: iconBannerRadial(
-      "rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.05) 100%"
+      "rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.04) 100%"
     ),
   },
   linkedin: {
     backgroundColor:
       "color-mix(in srgb, #0a66c2 5%, var(--profile-card-surface-bg))",
     backgroundImage: iconBannerRadial(
-      "rgba(10, 102, 194, 0.1) 0%, rgba(10, 102, 194, 0.05) 100%"
+      "rgba(10, 102, 194, 0.22) 0%, rgba(10, 102, 194, 0.04) 100%"
     ),
   },
 } as const satisfies Record<ProfilePlatform, CSSProperties>;
@@ -79,7 +79,7 @@ function ProfileCardFrame({
         <div className="absolute inset-0 flex flex-col overflow-hidden rounded-[20px] bg-profile-card-surface xl:rounded-[24px]">
           <div className="relative min-h-0 flex-1 px-2 pt-2">
             <div
-              className="relative h-full rounded-[12px] border border-border-light dark:shadow-container"
+              className="profile-card-banner-inset relative h-full rounded-[12px] border border-border-light dark:shadow-container"
               style={bannerStyle}
             />
             <div className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-1/2">

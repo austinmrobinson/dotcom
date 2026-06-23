@@ -245,6 +245,7 @@ export function ProfileCardStack({
 
   return (
     <div
+      data-preview-target
       className={cn(
         "relative flex aspect-video w-full min-w-0 items-center justify-center rounded-xl bg-profile-preview",
         fanned ? "overflow-visible" : "overflow-hidden",

@@ -171,7 +171,7 @@
   --profile-card-banner-base: var(--muted);
   --profile-card-banner-highlight: color-mix(
     in oklch,
-    var(--foreground) 8%,
+    var(--foreground) 18%,
     var(--profile-card-banner-base)
   );
 
@@ -278,7 +278,7 @@
   --profile-card-banner-base: var(--muted);
   --profile-card-banner-highlight: color-mix(
     in oklch,
-    var(--foreground) 8%,
+    var(--foreground) 18%,
     var(--profile-card-banner-base)
   );
 
@@ -444,6 +444,12 @@ body {
 
 @utility shadow-raised-container-lg {
   box-shadow: var(--container-shadow), var(--raised-shadow-lg);
+}
+
+@utility profile-card-banner-inset {
+  box-shadow:
+    inset 0 5px 10px -4px oklch(0 0 0 / 0.2),
+    inset 0 -3px 6px -3px oklch(1 0 0 / 0.1);
 }
 
 .profile-banner-noise::after {

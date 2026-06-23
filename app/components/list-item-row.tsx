@@ -9,7 +9,7 @@ export const LIST_HIGHLIGHT_LAYOUT_ID = "list-highlight";
 export const listSectionClassName = "relative overflow-visible";
 
 export const listItemRowClassName =
-  "relative min-w-0 w-[calc(100%+2rem)] -mx-4 px-4 py-4 rounded-lg cursor-default text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 before:absolute before:top-0 before:inset-x-4 before:h-px before:bg-border-light before:transition-opacity";
+  "relative min-w-0 w-[calc(100%+2rem)] -mx-4 px-4 py-4 rounded-lg cursor-default text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50";
 
 const listItemTextClassName =
   "[&_[data-slot=item-title]]:w-full [&_[data-slot=item-title]]:text-muted-foreground [&_[data-slot=item-description]]:text-muted-foreground [&_.text-muted-foreground]:text-muted-foreground [&_p.text-muted-foreground]:text-muted-foreground [&_[data-slot=item-title]]:transition-colors [&_[data-slot=item-description]]:transition-colors [&_.text-muted-foreground]:transition-colors [&_p.text-muted-foreground]:transition-colors duration-150";
@@ -23,18 +23,31 @@ const highlightLayoutTransition = {
   damping: 20,
 };
 
-const highlightBlurTransition = {
-  duration: 0.3,
-  ease: [0.25, 0.46, 0.45, 0.94] as const,
-};
-
-function getListItemRowClassName(isHighlighted: boolean, className?: string) {
+function getListItemRowClassName(
+  isHighlighted: boolean,
+  disabled: boolean,
+  className?: string
+) {
   return cn(
     listItemRowClassName,
     listItemTextClassName,
-    isHighlighted && "before:opacity-0 [&+*]:before:opacity-0",
     isHighlighted && listItemActiveTextClassName,
+    disabled && "pointer-events-none",
     className
+  );
+}
+
+function ListItemTopDivider({ visible }: { visible: boolean }) {
+  const prefersReducedMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      aria-hidden
+      className="absolute top-0 inset-x-4 h-px bg-border-light pointer-events-none"
+      initial={false}
+      animate={{ opacity: visible ? 1 : 0 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
+    />
   );
 }
 
@@ -43,9 +56,12 @@ interface ListItemRowProps {
   highlightId: string | null;
   highlightLayoutId: string;
   isPreviewActive?: boolean;
+  disabled?: boolean;
+  hideTopDivider?: boolean;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   onFocus?: () => void;
+  onBlur?: (event: React.FocusEvent<HTMLElement>) => void;
   children: React.ReactNode;
   className?: string;
 }
@@ -69,13 +85,8 @@ function ListItemHighlight({ layoutId }: { layoutId: string }) {
   return (
     <motion.div
       layoutId={layoutId}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{
-        layout: highlightLayoutTransition,
-        opacity: highlightBlurTransition,
-      }}
+      transition={{ layout: highlightLayoutTransition }}
+      style={{ opacity: 1 }}
       className="absolute inset-0 -z-10 rounded-lg bg-overlay-light"
     />
   );
@@ -88,13 +99,9 @@ function ListItemHighlightLayer({
   isHighlighted: boolean;
   highlightLayoutId: string;
 }) {
-  return (
-    <AnimatePresence initial={false}>
-      {isHighlighted && (
-        <ListItemHighlight layoutId={highlightLayoutId} />
-      )}
-    </AnimatePresence>
-  );
+  if (!isHighlighted) return null;
+
+  return <ListItemHighlight layoutId={highlightLayoutId} />;
 }
 
 function ListItemRowBase({
@@ -102,26 +109,34 @@ function ListItemRowBase({
   highlightId,
   highlightLayoutId,
   isPreviewActive = false,
+  disabled = false,
+  hideTopDivider = false,
   onMouseEnter,
   onMouseLeave,
   onFocus,
+  onBlur,
   children,
   className,
   ...props
 }: ListItemRowProps & React.ComponentPropsWithoutRef<"div">) {
-  const isHighlighted = highlightId === id;
+  const isHighlighted = !disabled && highlightId === id;
 
   return (
     <div
       {...props}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onFocus={onFocus}
+      id={id}
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : 0}
+      onMouseEnter={disabled ? undefined : onMouseEnter}
+      onMouseLeave={disabled ? undefined : onMouseLeave}
+      onFocus={disabled ? undefined : onFocus}
+      onBlur={disabled ? undefined : onBlur}
       className={cn(
-        getListItemRowClassName(isHighlighted, className),
+        getListItemRowClassName(isHighlighted, disabled, className),
         getListItemRowStacking(isHighlighted, isPreviewActive)
       )}
     >
+      <ListItemTopDivider visible={!hideTopDivider} />
       <ListItemHighlightLayer
         isHighlighted={isHighlighted}
         highlightLayoutId={highlightLayoutId}
@@ -147,27 +162,34 @@ export function ListItemRowLink({
     highlightId,
     highlightLayoutId,
     isPreviewActive = false,
+    disabled = false,
+    hideTopDivider = false,
     onMouseEnter,
     onMouseLeave,
     onFocus,
+    onBlur,
     children,
     className,
   } = props;
-  const isHighlighted = highlightId === id;
+  const isHighlighted = !disabled && highlightId === id;
 
   return (
     <a
       href={href}
       target={target}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onFocus={onFocus}
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : undefined}
+      onMouseEnter={disabled ? undefined : onMouseEnter}
+      onMouseLeave={disabled ? undefined : onMouseLeave}
+      onFocus={disabled ? undefined : onFocus}
+      onBlur={disabled ? undefined : onBlur}
       className={cn(
-        getListItemRowClassName(isHighlighted, className),
+        getListItemRowClassName(isHighlighted, disabled, className),
         getListItemRowStacking(isHighlighted, isPreviewActive),
-        "cursor-pointer"
+        !disabled && "cursor-pointer"
       )}
     >
+      <ListItemTopDivider visible={!hideTopDivider} />
       <ListItemHighlightLayer
         isHighlighted={isHighlighted}
         highlightLayoutId={highlightLayoutId}
@@ -190,26 +212,36 @@ export function ListItemRowButton({
     highlightId,
     highlightLayoutId,
     isPreviewActive = false,
+    disabled = false,
+    hideTopDivider = false,
     onMouseEnter,
     onMouseLeave,
     onFocus,
+    onBlur,
     children,
     className,
   } = props;
-  const isHighlighted = highlightId === id;
+  const isHighlighted = !disabled && highlightId === id;
 
   return (
     <button
       type={type}
       onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onFocus={onFocus}
+      disabled={disabled}
+      onMouseEnter={disabled ? undefined : onMouseEnter}
+      onMouseLeave={disabled ? undefined : onMouseLeave}
+      onFocus={disabled ? undefined : onFocus}
+      onBlur={disabled ? undefined : onBlur}
       className={cn(
-        getListItemRowClassName(isHighlighted, cn("cursor-pointer", className)),
+        getListItemRowClassName(
+          isHighlighted,
+          disabled,
+          cn(!disabled && "cursor-pointer", className)
+        ),
         getListItemRowStacking(isHighlighted, isPreviewActive)
       )}
     >
+      <ListItemTopDivider visible={!hideTopDivider} />
       <ListItemHighlightLayer
         isHighlighted={isHighlighted}
         highlightLayoutId={highlightLayoutId}
