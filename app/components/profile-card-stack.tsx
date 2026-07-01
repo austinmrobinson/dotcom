@@ -23,6 +23,9 @@ interface ProfileCardStackProps {
   className?: string;
   onSelectProfile: (profile: ProfileStackItem) => void;
   onCopyEmail: (email: string) => void;
+  activeLayoutId?: string;
+  onActiveCardExpand?: () => void;
+  isLightboxOpen?: boolean;
 }
 
 const stackTransition = {
@@ -131,8 +134,17 @@ interface StackCardProps {
   prefersReducedMotion: boolean | null;
   onSelectProfile: (profile: ProfileStackItem) => void;
   onCopyEmail: (email: string) => void;
+  onActiveCardExpand?: () => void;
+  activeLayoutId?: string;
+  isLightboxOpen?: boolean;
   cardRef?: (node: HTMLButtonElement | null) => void;
 }
+
+const layoutTransition = {
+  type: "spring" as const,
+  stiffness: 300,
+  damping: 30,
+};
 
 function StackCard({
   profile,
@@ -140,12 +152,21 @@ function StackCard({
   prefersReducedMotion,
   onSelectProfile,
   onCopyEmail,
+  onActiveCardExpand,
+  activeLayoutId,
+  isLightboxOpen,
   cardRef,
 }: StackCardProps) {
   function handleClick() {
-    onSelectProfile(profile);
+    if (!isActive) {
+      onSelectProfile(profile);
+      return;
+    }
 
-    if (!isActive) return;
+    if (onActiveCardExpand) {
+      onActiveCardExpand();
+      return;
+    }
 
     if (profile.platform === "email") {
       onCopyEmail(profile.handle);
@@ -160,11 +181,30 @@ function StackCard({
   const label =
     profile.platform === "email"
       ? isActive
-        ? `Copy ${profile.handle}`
+        ? onActiveCardExpand
+          ? `Expand email card for ${profile.name}`
+          : `Copy ${profile.handle}`
         : `Show email card for ${profile.name}`
       : isActive
-        ? `Open ${profile.platform} profile for ${profile.name}`
+        ? onActiveCardExpand
+          ? `Expand ${profile.platform} profile for ${profile.name}`
+          : `Open ${profile.platform} profile for ${profile.name}`
         : `Show ${profile.platform} profile for ${profile.name}`;
+
+  const sharedLayoutId =
+    isActive &&
+    activeLayoutId &&
+    !prefersReducedMotion &&
+    !isLightboxOpen
+      ? activeLayoutId
+      : undefined;
+
+  const cardClassName = cn(
+    "pointer-events-auto w-full max-w-[400px] text-left xl:max-w-[480px]",
+    isActive && onActiveCardExpand ? "cursor-zoom-in" : "cursor-pointer"
+  );
+
+  const cardContent = <ProfileCard {...profile} />;
 
   if (prefersReducedMotion) {
     return (
@@ -173,10 +213,28 @@ function StackCard({
         type="button"
         onClick={handleClick}
         aria-label={label}
-        className="pointer-events-auto w-full max-w-[400px] cursor-pointer text-left xl:max-w-[480px]"
+        className={cardClassName}
       >
-        <ProfileCard {...profile} />
+        {cardContent}
       </button>
+    );
+  }
+
+  if (sharedLayoutId) {
+    return (
+      <motion.button
+        ref={cardRef}
+        type="button"
+        layoutId={sharedLayoutId}
+        transition={layoutTransition}
+        onClick={handleClick}
+        aria-label={label}
+        className={cardClassName}
+        whileHover={{ y: -6, scale: 1.02 }}
+        whileTap={{ y: 2, scale: 0.98 }}
+      >
+        {cardContent}
+      </motion.button>
     );
   }
 
@@ -186,12 +244,12 @@ function StackCard({
       type="button"
       onClick={handleClick}
       aria-label={label}
-      className="pointer-events-auto w-full max-w-[400px] cursor-pointer text-left xl:max-w-[480px]"
+      className={cardClassName}
       whileHover={{ y: -6, scale: 1.02 }}
       whileTap={{ y: 2, scale: 0.98 }}
       transition={cardInteractionTransition}
     >
-      <ProfileCard {...profile} />
+      {cardContent}
     </motion.button>
   );
 }
@@ -202,6 +260,9 @@ export function ProfileCardStack({
   className,
   onSelectProfile,
   onCopyEmail,
+  activeLayoutId,
+  onActiveCardExpand,
+  isLightboxOpen,
 }: ProfileCardStackProps) {
   const prefersReducedMotion = useReducedMotion();
   const isXlViewport = useIsXlViewport();
@@ -281,6 +342,9 @@ export function ProfileCardStack({
                   prefersReducedMotion={prefersReducedMotion}
                   onSelectProfile={onSelectProfile}
                   onCopyEmail={onCopyEmail}
+                  onActiveCardExpand={onActiveCardExpand}
+                  activeLayoutId={activeLayoutId}
+                  isLightboxOpen={isLightboxOpen}
                   cardRef={setCardRef(profile.id)}
                 />
               </div>
@@ -308,6 +372,9 @@ export function ProfileCardStack({
                 prefersReducedMotion={prefersReducedMotion}
                 onSelectProfile={onSelectProfile}
                 onCopyEmail={onCopyEmail}
+                onActiveCardExpand={onActiveCardExpand}
+                activeLayoutId={activeLayoutId}
+                isLightboxOpen={isLightboxOpen}
                 cardRef={setCardRef(profile.id)}
               />
             </motion.div>
