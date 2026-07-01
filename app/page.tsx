@@ -863,20 +863,17 @@ export default function Home() {
     : hoveredListItemId ?? getListHighlightId(previewPanel.panel);
   const highlightId = highlightVisible ? activeHighlightId : null;
   const displayedPanel = previewPanel.panel ?? slotPanel;
+  const isLightboxOpen = lightbox !== null;
 
-  useEffect(() => {
-    if (activePanelRef.current && !previewPanel.panel) {
-      setLightbox(null);
-    }
-  }, [previewPanel.panel]);
+  function guardedStartDeselectTimer() {
+    if (isLightboxOpen) return;
+    previewPanel.startDeselectTimer();
+  }
 
-  useEffect(() => {
-    if (!previewPanel.panel) {
-      return;
-    }
-
-    activePanelRef.current = previewPanel.panel;
-  }, [previewPanel.panel]);
+  function guardedDismissListInteraction() {
+    if (isLightboxOpen) return;
+    dismissListInteraction();
+  }
 
   function clearHighlightExitTimer() {
     if (highlightExitTimer.current) {
@@ -898,6 +895,15 @@ export default function Home() {
     highlightExitTimer.current = setTimeout(() => {
       setHighlightVisible(false);
     }, HIGHLIGHT_EXIT_DELAY_MS);
+  }
+
+  function isMovingToLightbox(relatedTarget: EventTarget | null) {
+    return (
+      relatedTarget instanceof Element &&
+      relatedTarget.closest(
+        '[data-slot="dialog-overlay"], [data-slot="dialog-portal"], [data-slot="dialog-content"]'
+      ) !== null
+    );
   }
 
   function handleListItemHover(id: string, activate: () => void) {
@@ -923,7 +929,8 @@ export default function Home() {
     if (
       relatedTarget instanceof Node &&
       (listSectionRef.current?.contains(relatedTarget) ||
-        isMovingToPreview(relatedTarget))
+        isMovingToPreview(relatedTarget) ||
+        isMovingToLightbox(relatedTarget))
     ) {
       return;
     }
@@ -934,7 +941,7 @@ export default function Home() {
       event.currentTarget.blur();
     }
 
-    dismissListInteraction();
+    guardedDismissListInteraction();
   }
 
   function handleListGapEnter() {
@@ -953,11 +960,15 @@ export default function Home() {
   }
 
   function handleMediaExpand(workIndex: number, mediaIndex = previewPanel.mediaIndex) {
+    previewPanel.clearDeselectTimer();
+    clearHighlightExitTimer();
     setLightboxMediaIndex(mediaIndex);
     setLightbox({ type: "media", workIndex });
   }
 
   function handleProfileExpand(id: string) {
+    previewPanel.clearDeselectTimer();
+    clearHighlightExitTimer();
     setLightbox({ type: "profile", id });
   }
 
@@ -1020,13 +1031,19 @@ export default function Home() {
     setHoveredListItemId(null);
     blurActiveListItem();
 
-    if (isMovingToPreview(event.relatedTarget)) {
+    if (isMovingToPreview(event.relatedTarget) || isMovingToLightbox(event.relatedTarget)) {
       clearHighlightExitTimer();
       return;
     }
 
-    dismissListInteraction();
+    guardedDismissListInteraction();
   }
+
+  useEffect(() => {
+    if (previewPanel.panel) {
+      activePanelRef.current = previewPanel.panel;
+    }
+  }, [previewPanel.panel]);
 
   useEffect(() => {
     return () => clearHighlightExitTimer();
@@ -1300,7 +1317,7 @@ export default function Home() {
             onActiveVideoEnded={previewPanel.advanceToNextMedia}
             onPreviewHoverChange={previewPanel.setIsPreviewHovered}
             panelRef={previewPanel.carouselRef}
-            startDeselectTimer={previewPanel.startDeselectTimer}
+            startDeselectTimer={guardedStartDeselectTimer}
             onPreviewEnter={handlePreviewEnter}
             onSelectProfile={handlePreviewCardSelect}
             onCopyEmail={handlePreviewCopyEmail}
@@ -1340,6 +1357,7 @@ export default function Home() {
               activeIndex={lightboxMediaIndex}
               onIndexChange={setLightboxMediaIndex}
               isLightboxOpen
+              enableSwipe
             />
           )}
           {lightbox?.type === "profile" && (() => {

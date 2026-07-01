@@ -21,6 +21,7 @@ import { Button } from "@/app/components/ui/button";
 import { MediaCarousel } from "@/app/components/media-carousel";
 import { ProfileCard } from "@/app/components/profile-card";
 import { Text } from "@/app/components/text";
+import { mobileAccordionTriggerClassName } from "@/app/components/list-item-row";
 import { cn } from "@/app/lib/utils";
 import type { ProfileStackItem } from "@/app/components/profile-card-stack";
 import {
@@ -56,6 +57,16 @@ interface MobilePreviewAccordionProps {
   lightbox?: { type: "media"; workIndex: number } | { type: "profile"; id: string } | null;
 }
 
+const accordionTriggerClassName = cn(
+  mobileAccordionTriggerClassName,
+  "[&_[data-slot=accordion-trigger-icon]]:hidden",
+  "[&_[data-slot=item-title]]:text-muted-foreground",
+  "[&_[data-slot=item-description]]:text-muted-foreground"
+);
+
+const accordionContentClassName =
+  "px-4 pb-6 text-base [&_[data-slot=item-title]]:text-muted-foreground";
+
 function MobileWorkAccordionItem({
   entry,
   index,
@@ -74,13 +85,8 @@ function MobileWorkAccordionItem({
 
   return (
     <AccordionItem value={value} className="border-border-light">
-      <AccordionTrigger
-        className={cn(
-          "w-[calc(100%+2rem)] -mx-4 px-4 py-4 rounded-lg hover:no-underline",
-          "[&_[data-slot=accordion-trigger-icon]]:hidden"
-        )}
-      >
-        <div className="flex w-full min-w-0 flex-col gap-3 pr-2 text-left">
+      <AccordionTrigger className={accordionTriggerClassName}>
+        <div className="flex w-full min-w-0 flex-col gap-3 pr-2">
           <Item className="w-full min-w-0 flex-nowrap items-start justify-between px-0 py-0">
             <ItemContent className="min-w-0">
               <ItemTitle className="w-full">{entry.company}</ItemTitle>
@@ -95,7 +101,7 @@ function MobileWorkAccordionItem({
           <Text className="text-pretty">{entry.description}</Text>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="px-4 pb-6">
+      <AccordionContent className={accordionContentClassName}>
         {entry.media && entry.media.length > 0 ? (
           <MediaCarousel
             media={entry.media}
@@ -108,6 +114,7 @@ function MobileWorkAccordionItem({
                 : undefined
             }
             isLightboxOpen={isLightboxOpen}
+            enableSwipe
           />
         ) : null}
       </AccordionContent>
@@ -145,12 +152,7 @@ function MobileContactAccordionItem({
 
   return (
     <AccordionItem value={`contact-${id}`} className="border-border-light">
-      <AccordionTrigger
-        className={cn(
-          "w-[calc(100%+2rem)] -mx-4 px-4 py-4 rounded-lg hover:no-underline",
-          "[&_[data-slot=accordion-trigger-icon]]:hidden"
-        )}
-      >
+      <AccordionTrigger className={accordionTriggerClassName}>
         <Item className="w-full min-w-0 flex-nowrap items-center justify-between px-0 py-0">
           <ItemContent className="min-w-0">
             <ItemTitle className="w-full">{title}</ItemTitle>
@@ -160,7 +162,7 @@ function MobileContactAccordionItem({
           </span>
         </Item>
       </AccordionTrigger>
-      <AccordionContent className="flex flex-col gap-4 px-4 pb-6">
+      <AccordionContent className={cn(accordionContentClassName, "flex flex-col gap-4")}>
         {layoutId ? (
           <motion.button
             type="button"
@@ -202,6 +204,11 @@ function MobileContactAccordionItem({
   );
 }
 
+function getDefaultOpenItem(workEntries: WorkEntryData[]) {
+  const firstEnabledIndex = workEntries.findIndex((entry) => !entry.disabled);
+  return firstEnabledIndex >= 0 ? [`work-${firstEnabledIndex}`] : [];
+}
+
 export function MobilePreviewAccordion({
   workEntries,
   contactProfiles,
@@ -210,7 +217,9 @@ export function MobilePreviewAccordion({
   lightbox,
 }: MobilePreviewAccordionProps) {
   const [, copy] = useCopyToClipboard();
-  const [openItems, setOpenItems] = useState<string[]>([]);
+  const [openItems, setOpenItems] = useState<string[]>(() =>
+    getDefaultOpenItem(workEntries)
+  );
 
   function handleCopyEmail(email: string) {
     copy(email)
@@ -220,7 +229,7 @@ export function MobilePreviewAccordion({
 
   return (
     <Accordion
-      className="lg:hidden w-full gap-0"
+      className="lg:hidden w-full gap-0 text-base"
       value={openItems}
       onValueChange={setOpenItems}
     >
@@ -258,7 +267,7 @@ export function MobilePreviewAccordion({
         );
       })}
 
-      <div className="pt-14 sm:pt-16 pb-2">
+      <div className="pt-14 sm:pt-16 pb-2 px-4">
         <h2
           id="contact-mobile"
           className="text-balance font-medium text-muted-foreground"

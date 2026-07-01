@@ -45,7 +45,7 @@ export function PreviewLightbox({
       <AnimatePresence>
         {open && (
           <DialogPortal>
-            <DialogOverlay className="data-[state=open]:animate-overlayShow bg-overlay-strong backdrop-blur-sm cursor-zoom-out" />
+            <DialogOverlay className="data-[state=open]:animate-overlayShow bg-overlay-strong cursor-zoom-out" />
             <div className="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
               <motion.div
                 layoutId={prefersReducedMotion ? undefined : layoutId}
