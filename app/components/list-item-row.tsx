@@ -11,6 +11,9 @@ export const listSectionClassName = "relative overflow-visible";
 export const listItemRowClassName =
   "relative min-w-0 w-[calc(100%+2rem)] -mx-4 px-4 py-4 rounded-lg cursor-default text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50";
 
+export const mobileAccordionTriggerClassName =
+  "relative flex w-[calc(100%+2rem)] -mx-4 items-start rounded-lg border border-transparent px-4 py-4 text-left text-base font-normal outline-none transition-all hover:no-underline focus-visible:ring-2 focus-visible:ring-ring/50";
+
 const listItemTextClassName =
   "[&_[data-slot=item-title]]:w-full [&_[data-slot=item-title]]:text-muted-foreground [&_[data-slot=item-description]]:text-muted-foreground [&_.text-muted-foreground]:text-muted-foreground [&_p.text-muted-foreground]:text-muted-foreground [&_[data-slot=item-title]]:transition-colors [&_[data-slot=item-description]]:transition-colors [&_.text-muted-foreground]:transition-colors [&_p.text-muted-foreground]:transition-colors duration-150";
 

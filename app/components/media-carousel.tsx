@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/app/lib/utils";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react";
 
@@ -43,16 +44,49 @@ interface MediaCarouselProps {
   onActiveVideoEnded?: () => void;
   companyName?: string;
   pressedArrowKey?: string | null;
+  layoutId?: string;
+  onViewportClick?: () => void;
+  isLightboxOpen?: boolean;
+  showControls?: boolean;
+  enableSwipe?: boolean;
 }
 
-export function MediaCarousel({
+const layoutTransition = {
+  type: "spring" as const,
+  stiffness: 300,
+  damping: 30,
+};
+
+const SWIPE_THRESHOLD_PX = 50;
+
+function MediaViewport({
   media,
   activeIndex,
   onIndexChange,
   onActiveVideoEnded,
-  pressedArrowKey,
-}: MediaCarouselProps) {
+  layoutId,
+  onViewportClick,
+  isLightboxOpen,
+  enableSwipe,
+  hideAmbientBlur,
+}: {
+  media: MediaItem[];
+  activeIndex: number;
+  onIndexChange: (index: number) => void;
+  onActiveVideoEnded?: () => void;
+  layoutId?: string;
+  onViewportClick?: () => void;
+  isLightboxOpen?: boolean;
+  enableSwipe?: boolean;
+  hideAmbientBlur?: boolean;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const touchStartX = useRef<number | null>(null);
+  const didSwipe = useRef(false);
+  const prefersReducedMotion = useReducedMotion();
+  const isExpandable = !!onViewportClick;
+  const sharedLayoutId =
+    !prefersReducedMotion && layoutId && !isLightboxOpen ? layoutId : undefined;
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -83,6 +117,179 @@ export function MediaCarousel({
     onActiveVideoEnded?.();
   }
 
+  function handleTouchStart(event: React.TouchEvent) {
+    if (!enableSwipe || media.length <= 1) return;
+    touchStartX.current = event.touches[0].clientX;
+    didSwipe.current = false;
+  }
+
+  function handleTouchEnd(event: React.TouchEvent) {
+    if (!enableSwipe || media.length <= 1 || touchStartX.current === null) {
+      touchStartX.current = null;
+      return;
+    }
+
+    const deltaX = event.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX) return;
+
+    didSwipe.current = true;
+    if (deltaX > 0) goToPrevious();
+    else goToNext();
+  }
+
+  function handleViewportClick() {
+    if (didSwipe.current) {
+      didSwipe.current = false;
+      return;
+    }
+    onViewportClick?.();
+  }
+
+  const viewportClassName = cn(
+    "relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle",
+    isExpandable && "cursor-zoom-in"
+  );
+
+  const mediaContent = (
+    <>
+      {media.map((item, index) => (
+        <div
+          key={item.src}
+          className={cn(
+            "absolute inset-0 transition-opacity duration-500 ease-out",
+            index === activeIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+          )}
+        >
+          {item.type === "video" ? (
+            <>
+              {!hideAmbientBlur && (
+                <video
+                  src={item.src}
+                  muted
+                  loop
+                  playsInline
+                  className="absolute inset-0 size-full object-cover blur-2xl scale-200"
+                  aria-hidden
+                  onLoadedData={(event) => {
+                    event.currentTarget.playbackRate = item.playbackRate ?? 1;
+                  }}
+                />
+              )}
+              <video
+                ref={index === activeIndex ? videoRef : undefined}
+                src={item.src}
+                muted
+                playsInline
+                className="relative size-full object-cover"
+                onLoadedData={(event) => {
+                  event.currentTarget.playbackRate = item.playbackRate ?? 1;
+                }}
+                onEnded={
+                  index === activeIndex ? handleActiveVideoEnded : undefined
+                }
+              />
+            </>
+          ) : (
+            <>
+              {!hideAmbientBlur && (
+                <Image
+                  src={item.src}
+                  alt=""
+                  fill
+                  quality={100}
+                  sizes="(min-width: 1024px) 60vw, 100vw"
+                  className="object-cover blur-2xl scale-200"
+                  aria-hidden="true"
+                />
+              )}
+              <Image
+                src={item.src}
+                alt={item.alt}
+                fill
+                quality={100}
+                sizes="(min-width: 1024px) 60vw, 100vw"
+                className="object-cover"
+                priority={index === 0}
+              />
+            </>
+          )}
+        </div>
+      ))}
+    </>
+  );
+
+  const touchHandlers =
+    enableSwipe && media.length > 1
+      ? {
+          onTouchStart: handleTouchStart,
+          onTouchEnd: handleTouchEnd,
+        }
+      : {};
+
+  if (isExpandable) {
+    return (
+      <motion.button
+        type="button"
+        layoutId={sharedLayoutId}
+        transition={layoutTransition}
+        onClick={handleViewportClick}
+        aria-label="Expand preview"
+        className={cn(viewportClassName, "block w-full text-left")}
+        {...touchHandlers}
+      >
+        {mediaContent}
+      </motion.button>
+    );
+  }
+
+  if (sharedLayoutId) {
+    return (
+      <motion.div
+        layoutId={sharedLayoutId}
+        transition={layoutTransition}
+        className={viewportClassName}
+        {...touchHandlers}
+      >
+        {mediaContent}
+      </motion.div>
+    );
+  }
+
+  return (
+    <div className={viewportClassName} {...touchHandlers}>
+      {mediaContent}
+    </div>
+  );
+}
+
+export function MediaCarousel({
+  media,
+  activeIndex,
+  onIndexChange,
+  onActiveVideoEnded,
+  pressedArrowKey,
+  layoutId,
+  onViewportClick,
+  isLightboxOpen,
+  showControls = true,
+  enableSwipe = false,
+}: MediaCarouselProps) {
+  function goToPrevious() {
+    onIndexChange(
+      media.length > 0
+        ? (activeIndex - 1 + media.length) % media.length
+        : 0
+    );
+  }
+
+  function goToNext() {
+    onIndexChange(
+      media.length > 0 ? (activeIndex + 1) % media.length : 0
+    );
+  }
+
   if (media.length === 0) {
     return (
       <div
@@ -96,75 +303,25 @@ export function MediaCarousel({
 
   return (
     <div className="flex w-full flex-col gap-3" data-preview-target>
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle">
-        {media.map((item, index) => (
-          <div
-            key={item.src}
-            className={cn(
-              "absolute inset-0 transition-opacity duration-500 ease-out",
-              index === activeIndex ? "opacity-100 z-10" : "opacity-0 z-0"
-            )}
-          >
-            {item.type === "video" ? (
-              <>
-                <video
-                  src={item.src}
-                  muted
-                  loop
-                  playsInline
-                  className="absolute inset-0 size-full object-cover blur-2xl scale-200"
-                  aria-hidden
-                  onLoadedData={(event) => {
-                    event.currentTarget.playbackRate = item.playbackRate ?? 1;
-                  }}
-                />
-                <video
-                  ref={index === activeIndex ? videoRef : undefined}
-                  src={item.src}
-                  muted
-                  playsInline
-                  className="relative size-full object-cover"
-                  onLoadedData={(event) => {
-                    event.currentTarget.playbackRate = item.playbackRate ?? 1;
-                  }}
-                  onEnded={
-                    index === activeIndex ? handleActiveVideoEnded : undefined
-                  }
-                />
-              </>
-            ) : (
-              <>
-                <Image
-                  src={item.src}
-                  alt=""
-                  fill
-                  quality={100}
-                  sizes="(min-width: 1024px) 60vw, 0vw"
-                  className="object-cover blur-2xl scale-200"
-                  aria-hidden="true"
-                />
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  fill
-                  quality={100}
-                  sizes="(min-width: 1024px) 60vw, 0vw"
-                  className="object-cover"
-                  priority={index === 0}
-                />
-              </>
-            )}
-          </div>
-        ))}
-      </div>
+      <MediaViewport
+        media={media}
+        activeIndex={activeIndex}
+        onIndexChange={onIndexChange}
+        onActiveVideoEnded={onActiveVideoEnded}
+        layoutId={layoutId}
+        onViewportClick={onViewportClick}
+        isLightboxOpen={isLightboxOpen}
+        enableSwipe={enableSwipe}
+        hideAmbientBlur={isLightboxOpen}
+      />
 
-      {media.length > 1 && (
+      {showControls && media.length > 1 && (
         <div className="flex items-center justify-center gap-3">
           <button
             type="button"
             onClick={goToPrevious}
             aria-label="Previous image"
-            className="cursor-pointer"
+            className="hidden cursor-pointer lg:block"
           >
             <Kbd pressed={pressedArrowKey === "ArrowLeft"}>
               <RiArrowLeftSLine />
@@ -190,7 +347,7 @@ export function MediaCarousel({
             type="button"
             onClick={goToNext}
             aria-label="Next image"
-            className="cursor-pointer"
+            className="hidden cursor-pointer lg:block"
           >
             <Kbd pressed={pressedArrowKey === "ArrowRight"}>
               <RiArrowRightSLine />
