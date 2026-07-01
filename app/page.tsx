@@ -1132,6 +1132,28 @@ export default function Home() {
                 <HomeEnterSection index={6}>
                   <ItemGroup className="gap-0 w-full">
                     <ContactEntry
+                      itemId="contact-run"
+                      href="/run"
+                      title="Run"
+                      trailing="Activities & races"
+                      highlightId={highlightId}
+                      isPreviewActive={
+                        !!previewPanel.panel && highlightId === "contact-run"
+                      }
+                      hideTopDivider={shouldHideListItemTopDivider(
+                        "contact-run",
+                        hoveredListItemId,
+                        `work-${workEntries.length - 1}`
+                      )}
+                      onHover={() =>
+                        handleListItemHover("contact-run", () =>
+                          previewPanel.activateHref("/run")
+                        )
+                      }
+                      onBlur={handleListItemBlur}
+                      onMouseLeave={handleListItemMouseLeave}
+                    />
+                    <ContactEntry
                       itemId="contact-twitter"
                       href="https://twitter.com/austinmrobinson"
                       title="Twitter"
@@ -1143,7 +1165,7 @@ export default function Home() {
                       hideTopDivider={shouldHideListItemTopDivider(
                         "contact-twitter",
                         hoveredListItemId,
-                        `work-${workEntries.length - 1}`
+                        "contact-run"
                       )}
                       onHover={() =>
                         handleListItemHover("contact-twitter", () =>
