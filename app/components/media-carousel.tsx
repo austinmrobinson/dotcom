@@ -1,7 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { cn } from "@/app/lib/utils";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react";
@@ -96,11 +102,13 @@ function MediaBlur({
 function CarouselVideo({
   item,
   isActive,
+  isNext,
   onNearEnd,
   onReady,
 }: {
   item: MediaItem;
   isActive: boolean;
+  isNext?: boolean;
   onNearEnd?: () => void;
   onReady?: () => void;
 }) {
@@ -117,6 +125,13 @@ function CarouselVideo({
   }, [item.src, onReady]);
 
   useEffect(() => {
+    if (isActive || !isNext) return;
+    const video = videoRef.current;
+    if (!video) return;
+    video.playbackRate = item.playbackRate ?? 1;
+  }, [isActive, isNext, item.playbackRate, item.src]);
+
+  useLayoutEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
@@ -130,7 +145,10 @@ function CarouselVideo({
     }
 
     hasSignaledEndRef.current = false;
-    video.currentTime = 0;
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      setShouldShowPoster(false);
+    }
+    if (video.currentTime > 0.05) video.currentTime = 0;
     video.play().catch(() => {});
   }, [isActive, item.playbackRate, item.src]);
 
@@ -197,7 +215,7 @@ function CarouselVideo({
       poster={shouldShowPoster ? item.poster : undefined}
       muted
       playsInline
-      preload={isActive ? "auto" : "metadata"}
+      preload={isActive || isNext ? "auto" : "metadata"}
       className="relative size-full object-cover"
       onLoadedData={() => onReady?.()}
       onPlaying={() => setShouldShowPoster(false)}
@@ -209,10 +227,12 @@ function CarouselVideo({
 function MediaSlide({
   item,
   isActive,
+  isNext,
   onActiveVideoEnded,
 }: {
   item: MediaItem;
   isActive: boolean;
+  isNext?: boolean;
   onActiveVideoEnded?: () => void;
 }) {
   const [isReady, setIsReady] = useState(() => hasCachedPreview(item));
@@ -232,6 +252,7 @@ function MediaSlide({
         <CarouselVideo
           item={item}
           isActive={isActive}
+          isNext={isNext}
           onNearEnd={onActiveVideoEnded}
           onReady={markReady}
         />
@@ -267,6 +288,9 @@ export function MediaCarousel({
 }: MediaCarouselProps) {
   const loadedIndicesRef = useRef(new Set<number>([activeIndex]));
   loadedIndicesRef.current.add(activeIndex);
+  if (media.length > 1) {
+    loadedIndicesRef.current.add((activeIndex + 1) % media.length);
+  }
 
   useEffect(() => {
     if (media.length <= 1) return;
@@ -336,6 +360,8 @@ export function MediaCarousel({
       <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle">
         {media.map((item, index) => {
           const isActive = index === activeIndex;
+          const isNext =
+            media.length > 1 && index === (activeIndex + 1) % media.length;
           const shouldLoad = loadedIndicesRef.current.has(index);
 
           return (
@@ -351,6 +377,7 @@ export function MediaCarousel({
                 <MediaSlide
                   item={item}
                   isActive={isActive}
+                  isNext={isNext}
                   onActiveVideoEnded={
                     isActive ? handleActiveVideoEnded : undefined
                   }
