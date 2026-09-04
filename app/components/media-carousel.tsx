@@ -138,15 +138,16 @@ function CarouselVideo({
     video.playbackRate = item.playbackRate ?? 1;
 
     if (!isActive) {
-      const timeout = window.setTimeout(() => {
-        video.pause();
-      }, SLIDE_FADE_MS);
-      return () => window.clearTimeout(timeout);
+      setShouldShowPoster(false);
+      video.removeAttribute("poster");
+      video.pause();
+      return;
     }
 
     hasSignaledEndRef.current = false;
     if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
       setShouldShowPoster(false);
+      video.removeAttribute("poster");
     }
     if (video.currentTime > 0.05) video.currentTime = 0;
     video.play().catch(() => {});
@@ -174,10 +175,14 @@ function CarouselVideo({
           remainingWall <= getAdvanceLeadSeconds(el)
         ) {
           hasSignaledEndRef.current = true;
+          el.removeAttribute("poster");
+          el.pause();
           onNearEndRef.current?.();
+          return;
         }
 
         if (remainingMedia <= VIDEO_FREEZE_LEAD_S) {
+          el.removeAttribute("poster");
           el.pause();
           return;
         }
@@ -202,7 +207,11 @@ function CarouselVideo({
   }, [isActive, item.src]);
 
   function handleEnded() {
-    videoRef.current?.pause();
+    const video = videoRef.current;
+    if (video) {
+      video.removeAttribute("poster");
+      video.pause();
+    }
     if (!isActive || hasSignaledEndRef.current) return;
     hasSignaledEndRef.current = true;
     onNearEndRef.current?.();
