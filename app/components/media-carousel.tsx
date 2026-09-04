@@ -29,11 +29,12 @@ export function Kbd({
   );
 }
 
-interface MediaItem {
+export interface MediaItem {
   src: string;
   alt: string;
   type: "image" | "video";
   playbackRate?: number;
+  poster?: string;
 }
 
 interface MediaCarouselProps {
@@ -45,6 +46,100 @@ interface MediaCarouselProps {
   pressedArrowKey?: string | null;
 }
 
+const carouselImageSizes = "(min-width: 1024px) 60vw, 0vw";
+
+function MediaBlur({ src, unoptimized = false }: { src: string; unoptimized?: boolean }) {
+  return (
+    <Image
+      src={src}
+      alt=""
+      fill
+      quality={60}
+      unoptimized={unoptimized}
+      sizes={carouselImageSizes}
+      className="object-cover blur-2xl scale-200"
+      aria-hidden="true"
+    />
+  );
+}
+
+function CarouselVideo({
+  item,
+  isActive,
+  onEnded,
+}: {
+  item: MediaItem;
+  isActive: boolean;
+  onEnded?: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.playbackRate = item.playbackRate ?? 1;
+
+    if (!isActive) {
+      video.pause();
+      return;
+    }
+
+    video.currentTime = 0;
+    video.play().catch(() => {});
+  }, [isActive, item.playbackRate, item.src]);
+
+  return (
+    <video
+      ref={videoRef}
+      src={item.src}
+      poster={item.poster}
+      muted
+      playsInline
+      preload={isActive ? "auto" : "metadata"}
+      className="relative size-full object-cover"
+      onEnded={isActive ? onEnded : undefined}
+    />
+  );
+}
+
+function MediaSlide({
+  item,
+  isActive,
+  onActiveVideoEnded,
+}: {
+  item: MediaItem;
+  isActive: boolean;
+  onActiveVideoEnded?: () => void;
+}) {
+  const blurSrc = item.poster ?? (item.type === "image" ? item.src : undefined);
+
+  return (
+    <>
+      {blurSrc ? (
+        <MediaBlur src={blurSrc} unoptimized={Boolean(item.poster)} />
+      ) : null}
+      {item.type === "video" ? (
+        <CarouselVideo
+          item={item}
+          isActive={isActive}
+          onEnded={onActiveVideoEnded}
+        />
+      ) : (
+        <Image
+          src={item.src}
+          alt={item.alt}
+          fill
+          quality={100}
+          sizes={carouselImageSizes}
+          className="object-cover"
+          priority={isActive}
+        />
+      )}
+    </>
+  );
+}
+
 export function MediaCarousel({
   media,
   activeIndex,
@@ -52,16 +147,40 @@ export function MediaCarousel({
   onActiveVideoEnded,
   pressedArrowKey,
 }: MediaCarouselProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const loadedIndicesRef = useRef(new Set<number>([activeIndex]));
+  loadedIndicesRef.current.add(activeIndex);
 
   useEffect(() => {
-    if (!videoRef.current) return;
+    if (media.length <= 1) return;
 
-    const item = media[activeIndex];
-    const video = videoRef.current;
-    video.playbackRate = item?.playbackRate ?? 1;
-    video.currentTime = 0;
-    video.play().catch(() => {});
+    const nextItem = media[(activeIndex + 1) % media.length];
+    if (!nextItem) return;
+
+    const warmers: Array<HTMLImageElement | HTMLVideoElement> = [];
+
+    if (nextItem.poster) {
+      const poster = new window.Image();
+      poster.src = nextItem.poster;
+      warmers.push(poster);
+    }
+
+    if (nextItem.type === "video") {
+      const video = document.createElement("video");
+      video.muted = true;
+      video.preload = "auto";
+      video.src = nextItem.src;
+      warmers.push(video);
+    } else {
+      const image = new window.Image();
+      image.src = nextItem.src;
+      warmers.push(image);
+    }
+
+    return () => {
+      warmers.forEach((element) => {
+        element.src = "";
+      });
+    };
   }, [activeIndex, media]);
 
   function goToPrevious() {
@@ -97,65 +216,30 @@ export function MediaCarousel({
   return (
     <div className="flex w-full flex-col gap-3" data-preview-target>
       <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle">
-        {media.map((item, index) => (
-          <div
-            key={item.src}
-            className={cn(
-              "absolute inset-0 transition-opacity duration-500 ease-out",
-              index === activeIndex ? "opacity-100 z-10" : "opacity-0 z-0"
-            )}
-          >
-            {item.type === "video" ? (
-              <>
-                <video
-                  src={item.src}
-                  muted
-                  loop
-                  playsInline
-                  className="absolute inset-0 size-full object-cover blur-2xl scale-200"
-                  aria-hidden
-                  onLoadedData={(event) => {
-                    event.currentTarget.playbackRate = item.playbackRate ?? 1;
-                  }}
-                />
-                <video
-                  ref={index === activeIndex ? videoRef : undefined}
-                  src={item.src}
-                  muted
-                  playsInline
-                  className="relative size-full object-cover"
-                  onLoadedData={(event) => {
-                    event.currentTarget.playbackRate = item.playbackRate ?? 1;
-                  }}
-                  onEnded={
-                    index === activeIndex ? handleActiveVideoEnded : undefined
+        {media.map((item, index) => {
+          const isActive = index === activeIndex;
+          const shouldLoad = loadedIndicesRef.current.has(index);
+
+          return (
+            <div
+              key={item.src}
+              className={cn(
+                "absolute inset-0 transition-opacity duration-500 ease-out",
+                isActive ? "opacity-100 z-10" : "opacity-0 z-0"
+              )}
+            >
+              {shouldLoad ? (
+                <MediaSlide
+                  item={item}
+                  isActive={isActive}
+                  onActiveVideoEnded={
+                    isActive ? handleActiveVideoEnded : undefined
                   }
                 />
-              </>
-            ) : (
-              <>
-                <Image
-                  src={item.src}
-                  alt=""
-                  fill
-                  quality={100}
-                  sizes="(min-width: 1024px) 60vw, 0vw"
-                  className="object-cover blur-2xl scale-200"
-                  aria-hidden="true"
-                />
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  fill
-                  quality={100}
-                  sizes="(min-width: 1024px) 60vw, 0vw"
-                  className="object-cover"
-                  priority={index === 0}
-                />
-              </>
-            )}
-          </div>
-        ))}
+              ) : null}
+            </div>
+          );
+        })}
       </div>
 
       {media.length > 1 && (
@@ -170,7 +254,7 @@ export function MediaCarousel({
               <RiArrowLeftSLine />
             </Kbd>
           </button>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-center gap-1.5">
             {media.map((_, index) => (
               <button
                 key={index}

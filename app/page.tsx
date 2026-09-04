@@ -27,7 +27,8 @@ import {
   ItemActions,
   ItemGroup,
 } from "@/app/components/ui/item";
-import { MediaCarousel } from "./components/media-carousel";
+import { MediaCarousel, type MediaItem } from "./components/media-carousel";
+import { WorkMediaPreloader } from "./components/work-media-preloader";
 import { ProfileCardStack, type ProfileStackItem } from "./components/profile-card-stack";
 import {
   ListItemRow,
@@ -103,13 +104,6 @@ function normalizeUrl(url: string) {
   } catch {
     return url;
   }
-}
-
-interface MediaItem {
-  src: string;
-  alt: string;
-  type: "image" | "video";
-  playbackRate?: number;
 }
 
 interface WorkEntryProps {
@@ -288,11 +282,13 @@ const workEntries: WorkEntryProps[] = [
     media: [
       {
         src: "/projects/nominal/nominal_02.mp4",
+        poster: "/projects/nominal/nominal_02.jpg",
         alt: "Nominal design work",
         type: "video",
       },
       {
         src: "/projects/nominal/nominal_01.mp4",
+        poster: "/projects/nominal/nominal_01.jpg",
         alt: "Nominal product interface",
         type: "video",
       },
@@ -306,9 +302,10 @@ const workEntries: WorkEntryProps[] = [
     description:
       "Unified the visual style across all platforms and products.",
     media: [
-      { src: "/projects/tesla-home/tesla-home_04.png", alt: "Cross-platform Tesla digital experiences", type: "image" },
+      { src: "/projects/tesla-home/tesla-home_04.jpg", alt: "Cross-platform Tesla digital experiences", type: "image" },
       {
         src: "/projects/cross-platform-color/cross-platform-color_05.mp4",
+        poster: "/projects/cross-platform-color/cross-platform-color_05.jpg",
         alt: "Harmonious color palette generation",
         type: "video",
         playbackRate: 1.5,
@@ -329,11 +326,13 @@ const workEntries: WorkEntryProps[] = [
     media: [
       {
         src: "/projects/paper-crowns/paper-crowns_01.mp4",
+        poster: "/projects/paper-crowns/paper-crowns_01.jpg",
         alt: "Call of Duty League Pick'em 2.0 showcase",
         type: "video",
       },
       {
         src: "/projects/paper-crowns/paper-crowns_02.mp4",
+        poster: "/projects/paper-crowns/paper-crowns_02.jpg",
         alt: "Overwatch League Pick'em promo",
         type: "video",
       },
@@ -349,6 +348,10 @@ const workEntries: WorkEntryProps[] = [
     disabled: true,
   },
 ];
+
+const workMediaGroups = workEntries
+  .map((entry) => entry.media ?? [])
+  .filter((media) => media.length > 0);
 
 function shouldHideListItemTopDivider(
   itemId: string,
@@ -997,6 +1000,7 @@ export default function Home() {
 
   return (
     <PreviewPanelContext.Provider value={contextValue}>
+      <WorkMediaPreloader groups={workMediaGroups} />
       <div className="flex flex-col lg:flex-row lg:gap-12 xl:gap-16">
         <div className="relative flex flex-col gap-14 sm:gap-16 w-full lg:w-[480px] lg:shrink-0">
           <section
