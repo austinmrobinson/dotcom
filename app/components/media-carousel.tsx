@@ -142,24 +142,25 @@ function CarouselVideo({
     let cancelled = false;
 
     function tick() {
-      if (cancelled || video.paused) return;
+      const el = videoRef.current;
+      if (cancelled || !el || el.paused) return;
 
-      const duration = video.duration;
+      const duration = el.duration;
       if (Number.isFinite(duration) && duration > 0) {
-        const remainingMedia = duration - video.currentTime;
-        const remainingWall = remainingMedia / (video.playbackRate || 1);
+        const remainingMedia = duration - el.currentTime;
+        const remainingWall = remainingMedia / (el.playbackRate || 1);
 
         if (
           isActive &&
           !hasSignaledEndRef.current &&
-          remainingWall <= getAdvanceLeadSeconds(video)
+          remainingWall <= getAdvanceLeadSeconds(el)
         ) {
           hasSignaledEndRef.current = true;
           onNearEndRef.current?.();
         }
 
         if (remainingMedia <= VIDEO_FREEZE_LEAD_S) {
-          video.pause();
+          el.pause();
           return;
         }
       }
