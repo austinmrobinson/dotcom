@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/app/lib/utils";
+import { Skeleton } from "@/app/components/ui/skeleton";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react";
 
 export function Kbd({
@@ -48,7 +49,24 @@ interface MediaCarouselProps {
 
 const carouselImageSizes = "(min-width: 1024px) 60vw, 0vw";
 
-function MediaBlur({ src, unoptimized = false }: { src: string; unoptimized?: boolean }) {
+function hasCachedPreview(item: MediaItem) {
+  const previewSrc = item.poster ?? (item.type === "image" ? item.src : undefined);
+  if (!previewSrc) return false;
+
+  const image = new window.Image();
+  image.src = previewSrc;
+  return image.complete && image.naturalWidth > 0;
+}
+
+function MediaBlur({
+  src,
+  unoptimized = false,
+  onLoad,
+}: {
+  src: string;
+  unoptimized?: boolean;
+  onLoad?: () => void;
+}) {
   return (
     <Image
       src={src}
@@ -59,6 +77,7 @@ function MediaBlur({ src, unoptimized = false }: { src: string; unoptimized?: bo
       sizes={carouselImageSizes}
       className="object-cover blur-2xl scale-200"
       aria-hidden="true"
+      onLoad={onLoad}
     />
   );
 }
@@ -67,12 +86,20 @@ function CarouselVideo({
   item,
   isActive,
   onEnded,
+  onReady,
 }: {
   item: MediaItem;
   isActive: boolean;
   onEnded?: () => void;
+  onReady?: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) onReady?.();
+  }, [item.src, onReady]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -98,6 +125,7 @@ function CarouselVideo({
       playsInline
       preload={isActive ? "auto" : "metadata"}
       className="relative size-full object-cover"
+      onLoadedData={() => onReady?.()}
       onEnded={isActive ? onEnded : undefined}
     />
   );
@@ -112,18 +140,25 @@ function MediaSlide({
   isActive: boolean;
   onActiveVideoEnded?: () => void;
 }) {
+  const [isReady, setIsReady] = useState(() => hasCachedPreview(item));
   const blurSrc = item.poster ?? (item.type === "image" ? item.src : undefined);
+  const markReady = useCallback(() => setIsReady(true), []);
 
   return (
     <>
       {blurSrc ? (
-        <MediaBlur src={blurSrc} unoptimized={Boolean(item.poster)} />
+        <MediaBlur
+          src={blurSrc}
+          unoptimized={Boolean(item.poster)}
+          onLoad={markReady}
+        />
       ) : null}
       {item.type === "video" ? (
         <CarouselVideo
           item={item}
           isActive={isActive}
           onEnded={onActiveVideoEnded}
+          onReady={markReady}
         />
       ) : (
         <Image
@@ -134,8 +169,16 @@ function MediaSlide({
           sizes={carouselImageSizes}
           className="object-cover"
           priority={isActive}
+          onLoad={markReady}
         />
       )}
+      <Skeleton
+        aria-hidden={isReady}
+        className={cn(
+          "absolute inset-0 size-full rounded-none bg-skeleton transition-opacity duration-300",
+          isReady ? "pointer-events-none opacity-0" : "opacity-100"
+        )}
+      />
     </>
   );
 }
