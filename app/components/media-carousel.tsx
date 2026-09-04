@@ -48,6 +48,17 @@ interface MediaCarouselProps {
 }
 
 const carouselImageSizes = "(min-width: 1024px) 60vw, 0vw";
+const SLIDE_FADE_MS = 600;
+const VIDEO_FREEZE_LEAD_S = 0.08;
+
+function getAdvanceLeadSeconds(video: HTMLVideoElement) {
+  const duration = video.duration;
+  const rate = video.playbackRate || 1;
+  if (!Number.isFinite(duration) || duration <= 0) return SLIDE_FADE_MS / 1000;
+
+  const wallDuration = duration / rate;
+  return Math.min(SLIDE_FADE_MS / 1000, Math.max(0.12, wallDuration * 0.3));
+}
 
 function hasCachedPreview(item: MediaItem) {
   const previewSrc = item.poster ?? (item.type === "image" ? item.src : undefined);
@@ -85,15 +96,19 @@ function MediaBlur({
 function CarouselVideo({
   item,
   isActive,
-  onEnded,
+  onNearEnd,
   onReady,
 }: {
   item: MediaItem;
   isActive: boolean;
-  onEnded?: () => void;
+  onNearEnd?: () => void;
   onReady?: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const onNearEndRef = useRef(onNearEnd);
+  const hasSignaledEndRef = useRef(false);
+  const [shouldShowPoster, setShouldShowPoster] = useState(true);
+  onNearEndRef.current = onNearEnd;
 
   useEffect(() => {
     const video = videoRef.current;
@@ -108,25 +123,84 @@ function CarouselVideo({
     video.playbackRate = item.playbackRate ?? 1;
 
     if (!isActive) {
-      video.pause();
-      return;
+      const timeout = window.setTimeout(() => {
+        video.pause();
+      }, SLIDE_FADE_MS);
+      return () => window.clearTimeout(timeout);
     }
 
+    hasSignaledEndRef.current = false;
     video.currentTime = 0;
     video.play().catch(() => {});
   }, [isActive, item.playbackRate, item.src]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    let raf = 0;
+    let cancelled = false;
+
+    function tick() {
+      if (cancelled || video.paused) return;
+
+      const duration = video.duration;
+      if (Number.isFinite(duration) && duration > 0) {
+        const remainingMedia = duration - video.currentTime;
+        const remainingWall = remainingMedia / (video.playbackRate || 1);
+
+        if (
+          isActive &&
+          !hasSignaledEndRef.current &&
+          remainingWall <= getAdvanceLeadSeconds(video)
+        ) {
+          hasSignaledEndRef.current = true;
+          onNearEndRef.current?.();
+        }
+
+        if (remainingMedia <= VIDEO_FREEZE_LEAD_S) {
+          video.pause();
+          return;
+        }
+      }
+
+      raf = requestAnimationFrame(tick);
+    }
+
+    function handlePlay() {
+      cancelAnimationFrame(raf);
+      if (!cancelled) raf = requestAnimationFrame(tick);
+    }
+
+    video.addEventListener("play", handlePlay);
+    if (!video.paused) raf = requestAnimationFrame(tick);
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      video.removeEventListener("play", handlePlay);
+    };
+  }, [isActive, item.src]);
+
+  function handleEnded() {
+    videoRef.current?.pause();
+    if (!isActive || hasSignaledEndRef.current) return;
+    hasSignaledEndRef.current = true;
+    onNearEndRef.current?.();
+  }
 
   return (
     <video
       ref={videoRef}
       src={item.src}
-      poster={item.poster}
+      poster={shouldShowPoster ? item.poster : undefined}
       muted
       playsInline
       preload={isActive ? "auto" : "metadata"}
       className="relative size-full object-cover"
       onLoadedData={() => onReady?.()}
-      onEnded={isActive ? onEnded : undefined}
+      onPlaying={() => setShouldShowPoster(false)}
+      onEnded={handleEnded}
     />
   );
 }
@@ -157,7 +231,7 @@ function MediaSlide({
         <CarouselVideo
           item={item}
           isActive={isActive}
-          onEnded={onActiveVideoEnded}
+          onNearEnd={onActiveVideoEnded}
           onReady={markReady}
         />
       ) : (
@@ -267,9 +341,10 @@ export function MediaCarousel({
             <div
               key={item.src}
               className={cn(
-                "absolute inset-0 transition-opacity duration-500 ease-out",
+                "absolute inset-0 transition-opacity ease-in-out",
                 isActive ? "opacity-100 z-10" : "opacity-0 z-0"
               )}
+              style={{ transitionDuration: `${SLIDE_FADE_MS}ms` }}
             >
               {shouldLoad ? (
                 <MediaSlide
