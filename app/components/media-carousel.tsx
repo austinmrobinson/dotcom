@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 import { cn } from "@/app/lib/utils";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react";
@@ -98,15 +99,21 @@ function MediaBlur({
   );
 }
 
-function freezePlayhead(video: HTMLVideoElement) {
-  const duration = video.duration;
-  const lastFrame =
-    Number.isFinite(duration) && duration > 0.2 ? duration - 0.05 : 0;
-  const freezeAt = video.currentTime > 0.15 ? video.currentTime : lastFrame;
+function captureVideoFrame(video: HTMLVideoElement) {
+  if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return null;
+  if (video.videoWidth === 0 || video.videoHeight === 0) return null;
 
-  video.pause();
-  if (freezeAt > 0.15 && video.currentTime < 0.15) {
-    video.currentTime = freezeAt;
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const context = canvas.getContext("2d");
+  if (!context) return null;
+
+  context.drawImage(video, 0, 0);
+  try {
+    return canvas.toDataURL("image/jpeg", 0.92);
+  } catch {
+    return null;
   }
 }
 
@@ -126,7 +133,9 @@ function CarouselVideo({
   const videoRef = useRef<HTMLVideoElement>(null);
   const onNearEndRef = useRef(onNearEnd);
   const hasSignaledEndRef = useRef(false);
+  const frozenFrameRef = useRef<string | null>(null);
   const [shouldShowPoster, setShouldShowPoster] = useState(true);
+  const [frozenFrame, setFrozenFrame] = useState<string | null>(null);
   onNearEndRef.current = onNearEnd;
 
   useEffect(() => {
@@ -149,6 +158,20 @@ function CarouselVideo({
 
     el.playbackRate = item.playbackRate ?? 1;
 
+    function freezeOutgoing() {
+      if (!frozenFrameRef.current) {
+        const frame = captureVideoFrame(el);
+        if (frame) {
+          frozenFrameRef.current = frame;
+          flushSync(() => {
+            setFrozenFrame(frame);
+            setShouldShowPoster(false);
+          });
+        }
+      }
+      el.pause();
+    }
+
     function maybeAdvance() {
       if (!isActive || hasSignaledEndRef.current) return;
 
@@ -159,12 +182,12 @@ function CarouselVideo({
       if (remainingWall > getAdvanceLeadSeconds(el)) return;
 
       hasSignaledEndRef.current = true;
-      freezePlayhead(el);
+      freezeOutgoing();
       onNearEndRef.current?.();
     }
 
     function handleEnded() {
-      freezePlayhead(el);
+      freezeOutgoing();
       if (!isActive || hasSignaledEndRef.current) return;
       hasSignaledEndRef.current = true;
       onNearEndRef.current?.();
@@ -176,11 +199,13 @@ function CarouselVideo({
 
     if (!isActive) {
       setShouldShowPoster(false);
-      freezePlayhead(el);
+      freezeOutgoing();
       return;
     }
 
     hasSignaledEndRef.current = false;
+    frozenFrameRef.current = null;
+    setFrozenFrame(null);
     el.addEventListener("timeupdate", handleTimeUpdate);
     el.addEventListener("ended", handleEnded);
     if (el.currentTime > 0.05) el.currentTime = 0;
@@ -211,7 +236,15 @@ function CarouselVideo({
         onLoadedData={() => onReady?.()}
         onPlaying={() => setShouldShowPoster(false)}
       />
-      {shouldShowPoster && item.poster ? (
+      {frozenFrame ? (
+        // Captured raster of the last decoded frame; not a next/image asset.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={frozenFrame}
+          alt=""
+          className="absolute inset-0 size-full object-cover"
+        />
+      ) : shouldShowPoster && item.poster ? (
         <Image
           src={item.poster}
           alt=""
