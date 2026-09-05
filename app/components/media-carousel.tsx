@@ -55,7 +55,6 @@ interface MediaCarouselProps {
 
 const carouselImageSizes = "(min-width: 1024px) 60vw, 0vw";
 const SLIDE_FADE_MS = 600;
-const VIDEO_FREEZE_LEAD_S = 0.08;
 
 function getAdvanceLeadSeconds(video: HTMLVideoElement) {
   const duration = video.duration;
@@ -99,6 +98,18 @@ function MediaBlur({
   );
 }
 
+function freezePlayhead(video: HTMLVideoElement) {
+  const duration = video.duration;
+  const lastFrame =
+    Number.isFinite(duration) && duration > 0.2 ? duration - 0.05 : 0;
+  const freezeAt = video.currentTime > 0.15 ? video.currentTime : lastFrame;
+
+  video.pause();
+  if (freezeAt > 0.15 && video.currentTime < 0.15) {
+    video.currentTime = freezeAt;
+  }
+}
+
 function CarouselVideo({
   item,
   isActive,
@@ -134,76 +145,59 @@ function CarouselVideo({
   useLayoutEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    const el: HTMLVideoElement = video;
 
-    video.playbackRate = item.playbackRate ?? 1;
+    el.playbackRate = item.playbackRate ?? 1;
+
+    function maybeAdvance() {
+      if (!isActive || hasSignaledEndRef.current) return;
+
+      const duration = el.duration;
+      if (!Number.isFinite(duration) || duration <= 0) return;
+
+      const remainingWall = (duration - el.currentTime) / (el.playbackRate || 1);
+      if (remainingWall > getAdvanceLeadSeconds(el)) return;
+
+      hasSignaledEndRef.current = true;
+      freezePlayhead(el);
+      onNearEndRef.current?.();
+    }
+
+    function handleEnded() {
+      freezePlayhead(el);
+      if (!isActive || hasSignaledEndRef.current) return;
+      hasSignaledEndRef.current = true;
+      onNearEndRef.current?.();
+    }
+
+    function handleTimeUpdate() {
+      maybeAdvance();
+    }
 
     if (!isActive) {
-      video.pause();
+      setShouldShowPoster(false);
+      freezePlayhead(el);
       return;
     }
 
     hasSignaledEndRef.current = false;
-    video.currentTime = 0;
-    video.play().catch(() => {});
-  }, [isActive, item.playbackRate, item.src]);
+    el.addEventListener("timeupdate", handleTimeUpdate);
+    el.addEventListener("ended", handleEnded);
+    if (el.currentTime > 0.05) el.currentTime = 0;
+    el.play().catch(() => {});
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    let raf = 0;
-    let cancelled = false;
-
-    function tick() {
-      const el = videoRef.current;
-      if (cancelled || !el || el.paused) return;
-
-      const duration = el.duration;
-      if (Number.isFinite(duration) && duration > 0) {
-        const remainingMedia = duration - el.currentTime;
-        const remainingWall = remainingMedia / (el.playbackRate || 1);
-
-        if (
-          isActive &&
-          !hasSignaledEndRef.current &&
-          remainingWall <= getAdvanceLeadSeconds(el)
-        ) {
-          hasSignaledEndRef.current = true;
-          el.pause();
-          onNearEndRef.current?.();
-          return;
-        }
-
-        if (remainingMedia <= VIDEO_FREEZE_LEAD_S) {
-          el.pause();
-          return;
-        }
-      }
-
-      raf = requestAnimationFrame(tick);
-    }
-
-    function handlePlay() {
-      cancelAnimationFrame(raf);
-      if (!cancelled) raf = requestAnimationFrame(tick);
-    }
-
-    video.addEventListener("play", handlePlay);
-    if (!video.paused) raf = requestAnimationFrame(tick);
+    let raf = requestAnimationFrame(function loop() {
+      maybeAdvance();
+      if (hasSignaledEndRef.current || el.paused) return;
+      raf = requestAnimationFrame(loop);
+    });
 
     return () => {
-      cancelled = true;
       cancelAnimationFrame(raf);
-      video.removeEventListener("play", handlePlay);
+      el.removeEventListener("timeupdate", handleTimeUpdate);
+      el.removeEventListener("ended", handleEnded);
     };
-  }, [isActive, item.src]);
-
-  function handleEnded() {
-    videoRef.current?.pause();
-    if (!isActive || hasSignaledEndRef.current) return;
-    hasSignaledEndRef.current = true;
-    onNearEndRef.current?.();
-  }
+  }, [isActive, item.playbackRate, item.src]);
 
   return (
     <>
@@ -216,7 +210,6 @@ function CarouselVideo({
         className="relative size-full object-cover"
         onLoadedData={() => onReady?.()}
         onPlaying={() => setShouldShowPoster(false)}
-        onEnded={handleEnded}
       />
       {shouldShowPoster && item.poster ? (
         <Image
