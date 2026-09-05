@@ -138,18 +138,12 @@ function CarouselVideo({
     video.playbackRate = item.playbackRate ?? 1;
 
     if (!isActive) {
-      setShouldShowPoster(false);
-      video.removeAttribute("poster");
       video.pause();
       return;
     }
 
     hasSignaledEndRef.current = false;
-    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-      setShouldShowPoster(false);
-      video.removeAttribute("poster");
-    }
-    if (video.currentTime > 0.05) video.currentTime = 0;
+    video.currentTime = 0;
     video.play().catch(() => {});
   }, [isActive, item.playbackRate, item.src]);
 
@@ -175,14 +169,12 @@ function CarouselVideo({
           remainingWall <= getAdvanceLeadSeconds(el)
         ) {
           hasSignaledEndRef.current = true;
-          el.removeAttribute("poster");
           el.pause();
           onNearEndRef.current?.();
           return;
         }
 
         if (remainingMedia <= VIDEO_FREEZE_LEAD_S) {
-          el.removeAttribute("poster");
           el.pause();
           return;
         }
@@ -207,29 +199,36 @@ function CarouselVideo({
   }, [isActive, item.src]);
 
   function handleEnded() {
-    const video = videoRef.current;
-    if (video) {
-      video.removeAttribute("poster");
-      video.pause();
-    }
+    videoRef.current?.pause();
     if (!isActive || hasSignaledEndRef.current) return;
     hasSignaledEndRef.current = true;
     onNearEndRef.current?.();
   }
 
   return (
-    <video
-      ref={videoRef}
-      src={item.src}
-      poster={shouldShowPoster ? item.poster : undefined}
-      muted
-      playsInline
-      preload={isActive || isNext ? "auto" : "metadata"}
-      className="relative size-full object-cover"
-      onLoadedData={() => onReady?.()}
-      onPlaying={() => setShouldShowPoster(false)}
-      onEnded={handleEnded}
-    />
+    <>
+      <video
+        ref={videoRef}
+        src={item.src}
+        muted
+        playsInline
+        preload="auto"
+        className="relative size-full object-cover"
+        onLoadedData={() => onReady?.()}
+        onPlaying={() => setShouldShowPoster(false)}
+        onEnded={handleEnded}
+      />
+      {shouldShowPoster && item.poster ? (
+        <Image
+          src={item.poster}
+          alt=""
+          fill
+          unoptimized
+          sizes={carouselImageSizes}
+          className="object-cover"
+        />
+      ) : null}
+    </>
   );
 }
 
