@@ -10,6 +10,13 @@ export function formatDistance(meters: number): string {
   return `${Math.round(meters)} m`;
 }
 
+export function formatTotalDistance(meters: number): string {
+  const miles = meters / METERS_TO_MILES;
+  return `${miles.toLocaleString("en-US", {
+    maximumFractionDigits: 0,
+  })} mi`;
+}
+
 export function formatDuration(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / SECONDS_PER_MINUTE);
@@ -45,6 +52,18 @@ export function formatPacePerKm(
   const minutes = Math.floor(paceSeconds / SECONDS_PER_MINUTE);
   const seconds = Math.round(paceSeconds % SECONDS_PER_MINUTE);
   return `${minutes}:${String(seconds).padStart(2, "0")}/km`;
+}
+
+export function formatTimelineDate(dateIso: string): string {
+  const date = new Date(dateIso);
+  const now = new Date();
+  const sameYear = date.getFullYear() === now.getFullYear();
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    ...(sameYear ? {} : { year: "numeric" }),
+  });
 }
 
 export function formatShortDate(dateIso: string): string {

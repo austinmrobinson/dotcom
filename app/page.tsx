@@ -1135,7 +1135,7 @@ export default function Home() {
                       itemId="contact-run"
                       href="/run"
                       title="Run"
-                      trailing="Activities & races"
+                      trailing="All-time timeline"
                       highlightId={highlightId}
                       isPreviewActive={
                         !!previewPanel.panel && highlightId === "contact-run"

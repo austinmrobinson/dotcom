@@ -1,9 +1,8 @@
-import type { RunActivity, RacePrepActivity, TimelineActivityView } from "../types";
+import type { RunActivity, TimelineActivityView } from "../types";
 import {
   formatDistance,
-  formatDuration,
   formatPaceFromSpeed,
-  formatShortDate,
+  formatTimelineDate,
 } from "./format";
 
 export function toRunActivity(activity: {
@@ -33,26 +32,9 @@ export function formatActivityForTimeline(
     id: activity.id,
     name: activity.name,
     type: activity.type,
-    dateLabel: formatShortDate(activity.startDate),
+    dateLabel: formatTimelineDate(activity.startDate),
     dateIso: activity.startDate,
     distanceLabel: formatDistance(activity.distanceMeters),
     paceLabel: formatPaceFromSpeed(activity.averageSpeed),
   };
-}
-
-export function mapActivitiesToRacePrep(
-  activities: RunActivity[]
-): RacePrepActivity[] {
-  return activities.map((activity) => ({
-    id: activity.id,
-    name: activity.name,
-    type: activity.type,
-    startDate: activity.startDate,
-    distanceMeters: activity.distanceMeters,
-    movingTimeSeconds: activity.movingTimeSeconds,
-    pacePerKmSeconds:
-      activity.averageSpeed > 0
-        ? Math.round(1000 / activity.averageSpeed)
-        : null,
-  }));
 }

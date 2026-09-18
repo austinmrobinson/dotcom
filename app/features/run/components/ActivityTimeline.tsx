@@ -73,12 +73,8 @@ export function ActivityTimeline({
       {error && <Text className="text-destructive pt-4">{error}</Text>}
 
       {cursor && (
-        <div className="pt-6">
-          <Button
-            variant="outline"
-            onClick={loadMore}
-            disabled={loading}
-          >
+        <div className="pt-8">
+          <Button variant="outline" onClick={loadMore} disabled={loading}>
             {loading ? "Loading…" : "Load more"}
           </Button>
         </div>

@@ -15,7 +15,8 @@ export async function GET(request: Request) {
     return Response.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to fetch activities",
+        error:
+          error instanceof Error ? error.message : "Failed to fetch activities",
       },
       { status: 500 }
     );
