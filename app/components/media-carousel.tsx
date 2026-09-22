@@ -1,7 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { flushSync } from "react-dom";
 import { cn } from "@/app/lib/utils";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react";
@@ -48,6 +55,16 @@ interface MediaCarouselProps {
 }
 
 const carouselImageSizes = "(min-width: 1024px) 60vw, 0vw";
+const SLIDE_FADE_MS = 600;
+
+function getAdvanceLeadSeconds(video: HTMLVideoElement) {
+  const duration = video.duration;
+  const rate = video.playbackRate || 1;
+  if (!Number.isFinite(duration) || duration <= 0) return SLIDE_FADE_MS / 1000;
+
+  const wallDuration = duration / rate;
+  return Math.min(SLIDE_FADE_MS / 1000, Math.max(0.12, wallDuration * 0.3));
+}
 
 function hasCachedPreview(item: MediaItem) {
   const previewSrc = item.poster ?? (item.type === "image" ? item.src : undefined);
@@ -82,18 +99,44 @@ function MediaBlur({
   );
 }
 
+function captureVideoFrame(video: HTMLVideoElement) {
+  if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return null;
+  if (video.videoWidth === 0 || video.videoHeight === 0) return null;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const context = canvas.getContext("2d");
+  if (!context) return null;
+
+  context.drawImage(video, 0, 0);
+  try {
+    return canvas.toDataURL("image/jpeg", 0.92);
+  } catch {
+    return null;
+  }
+}
+
 function CarouselVideo({
   item,
   isActive,
-  onEnded,
+  isNext,
+  onNearEnd,
   onReady,
 }: {
   item: MediaItem;
   isActive: boolean;
-  onEnded?: () => void;
+  isNext?: boolean;
+  onNearEnd?: () => void;
   onReady?: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const onNearEndRef = useRef(onNearEnd);
+  const hasSignaledEndRef = useRef(false);
+  const frozenFrameRef = useRef<string | null>(null);
+  const [shouldShowPoster, setShouldShowPoster] = useState(true);
+  const [frozenFrame, setFrozenFrame] = useState<string | null>(null);
+  onNearEndRef.current = onNearEnd;
 
   useEffect(() => {
     const video = videoRef.current;
@@ -102,42 +145,128 @@ function CarouselVideo({
   }, [item.src, onReady]);
 
   useEffect(() => {
+    if (isActive || !isNext) return;
     const video = videoRef.current;
     if (!video) return;
-
     video.playbackRate = item.playbackRate ?? 1;
+  }, [isActive, isNext, item.playbackRate, item.src]);
+
+  useLayoutEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const el: HTMLVideoElement = video;
+
+    el.playbackRate = item.playbackRate ?? 1;
+
+    function freezeOutgoing() {
+      if (!frozenFrameRef.current) {
+        const frame = captureVideoFrame(el);
+        if (frame) {
+          frozenFrameRef.current = frame;
+          flushSync(() => {
+            setFrozenFrame(frame);
+            setShouldShowPoster(false);
+          });
+        }
+      }
+      el.pause();
+    }
+
+    function maybeAdvance() {
+      if (!isActive || hasSignaledEndRef.current) return;
+
+      const duration = el.duration;
+      if (!Number.isFinite(duration) || duration <= 0) return;
+
+      const remainingWall = (duration - el.currentTime) / (el.playbackRate || 1);
+      if (remainingWall > getAdvanceLeadSeconds(el)) return;
+
+      hasSignaledEndRef.current = true;
+      freezeOutgoing();
+      onNearEndRef.current?.();
+    }
+
+    function handleEnded() {
+      freezeOutgoing();
+      if (!isActive || hasSignaledEndRef.current) return;
+      hasSignaledEndRef.current = true;
+      onNearEndRef.current?.();
+    }
+
+    function handleTimeUpdate() {
+      maybeAdvance();
+    }
 
     if (!isActive) {
-      video.pause();
+      setShouldShowPoster(false);
+      freezeOutgoing();
       return;
     }
 
-    video.currentTime = 0;
-    video.play().catch(() => {});
+    hasSignaledEndRef.current = false;
+    frozenFrameRef.current = null;
+    setFrozenFrame(null);
+    el.addEventListener("timeupdate", handleTimeUpdate);
+    el.addEventListener("ended", handleEnded);
+    if (el.currentTime > 0.05) el.currentTime = 0;
+    el.play().catch(() => {});
+
+    let raf = requestAnimationFrame(function loop() {
+      maybeAdvance();
+      if (hasSignaledEndRef.current || el.paused) return;
+      raf = requestAnimationFrame(loop);
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      el.removeEventListener("timeupdate", handleTimeUpdate);
+      el.removeEventListener("ended", handleEnded);
+    };
   }, [isActive, item.playbackRate, item.src]);
 
   return (
-    <video
-      ref={videoRef}
-      src={item.src}
-      poster={item.poster}
-      muted
-      playsInline
-      preload={isActive ? "auto" : "metadata"}
-      className="relative size-full object-cover"
-      onLoadedData={() => onReady?.()}
-      onEnded={isActive ? onEnded : undefined}
-    />
+    <>
+      <video
+        ref={videoRef}
+        src={item.src}
+        muted
+        playsInline
+        preload="auto"
+        className="relative size-full object-cover"
+        onLoadedData={() => onReady?.()}
+        onPlaying={() => setShouldShowPoster(false)}
+      />
+      {frozenFrame ? (
+        // Captured raster of the last decoded frame; not a next/image asset.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={frozenFrame}
+          alt=""
+          className="absolute inset-0 size-full object-cover"
+        />
+      ) : shouldShowPoster && item.poster ? (
+        <Image
+          src={item.poster}
+          alt=""
+          fill
+          unoptimized
+          sizes={carouselImageSizes}
+          className="object-cover"
+        />
+      ) : null}
+    </>
   );
 }
 
 function MediaSlide({
   item,
   isActive,
+  isNext,
   onActiveVideoEnded,
 }: {
   item: MediaItem;
   isActive: boolean;
+  isNext?: boolean;
   onActiveVideoEnded?: () => void;
 }) {
   const [isReady, setIsReady] = useState(() => hasCachedPreview(item));
@@ -157,7 +286,8 @@ function MediaSlide({
         <CarouselVideo
           item={item}
           isActive={isActive}
-          onEnded={onActiveVideoEnded}
+          isNext={isNext}
+          onNearEnd={onActiveVideoEnded}
           onReady={markReady}
         />
       ) : (
@@ -192,6 +322,9 @@ export function MediaCarousel({
 }: MediaCarouselProps) {
   const loadedIndicesRef = useRef(new Set<number>([activeIndex]));
   loadedIndicesRef.current.add(activeIndex);
+  if (media.length > 1) {
+    loadedIndicesRef.current.add((activeIndex + 1) % media.length);
+  }
 
   useEffect(() => {
     if (media.length <= 1) return;
@@ -261,20 +394,24 @@ export function MediaCarousel({
       <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle">
         {media.map((item, index) => {
           const isActive = index === activeIndex;
+          const isNext =
+            media.length > 1 && index === (activeIndex + 1) % media.length;
           const shouldLoad = loadedIndicesRef.current.has(index);
 
           return (
             <div
               key={item.src}
               className={cn(
-                "absolute inset-0 transition-opacity duration-500 ease-out",
+                "absolute inset-0 transition-opacity ease-in-out",
                 isActive ? "opacity-100 z-10" : "opacity-0 z-0"
               )}
+              style={{ transitionDuration: `${SLIDE_FADE_MS}ms` }}
             >
               {shouldLoad ? (
                 <MediaSlide
                   item={item}
                   isActive={isActive}
+                  isNext={isNext}
                   onActiveVideoEnded={
                     isActive ? handleActiveVideoEnded : undefined
                   }
