@@ -45,13 +45,13 @@ export function PreviewLightbox({
       <AnimatePresence>
         {open && (
           <DialogPortal>
-            <DialogOverlay className="data-[state=open]:animate-overlayShow bg-overlay-strong cursor-zoom-out" />
-            <div className="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+            <DialogOverlay className="bg-overlay-strong backdrop-blur-none supports-backdrop-filter:backdrop-blur-none cursor-zoom-out" />
+            <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4">
               <motion.div
                 layoutId={prefersReducedMotion ? undefined : layoutId}
                 transition={layoutTransition}
                 className={cn(
-                  "pointer-events-auto w-full max-w-5xl overflow-hidden",
+                  "pointer-events-auto w-full max-w-5xl overflow-hidden [filter:none]",
                   className
                 )}
               >

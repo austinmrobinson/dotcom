@@ -182,7 +182,10 @@ function MediaViewport({
                 src={item.src}
                 muted
                 playsInline
-                className="relative size-full object-cover"
+                className={cn(
+                  "relative size-full object-cover",
+                  hideAmbientBlur && "[filter:none]"
+                )}
                 onLoadedData={(event) => {
                   event.currentTarget.playbackRate = item.playbackRate ?? 1;
                 }}
@@ -210,7 +213,10 @@ function MediaViewport({
                 fill
                 quality={100}
                 sizes="(min-width: 1024px) 60vw, 100vw"
-                className="object-cover"
+                className={cn(
+                  "object-cover",
+                  hideAmbientBlur && "[filter:none]"
+                )}
                 priority={index === 0}
               />
             </>
