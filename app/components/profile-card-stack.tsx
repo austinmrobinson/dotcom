@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ProfileCard, type ProfilePlatform } from "./profile-card";
 import { cn } from "@/app/lib/utils";
+import { previewLayoutTransition } from "@/app/components/preview-lightbox";
 
 export interface ProfileStackItem {
   id: string;
@@ -140,12 +141,6 @@ interface StackCardProps {
   cardRef?: (node: HTMLButtonElement | null) => void;
 }
 
-const layoutTransition = {
-  type: "spring" as const,
-  stiffness: 300,
-  damping: 30,
-};
-
 function StackCard({
   profile,
   isActive,
@@ -201,7 +196,8 @@ function StackCard({
 
   const cardClassName = cn(
     "pointer-events-auto w-full max-w-[400px] text-left xl:max-w-[480px]",
-    isActive && onActiveCardExpand ? "cursor-zoom-in" : "cursor-pointer"
+    isActive && onActiveCardExpand ? "cursor-zoom-in" : "cursor-pointer",
+    isActive && isLightboxOpen && "invisible pointer-events-none"
   );
 
   const cardContent = <ProfileCard {...profile} />;
@@ -226,7 +222,7 @@ function StackCard({
         ref={cardRef}
         type="button"
         layoutId={sharedLayoutId}
-        transition={layoutTransition}
+        transition={previewLayoutTransition}
         onClick={handleClick}
         aria-label={label}
         className={cardClassName}

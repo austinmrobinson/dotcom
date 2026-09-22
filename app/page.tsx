@@ -33,8 +33,9 @@ import { ProfileCardStack, type ProfileStackItem } from "./components/profile-ca
 import { ProfileCard } from "./components/profile-card";
 import {
   PreviewLightbox,
-  PREVIEW_MEDIA_LAYOUT_ID,
+  getPreviewMediaLayoutId,
   getPreviewProfileLayoutId,
+  previewLayoutTransition,
 } from "./components/preview-lightbox";
 import { MobilePreviewAccordion } from "./components/mobile-preview-accordion";
 import { Button } from "@/app/components/ui/button";
@@ -720,7 +721,7 @@ function PreviewPanel({
           onActiveVideoEnded={onActiveVideoEnded}
           companyName={workEntries[panel.workIndex]?.company}
           pressedArrowKey={pressedArrowKey}
-          layoutId={PREVIEW_MEDIA_LAYOUT_ID}
+          layoutId={getPreviewMediaLayoutId(panel.workIndex)}
           onViewportClick={() => onMediaExpand(panel.workIndex)}
           isLightboxOpen={isMediaLightboxOpen}
         />
@@ -785,15 +786,17 @@ function PreviewPanelSlot({
 }) {
   const prefersReducedMotion = useReducedMotion();
 
+  // Avoid leaving `filter` on the settled panel — non-none filters create a
+  // containing block that breaks shared-layout morph measurements.
   const contentMotion = prefersReducedMotion
     ? {
         initial: { opacity: 0 },
-        animate: { opacity: 1 },
+        animate: { opacity: 1, filter: "none" },
         exit: { opacity: 0 },
       }
     : {
         initial: { opacity: 0, filter: `blur(${previewBlur})` },
-        animate: { opacity: 1, filter: "blur(0px)" },
+        animate: { opacity: 1, filter: "none" },
         exit: { opacity: 0, filter: `blur(${previewBlur})` },
       };
 
@@ -858,6 +861,7 @@ export default function Home() {
   const [slotPanel, setSlotPanel] = useState<PanelContent | null>(null);
   const [lightbox, setLightbox] = useState<LightboxState>(null);
   const [lightboxMediaIndex, setLightboxMediaIndex] = useState(0);
+  const [lightboxRender, setLightboxRender] = useState<LightboxState>(null);
   const highlightExitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activePanelRef = useRef<PanelContent | null>(null);
 
@@ -966,13 +970,17 @@ export default function Home() {
     previewPanel.clearDeselectTimer();
     clearHighlightExitTimer();
     setLightboxMediaIndex(mediaIndex);
-    setLightbox({ type: "media", workIndex });
+    const next = { type: "media" as const, workIndex };
+    setLightboxRender(next);
+    setLightbox(next);
   }
 
   function handleProfileExpand(id: string) {
     previewPanel.clearDeselectTimer();
     clearHighlightExitTimer();
-    setLightbox({ type: "profile", id });
+    const next = { type: "profile" as const, id };
+    setLightboxRender(next);
+    setLightbox(next);
   }
 
   function handleLightboxOpenChange(open: boolean) {
@@ -1340,37 +1348,37 @@ export default function Home() {
         <PreviewLightbox
           open={lightbox !== null}
           onOpenChange={handleLightboxOpenChange}
-          layoutId={
-            lightbox?.type === "media"
-              ? PREVIEW_MEDIA_LAYOUT_ID
-              : lightbox?.type === "profile"
-                ? getPreviewProfileLayoutId(lightbox.id)
-                : undefined
-          }
           title={
-            lightbox?.type === "media"
-              ? `${workEntries[lightbox.workIndex]?.company ?? "Work"} preview`
-              : lightbox?.type === "profile"
-                ? `${contactProfiles[lightbox.id as keyof typeof contactProfiles]?.name ?? "Profile"} preview`
+            lightboxRender?.type === "media"
+              ? `${workEntries[lightboxRender.workIndex]?.company ?? "Work"} preview`
+              : lightboxRender?.type === "profile"
+                ? `${contactProfiles[lightboxRender.id as keyof typeof contactProfiles]?.name ?? "Profile"} preview`
                 : "Preview"
           }
         >
-          {lightbox?.type === "media" && (
+          {lightboxRender?.type === "media" && (
             <MediaCarousel
-              media={workEntries[lightbox.workIndex]?.media ?? []}
+              media={workEntries[lightboxRender.workIndex]?.media ?? []}
               activeIndex={lightboxMediaIndex}
               onIndexChange={setLightboxMediaIndex}
-              isLightboxOpen
+              layoutId={getPreviewMediaLayoutId(lightboxRender.workIndex)}
+              isLightboxDestination
               enableSwipe
             />
           )}
-          {lightbox?.type === "profile" && (() => {
+          {lightboxRender?.type === "profile" && (() => {
             const profile =
-              contactProfiles[lightbox.id as keyof typeof contactProfiles];
+              contactProfiles[lightboxRender.id as keyof typeof contactProfiles];
 
             return (
-              <div className="flex flex-col gap-4 p-4">
-                <ProfileCard {...profile} />
+              <div className="flex flex-col gap-4">
+                <motion.div
+                  layoutId={getPreviewProfileLayoutId(lightboxRender.id)}
+                  transition={previewLayoutTransition}
+                  className="w-full"
+                >
+                  <ProfileCard {...profile} />
+                </motion.div>
                 {profile.platform === "email" ? (
                   <Button
                     variant="outline"

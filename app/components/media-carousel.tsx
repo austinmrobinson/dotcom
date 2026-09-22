@@ -13,6 +13,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/app/lib/utils";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react";
+import { previewLayoutTransition } from "@/app/components/preview-lightbox";
 
 export function Kbd({
   children,
@@ -55,7 +56,10 @@ interface MediaCarouselProps {
   pressedArrowKey?: string | null;
   layoutId?: string;
   onViewportClick?: () => void;
+  /** Source carousel: hide while lightbox owns the shared layoutId */
   isLightboxOpen?: boolean;
+  /** Destination carousel: strip ambient blur; keep layoutId for morph */
+  isLightboxDestination?: boolean;
   showControls?: boolean;
   enableSwipe?: boolean;
 }
@@ -63,12 +67,6 @@ interface MediaCarouselProps {
 const carouselImageSizes = "(min-width: 1024px) 60vw, 100vw";
 const SLIDE_FADE_MS = 600;
 const SWIPE_THRESHOLD_PX = 50;
-
-const layoutTransition = {
-  type: "spring" as const,
-  stiffness: 300,
-  damping: 30,
-};
 
 function getAdvanceLeadSeconds(video: HTMLVideoElement) {
   const duration = video.duration;
@@ -339,6 +337,7 @@ export function MediaCarousel({
   layoutId,
   onViewportClick,
   isLightboxOpen,
+  isLightboxDestination,
   showControls = true,
   enableSwipe = false,
 }: MediaCarouselProps) {
@@ -347,9 +346,14 @@ export function MediaCarousel({
   const didSwipe = useRef(false);
   const prefersReducedMotion = useReducedMotion();
   const isExpandable = !!onViewportClick;
-  const hideAmbientBlur = !!isLightboxOpen;
+  const hideAmbientBlur = !!isLightboxDestination;
+  // Source yields layoutId while lightbox is open; destination keeps it for the morph.
   const sharedLayoutId =
-    !prefersReducedMotion && layoutId && !isLightboxOpen ? layoutId : undefined;
+    !prefersReducedMotion &&
+    layoutId &&
+    !isLightboxOpen
+      ? layoutId
+      : undefined;
 
   loadedIndicesRef.current.add(activeIndex);
   if (media.length > 1) {
@@ -451,7 +455,8 @@ export function MediaCarousel({
 
   const viewportClassName = cn(
     "relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle",
-    isExpandable && "cursor-zoom-in"
+    isExpandable && "cursor-zoom-in",
+    isLightboxOpen && "invisible pointer-events-none"
   );
 
   const touchHandlers =
@@ -499,7 +504,7 @@ export function MediaCarousel({
       <motion.button
         type="button"
         layoutId={sharedLayoutId}
-        transition={layoutTransition}
+        transition={previewLayoutTransition}
         onClick={handleViewportClick}
         aria-label="Expand preview"
         className={cn(viewportClassName, "block w-full text-left")}
@@ -512,7 +517,7 @@ export function MediaCarousel({
     viewport = (
       <motion.div
         layoutId={sharedLayoutId}
-        transition={layoutTransition}
+        transition={previewLayoutTransition}
         className={viewportClassName}
         {...touchHandlers}
       >
@@ -528,11 +533,22 @@ export function MediaCarousel({
   }
 
   return (
-    <div className="flex w-full flex-col gap-3" data-preview-target>
+    <div
+      className={cn(
+        "flex w-full flex-col gap-3",
+        isLightboxOpen && "pointer-events-none"
+      )}
+      data-preview-target
+    >
       {viewport}
 
       {showControls && media.length > 1 && (
-        <div className="flex items-center justify-center gap-3">
+        <div
+          className={cn(
+            "flex items-center justify-center gap-3",
+            isLightboxOpen && "invisible"
+          )}
+        >
           <button
             type="button"
             onClick={goToPrevious}

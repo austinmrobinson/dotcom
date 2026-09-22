@@ -25,8 +25,9 @@ import { mobileAccordionTriggerClassName } from "@/app/components/list-item-row"
 import { cn } from "@/app/lib/utils";
 import type { ProfileStackItem } from "@/app/components/profile-card-stack";
 import {
-  PREVIEW_MEDIA_LAYOUT_ID,
+  getPreviewMediaLayoutId,
   getPreviewProfileLayoutId,
+  previewLayoutTransition,
 } from "@/app/components/preview-lightbox";
 
 interface MediaItem {
@@ -107,7 +108,7 @@ function MobileWorkAccordionItem({
             media={entry.media}
             activeIndex={mediaIndex}
             onIndexChange={setMediaIndex}
-            layoutId={PREVIEW_MEDIA_LAYOUT_ID}
+            layoutId={getPreviewMediaLayoutId(index)}
             onViewportClick={
               onMediaExpand
                 ? () => onMediaExpand(index, mediaIndex)
@@ -167,7 +168,7 @@ function MobileContactAccordionItem({
           <motion.button
             type="button"
             layoutId={layoutId}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            transition={previewLayoutTransition}
             onClick={() => onProfileExpand?.(id)}
             aria-label={`Expand ${title} preview`}
             className="w-full cursor-zoom-in text-left"
@@ -181,7 +182,7 @@ function MobileContactAccordionItem({
             aria-label={`Expand ${title} preview`}
             className={cn(
               "w-full cursor-zoom-in text-left",
-              isLightboxOpen && "pointer-events-none"
+              isLightboxOpen && "invisible pointer-events-none"
             )}
           >
             {profilePreview}
