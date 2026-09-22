@@ -64,8 +64,7 @@ const AUTO_ADVANCE_MS = 2500;
 const MANUAL_PAUSE_MS = 8000;
 
 const blurEase = [0.25, 0.46, 0.45, 0.94] as const;
-const previewBlurTransition = { duration: 0.4, ease: blurEase };
-const previewBlur = "12px";
+const previewBlurTransition = { duration: 0.28, ease: blurEase };
 
 function getPanelKey(panel: PanelContent) {
   if (panel.type === "media") return `media-${panel.workIndex}`;
@@ -786,18 +785,18 @@ function PreviewPanelSlot({
 }) {
   const prefersReducedMotion = useReducedMotion();
 
-  // Avoid leaving `filter` on the settled panel — non-none filters create a
-  // containing block that breaks shared-layout morph measurements.
+  // Avoid CSS `filter` on the panel — it creates a containing block that
+  // breaks shared-layout morph measurements for the lightbox.
   const contentMotion = prefersReducedMotion
     ? {
         initial: { opacity: 0 },
-        animate: { opacity: 1, filter: "none" },
+        animate: { opacity: 1 },
         exit: { opacity: 0 },
       }
     : {
-        initial: { opacity: 0, filter: `blur(${previewBlur})` },
-        animate: { opacity: 1, filter: "none" },
-        exit: { opacity: 0, filter: `blur(${previewBlur})` },
+        initial: { opacity: 0, y: 6 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: 6 },
       };
 
   return (

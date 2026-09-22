@@ -21,9 +21,9 @@ export function getPreviewProfileLayoutId(id: string) {
 
 export const previewLayoutTransition = {
   type: "spring" as const,
-  stiffness: 420,
-  damping: 36,
-  mass: 0.85,
+  stiffness: 480,
+  damping: 40,
+  mass: 0.7,
 };
 
 interface PreviewLightboxProps {
@@ -48,6 +48,9 @@ export function PreviewLightbox({
     if (open) setIsPresent(true);
   }, [open]);
 
+  const overlayDuration = prefersReducedMotion ? 0.1 : 0.18;
+  const exitHold = prefersReducedMotion ? 0.12 : 0.34;
+
   return (
     <Dialog
       open={isPresent}
@@ -67,16 +70,17 @@ export function PreviewLightbox({
               className="fixed inset-0 z-50"
               initial={false}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{
-                duration: prefersReducedMotion ? 0.12 : 0.22,
-                ease: [0.22, 1, 0.36, 1],
-              }}
+              exit={{ opacity: 1 }}
+              transition={{ duration: exitHold }}
             >
-              <div
+              <motion.div
                 aria-hidden
                 data-slot="dialog-overlay"
-                className="absolute inset-0 bg-overlay-strong cursor-zoom-out"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: overlayDuration }}
+                className="absolute inset-0 bg-black/40 cursor-zoom-out"
                 onClick={() => onOpenChange(false)}
               />
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4 sm:p-6">

@@ -455,8 +455,7 @@ export function MediaCarousel({
 
   const viewportClassName = cn(
     "relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle",
-    isExpandable && "cursor-zoom-in",
-    isLightboxOpen && "invisible pointer-events-none"
+    isExpandable && "cursor-zoom-in"
   );
 
   const touchHandlers =
@@ -497,96 +496,90 @@ export function MediaCarousel({
     );
   });
 
-  let viewport: React.ReactNode;
+  const viewport = isExpandable ? (
+    <button
+      type="button"
+      onClick={handleViewportClick}
+      aria-label="Expand preview"
+      className={cn(viewportClassName, "block w-full text-left")}
+      {...touchHandlers}
+    >
+      {slides}
+    </button>
+  ) : (
+    <div className={viewportClassName} {...touchHandlers}>
+      {slides}
+    </div>
+  );
 
-  if (isExpandable) {
-    viewport = (
-      <motion.button
-        type="button"
-        layoutId={sharedLayoutId}
-        transition={previewLayoutTransition}
-        onClick={handleViewportClick}
-        aria-label="Expand preview"
-        className={cn(viewportClassName, "block w-full text-left")}
-        {...touchHandlers}
-      >
-        {slides}
-      </motion.button>
-    );
-  } else if (sharedLayoutId) {
-    viewport = (
+  const controls =
+    showControls && media.length > 1 ? (
+      <div className="flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={goToPrevious}
+          aria-label="Previous image"
+          className="hidden cursor-pointer lg:block"
+        >
+          <Kbd pressed={pressedArrowKey === "ArrowLeft"}>
+            <RiArrowLeftSLine />
+          </Kbd>
+        </button>
+        <div className="flex items-center justify-center gap-1.5">
+          {media.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => onIndexChange(index)}
+              className={cn(
+                "size-1.5 rounded-full transition-all duration-200 cursor-pointer",
+                index === activeIndex
+                  ? "bg-foreground/60"
+                  : "bg-foreground/15 hover:bg-foreground/30"
+              )}
+              aria-label={`View image ${index + 1} of ${media.length}`}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={goToNext}
+          aria-label="Next image"
+          className="hidden cursor-pointer lg:block"
+        >
+          <Kbd pressed={pressedArrowKey === "ArrowRight"}>
+            <RiArrowRightSLine />
+          </Kbd>
+        </button>
+      </div>
+    ) : null;
+
+  const shellClassName = cn(
+    "flex w-full flex-col gap-3",
+    isLightboxOpen && "invisible pointer-events-none"
+  );
+
+  // Keep a motion shell whenever this carousel participates in shared layout,
+  // even while yielding the layoutId to the lightbox destination.
+  if (layoutId && !prefersReducedMotion) {
+    return (
       <motion.div
         layoutId={sharedLayoutId}
         transition={previewLayoutTransition}
-        className={viewportClassName}
-        {...touchHandlers}
+        className={shellClassName}
+        data-preview-target
+        style={{ borderRadius: 12 }}
       >
-        {slides}
+        {viewport}
+        {controls}
       </motion.div>
-    );
-  } else {
-    viewport = (
-      <div className={viewportClassName} {...touchHandlers}>
-        {slides}
-      </div>
     );
   }
 
   return (
-    <div
-      className={cn(
-        "flex w-full flex-col gap-3",
-        isLightboxOpen && "pointer-events-none"
-      )}
-      data-preview-target
-    >
+    <div className={shellClassName} data-preview-target>
       {viewport}
-
-      {showControls && media.length > 1 && (
-        <div
-          className={cn(
-            "flex items-center justify-center gap-3",
-            isLightboxOpen && "invisible"
-          )}
-        >
-          <button
-            type="button"
-            onClick={goToPrevious}
-            aria-label="Previous image"
-            className="hidden cursor-pointer lg:block"
-          >
-            <Kbd pressed={pressedArrowKey === "ArrowLeft"}>
-              <RiArrowLeftSLine />
-            </Kbd>
-          </button>
-          <div className="flex items-center justify-center gap-1.5">
-            {media.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => onIndexChange(index)}
-                className={cn(
-                  "size-1.5 rounded-full transition-all duration-200 cursor-pointer",
-                  index === activeIndex
-                    ? "bg-foreground/60"
-                    : "bg-foreground/15 hover:bg-foreground/30"
-                )}
-                aria-label={`View image ${index + 1} of ${media.length}`}
-              />
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={goToNext}
-            aria-label="Next image"
-            className="hidden cursor-pointer lg:block"
-          >
-            <Kbd pressed={pressedArrowKey === "ArrowRight"}>
-              <RiArrowRightSLine />
-            </Kbd>
-          </button>
-        </div>
-      )}
+      {controls}
     </div>
   );
 }
