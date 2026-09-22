@@ -1,9 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { flushSync } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/app/lib/utils";
+import { Skeleton } from "@/app/components/ui/skeleton";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react";
 
 export function Kbd({
@@ -30,11 +38,12 @@ export function Kbd({
   );
 }
 
-interface MediaItem {
+export interface MediaItem {
   src: string;
   alt: string;
   type: "image" | "video";
   playbackRate?: number;
+  poster?: string;
 }
 
 interface MediaCarouselProps {
@@ -51,51 +60,333 @@ interface MediaCarouselProps {
   enableSwipe?: boolean;
 }
 
+const carouselImageSizes = "(min-width: 1024px) 60vw, 100vw";
+const SLIDE_FADE_MS = 600;
+const SWIPE_THRESHOLD_PX = 50;
+
 const layoutTransition = {
   type: "spring" as const,
   stiffness: 300,
   damping: 30,
 };
 
-const SWIPE_THRESHOLD_PX = 50;
+function getAdvanceLeadSeconds(video: HTMLVideoElement) {
+  const duration = video.duration;
+  const rate = video.playbackRate || 1;
+  if (!Number.isFinite(duration) || duration <= 0) return SLIDE_FADE_MS / 1000;
 
-function MediaViewport({
+  const wallDuration = duration / rate;
+  return Math.min(SLIDE_FADE_MS / 1000, Math.max(0.12, wallDuration * 0.3));
+}
+
+function hasCachedPreview(item: MediaItem) {
+  if (typeof window === "undefined") return false;
+
+  const previewSrc = item.poster ?? (item.type === "image" ? item.src : undefined);
+  if (!previewSrc) return false;
+
+  const image = new window.Image();
+  image.src = previewSrc;
+  return image.complete && image.naturalWidth > 0;
+}
+
+function MediaBlur({
+  src,
+  unoptimized = false,
+  onLoad,
+}: {
+  src: string;
+  unoptimized?: boolean;
+  onLoad?: () => void;
+}) {
+  return (
+    <Image
+      src={src}
+      alt=""
+      fill
+      quality={60}
+      unoptimized={unoptimized}
+      sizes={carouselImageSizes}
+      className="object-cover blur-2xl scale-200"
+      aria-hidden="true"
+      onLoad={onLoad}
+    />
+  );
+}
+
+function captureVideoFrame(video: HTMLVideoElement) {
+  if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return null;
+  if (video.videoWidth === 0 || video.videoHeight === 0) return null;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const context = canvas.getContext("2d");
+  if (!context) return null;
+
+  context.drawImage(video, 0, 0);
+  try {
+    return canvas.toDataURL("image/jpeg", 0.92);
+  } catch {
+    return null;
+  }
+}
+
+function CarouselVideo({
+  item,
+  isActive,
+  isNext,
+  onNearEnd,
+  onReady,
+}: {
+  item: MediaItem;
+  isActive: boolean;
+  isNext?: boolean;
+  onNearEnd?: () => void;
+  onReady?: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const onNearEndRef = useRef(onNearEnd);
+  const hasSignaledEndRef = useRef(false);
+  const frozenFrameRef = useRef<string | null>(null);
+  const [shouldShowPoster, setShouldShowPoster] = useState(true);
+  const [frozenFrame, setFrozenFrame] = useState<string | null>(null);
+  onNearEndRef.current = onNearEnd;
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) onReady?.();
+  }, [item.src, onReady]);
+
+  useEffect(() => {
+    if (isActive || !isNext) return;
+    const video = videoRef.current;
+    if (!video) return;
+    video.playbackRate = item.playbackRate ?? 1;
+  }, [isActive, isNext, item.playbackRate, item.src]);
+
+  useLayoutEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const el: HTMLVideoElement = video;
+
+    el.playbackRate = item.playbackRate ?? 1;
+
+    function freezeOutgoing() {
+      if (!frozenFrameRef.current) {
+        const frame = captureVideoFrame(el);
+        if (frame) {
+          frozenFrameRef.current = frame;
+          flushSync(() => {
+            setFrozenFrame(frame);
+            setShouldShowPoster(false);
+          });
+        }
+      }
+      el.pause();
+    }
+
+    function maybeAdvance() {
+      if (!isActive || hasSignaledEndRef.current) return;
+
+      const duration = el.duration;
+      if (!Number.isFinite(duration) || duration <= 0) return;
+
+      const remainingWall = (duration - el.currentTime) / (el.playbackRate || 1);
+      if (remainingWall > getAdvanceLeadSeconds(el)) return;
+
+      hasSignaledEndRef.current = true;
+      freezeOutgoing();
+      onNearEndRef.current?.();
+    }
+
+    function handleEnded() {
+      freezeOutgoing();
+      if (!isActive || hasSignaledEndRef.current) return;
+      hasSignaledEndRef.current = true;
+      onNearEndRef.current?.();
+    }
+
+    function handleTimeUpdate() {
+      maybeAdvance();
+    }
+
+    if (!isActive) {
+      setShouldShowPoster(false);
+      freezeOutgoing();
+      return;
+    }
+
+    hasSignaledEndRef.current = false;
+    frozenFrameRef.current = null;
+    setFrozenFrame(null);
+    el.addEventListener("timeupdate", handleTimeUpdate);
+    el.addEventListener("ended", handleEnded);
+    if (el.currentTime > 0.05) el.currentTime = 0;
+    el.play().catch(() => {});
+
+    let raf = requestAnimationFrame(function loop() {
+      maybeAdvance();
+      if (hasSignaledEndRef.current || el.paused) return;
+      raf = requestAnimationFrame(loop);
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      el.removeEventListener("timeupdate", handleTimeUpdate);
+      el.removeEventListener("ended", handleEnded);
+    };
+  }, [isActive, item.playbackRate, item.src]);
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        src={item.src}
+        muted
+        playsInline
+        preload="auto"
+        className="relative size-full object-cover"
+        onLoadedData={() => onReady?.()}
+        onPlaying={() => setShouldShowPoster(false)}
+      />
+      {frozenFrame ? (
+        // Captured raster of the last decoded frame; not a next/image asset.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={frozenFrame}
+          alt=""
+          className="absolute inset-0 size-full object-cover"
+        />
+      ) : shouldShowPoster && item.poster ? (
+        <Image
+          src={item.poster}
+          alt=""
+          fill
+          unoptimized
+          sizes={carouselImageSizes}
+          className="object-cover"
+        />
+      ) : null}
+    </>
+  );
+}
+
+function MediaSlide({
+  item,
+  isActive,
+  isNext,
+  onActiveVideoEnded,
+  hideAmbientBlur,
+}: {
+  item: MediaItem;
+  isActive: boolean;
+  isNext?: boolean;
+  onActiveVideoEnded?: () => void;
+  hideAmbientBlur?: boolean;
+}) {
+  const [isReady, setIsReady] = useState(() => hasCachedPreview(item));
+  const blurSrc = item.poster ?? (item.type === "image" ? item.src : undefined);
+  const markReady = useCallback(() => setIsReady(true), []);
+
+  return (
+    <>
+      {!hideAmbientBlur && blurSrc ? (
+        <MediaBlur
+          src={blurSrc}
+          unoptimized={Boolean(item.poster)}
+          onLoad={markReady}
+        />
+      ) : null}
+      {item.type === "video" ? (
+        <CarouselVideo
+          item={item}
+          isActive={isActive}
+          isNext={isNext}
+          onNearEnd={onActiveVideoEnded}
+          onReady={markReady}
+        />
+      ) : (
+        <Image
+          src={item.src}
+          alt={item.alt}
+          fill
+          quality={100}
+          sizes={carouselImageSizes}
+          className={cn("object-cover", hideAmbientBlur && "[filter:none]")}
+          priority={isActive}
+          onLoad={markReady}
+        />
+      )}
+      <Skeleton
+        aria-hidden={isReady}
+        className={cn(
+          "absolute inset-0 size-full rounded-none bg-skeleton transition-opacity duration-300",
+          isReady ? "pointer-events-none opacity-0" : "opacity-100"
+        )}
+      />
+    </>
+  );
+}
+
+export function MediaCarousel({
   media,
   activeIndex,
   onIndexChange,
   onActiveVideoEnded,
+  pressedArrowKey,
   layoutId,
   onViewportClick,
   isLightboxOpen,
-  enableSwipe,
-  hideAmbientBlur,
-}: {
-  media: MediaItem[];
-  activeIndex: number;
-  onIndexChange: (index: number) => void;
-  onActiveVideoEnded?: () => void;
-  layoutId?: string;
-  onViewportClick?: () => void;
-  isLightboxOpen?: boolean;
-  enableSwipe?: boolean;
-  hideAmbientBlur?: boolean;
-}) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  showControls = true,
+  enableSwipe = false,
+}: MediaCarouselProps) {
+  const loadedIndicesRef = useRef(new Set<number>([activeIndex]));
   const touchStartX = useRef<number | null>(null);
   const didSwipe = useRef(false);
   const prefersReducedMotion = useReducedMotion();
   const isExpandable = !!onViewportClick;
+  const hideAmbientBlur = !!isLightboxOpen;
   const sharedLayoutId =
     !prefersReducedMotion && layoutId && !isLightboxOpen ? layoutId : undefined;
 
-  useEffect(() => {
-    if (!videoRef.current) return;
+  loadedIndicesRef.current.add(activeIndex);
+  if (media.length > 1) {
+    loadedIndicesRef.current.add((activeIndex + 1) % media.length);
+  }
 
-    const item = media[activeIndex];
-    const video = videoRef.current;
-    video.playbackRate = item?.playbackRate ?? 1;
-    video.currentTime = 0;
-    video.play().catch(() => {});
+  useEffect(() => {
+    if (media.length <= 1) return;
+
+    const nextItem = media[(activeIndex + 1) % media.length];
+    if (!nextItem) return;
+
+    const warmers: Array<HTMLImageElement | HTMLVideoElement> = [];
+
+    if (nextItem.poster) {
+      const poster = new window.Image();
+      poster.src = nextItem.poster;
+      warmers.push(poster);
+    }
+
+    if (nextItem.type === "video") {
+      const video = document.createElement("video");
+      video.muted = true;
+      video.preload = "auto";
+      video.src = nextItem.src;
+      warmers.push(video);
+    } else {
+      const image = new window.Image();
+      image.src = nextItem.src;
+      warmers.push(image);
+    }
+
+    return () => {
+      warmers.forEach((element) => {
+        element.src = "";
+      });
+    };
   }, [activeIndex, media]);
 
   function goToPrevious() {
@@ -147,155 +438,6 @@ function MediaViewport({
     onViewportClick?.();
   }
 
-  const viewportClassName = cn(
-    "relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle",
-    isExpandable && "cursor-zoom-in"
-  );
-
-  const mediaContent = (
-    <>
-      {media.map((item, index) => (
-        <div
-          key={item.src}
-          className={cn(
-            "absolute inset-0 transition-opacity duration-500 ease-out",
-            index === activeIndex ? "opacity-100 z-10" : "opacity-0 z-0"
-          )}
-        >
-          {item.type === "video" ? (
-            <>
-              {!hideAmbientBlur && (
-                <video
-                  src={item.src}
-                  muted
-                  loop
-                  playsInline
-                  className="absolute inset-0 size-full object-cover blur-2xl scale-200"
-                  aria-hidden
-                  onLoadedData={(event) => {
-                    event.currentTarget.playbackRate = item.playbackRate ?? 1;
-                  }}
-                />
-              )}
-              <video
-                ref={index === activeIndex ? videoRef : undefined}
-                src={item.src}
-                muted
-                playsInline
-                className={cn(
-                  "relative size-full object-cover",
-                  hideAmbientBlur && "[filter:none]"
-                )}
-                onLoadedData={(event) => {
-                  event.currentTarget.playbackRate = item.playbackRate ?? 1;
-                }}
-                onEnded={
-                  index === activeIndex ? handleActiveVideoEnded : undefined
-                }
-              />
-            </>
-          ) : (
-            <>
-              {!hideAmbientBlur && (
-                <Image
-                  src={item.src}
-                  alt=""
-                  fill
-                  quality={100}
-                  sizes="(min-width: 1024px) 60vw, 100vw"
-                  className="object-cover blur-2xl scale-200"
-                  aria-hidden="true"
-                />
-              )}
-              <Image
-                src={item.src}
-                alt={item.alt}
-                fill
-                quality={100}
-                sizes="(min-width: 1024px) 60vw, 100vw"
-                className={cn(
-                  "object-cover",
-                  hideAmbientBlur && "[filter:none]"
-                )}
-                priority={index === 0}
-              />
-            </>
-          )}
-        </div>
-      ))}
-    </>
-  );
-
-  const touchHandlers =
-    enableSwipe && media.length > 1
-      ? {
-          onTouchStart: handleTouchStart,
-          onTouchEnd: handleTouchEnd,
-        }
-      : {};
-
-  if (isExpandable) {
-    return (
-      <motion.button
-        type="button"
-        layoutId={sharedLayoutId}
-        transition={layoutTransition}
-        onClick={handleViewportClick}
-        aria-label="Expand preview"
-        className={cn(viewportClassName, "block w-full text-left")}
-        {...touchHandlers}
-      >
-        {mediaContent}
-      </motion.button>
-    );
-  }
-
-  if (sharedLayoutId) {
-    return (
-      <motion.div
-        layoutId={sharedLayoutId}
-        transition={layoutTransition}
-        className={viewportClassName}
-        {...touchHandlers}
-      >
-        {mediaContent}
-      </motion.div>
-    );
-  }
-
-  return (
-    <div className={viewportClassName} {...touchHandlers}>
-      {mediaContent}
-    </div>
-  );
-}
-
-export function MediaCarousel({
-  media,
-  activeIndex,
-  onIndexChange,
-  onActiveVideoEnded,
-  pressedArrowKey,
-  layoutId,
-  onViewportClick,
-  isLightboxOpen,
-  showControls = true,
-  enableSwipe = false,
-}: MediaCarouselProps) {
-  function goToPrevious() {
-    onIndexChange(
-      media.length > 0
-        ? (activeIndex - 1 + media.length) % media.length
-        : 0
-    );
-  }
-
-  function goToNext() {
-    onIndexChange(
-      media.length > 0 ? (activeIndex + 1) % media.length : 0
-    );
-  }
-
   if (media.length === 0) {
     return (
       <div
@@ -307,19 +449,87 @@ export function MediaCarousel({
     );
   }
 
+  const viewportClassName = cn(
+    "relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle",
+    isExpandable && "cursor-zoom-in"
+  );
+
+  const touchHandlers =
+    enableSwipe && media.length > 1
+      ? {
+          onTouchStart: handleTouchStart,
+          onTouchEnd: handleTouchEnd,
+        }
+      : {};
+
+  const slides = media.map((item, index) => {
+    const isActive = index === activeIndex;
+    const isNext =
+      media.length > 1 && index === (activeIndex + 1) % media.length;
+    const shouldLoad = loadedIndicesRef.current.has(index);
+
+    return (
+      <div
+        key={item.src}
+        className={cn(
+          "absolute inset-0 transition-opacity ease-in-out",
+          isActive ? "opacity-100 z-10" : "opacity-0 z-0"
+        )}
+        style={{ transitionDuration: `${SLIDE_FADE_MS}ms` }}
+      >
+        {shouldLoad ? (
+          <MediaSlide
+            item={item}
+            isActive={isActive}
+            isNext={isNext}
+            hideAmbientBlur={hideAmbientBlur}
+            onActiveVideoEnded={
+              isActive ? handleActiveVideoEnded : undefined
+            }
+          />
+        ) : null}
+      </div>
+    );
+  });
+
+  let viewport: React.ReactNode;
+
+  if (isExpandable) {
+    viewport = (
+      <motion.button
+        type="button"
+        layoutId={sharedLayoutId}
+        transition={layoutTransition}
+        onClick={handleViewportClick}
+        aria-label="Expand preview"
+        className={cn(viewportClassName, "block w-full text-left")}
+        {...touchHandlers}
+      >
+        {slides}
+      </motion.button>
+    );
+  } else if (sharedLayoutId) {
+    viewport = (
+      <motion.div
+        layoutId={sharedLayoutId}
+        transition={layoutTransition}
+        className={viewportClassName}
+        {...touchHandlers}
+      >
+        {slides}
+      </motion.div>
+    );
+  } else {
+    viewport = (
+      <div className={viewportClassName} {...touchHandlers}>
+        {slides}
+      </div>
+    );
+  }
+
   return (
     <div className="flex w-full flex-col gap-3" data-preview-target>
-      <MediaViewport
-        media={media}
-        activeIndex={activeIndex}
-        onIndexChange={onIndexChange}
-        onActiveVideoEnded={onActiveVideoEnded}
-        layoutId={layoutId}
-        onViewportClick={onViewportClick}
-        isLightboxOpen={isLightboxOpen}
-        enableSwipe={enableSwipe}
-        hideAmbientBlur={isLightboxOpen}
-      />
+      {viewport}
 
       {showControls && media.length > 1 && (
         <div className="flex items-center justify-center gap-3">
@@ -333,7 +543,7 @@ export function MediaCarousel({
               <RiArrowLeftSLine />
             </Kbd>
           </button>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-center gap-1.5">
             {media.map((_, index) => (
               <button
                 key={index}
