@@ -24,12 +24,12 @@ export function HomeEnterSection({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8, filter: "blur(8px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.8,
+        duration: 0.55,
         ease: enterEase,
-        delay: index * 0.1,
+        delay: index * 0.08,
       }}
       className={cn(className)}
     >

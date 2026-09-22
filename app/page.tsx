@@ -30,6 +30,15 @@ import {
 import { MediaCarousel, type MediaItem } from "./components/media-carousel";
 import { WorkMediaPreloader } from "./components/work-media-preloader";
 import { ProfileCardStack, type ProfileStackItem } from "./components/profile-card-stack";
+import { ProfileCard } from "./components/profile-card";
+import {
+  PreviewLightbox,
+  getPreviewMediaLayoutId,
+  getPreviewProfileLayoutId,
+  previewLayoutTransition,
+} from "./components/preview-lightbox";
+import { MobilePreviewAccordion } from "./components/mobile-preview-accordion";
+import { Button } from "@/app/components/ui/button";
 import {
   ListItemRow,
   ListItemRowLink,
@@ -55,14 +64,18 @@ const AUTO_ADVANCE_MS = 2500;
 const MANUAL_PAUSE_MS = 8000;
 
 const blurEase = [0.25, 0.46, 0.45, 0.94] as const;
-const previewBlurTransition = { duration: 0.4, ease: blurEase };
-const previewBlur = "12px";
+const previewBlurTransition = { duration: 0.28, ease: blurEase };
 
 function getPanelKey(panel: PanelContent) {
   if (panel.type === "media") return `media-${panel.workIndex}`;
   if (panel.type === "profile") return "profile-stack";
   return panel.type;
 }
+
+type LightboxState =
+  | { type: "media"; workIndex: number }
+  | { type: "profile"; id: string }
+  | null;
 
 const contactProfiles = {
   twitter: {
@@ -679,6 +692,9 @@ function PreviewPanel({
   onSelectProfile,
   onCopyEmail,
   pressedArrowKey,
+  lightbox,
+  onMediaExpand,
+  onProfileExpand,
 }: {
   panel: PanelContent;
   mediaIndex: number;
@@ -687,8 +703,14 @@ function PreviewPanel({
   onSelectProfile: (profile: ProfileStackItem) => void;
   onCopyEmail: (email: string) => void;
   pressedArrowKey?: string | null;
+  lightbox: LightboxState;
+  onMediaExpand: (workIndex: number) => void;
+  onProfileExpand: (id: string) => void;
 }) {
   if (panel.type === "media") {
+    const isMediaLightboxOpen =
+      lightbox?.type === "media" && lightbox.workIndex === panel.workIndex;
+
     return (
       <div className="w-full min-w-0">
         <MediaCarousel
@@ -698,18 +720,27 @@ function PreviewPanel({
           onActiveVideoEnded={onActiveVideoEnded}
           companyName={workEntries[panel.workIndex]?.company}
           pressedArrowKey={pressedArrowKey}
+          layoutId={getPreviewMediaLayoutId(panel.workIndex)}
+          onViewportClick={() => onMediaExpand(panel.workIndex)}
+          isLightboxOpen={isMediaLightboxOpen}
         />
       </div>
     );
   }
 
   if (panel.type === "profile") {
+    const isProfileLightboxOpen =
+      lightbox?.type === "profile" && lightbox.id === panel.id;
+
     return (
       <ProfileCardStack
         profiles={contactProfileList}
         activeId={panel.id}
         onSelectProfile={onSelectProfile}
         onCopyEmail={onCopyEmail}
+        activeLayoutId={getPreviewProfileLayoutId(panel.id)}
+        onActiveCardExpand={() => onProfileExpand(panel.id)}
+        isLightboxOpen={isProfileLightboxOpen}
       />
     );
   }
@@ -731,6 +762,9 @@ function PreviewPanelSlot({
   onSelectProfile,
   onCopyEmail,
   pressedArrowKey,
+  lightbox,
+  onMediaExpand,
+  onProfileExpand,
 }: {
   panel: PanelContent;
   isOpen: boolean;
@@ -745,9 +779,14 @@ function PreviewPanelSlot({
   onSelectProfile: (profile: ProfileStackItem) => void;
   onCopyEmail: (email: string) => void;
   pressedArrowKey?: string | null;
+  lightbox: LightboxState;
+  onMediaExpand: (workIndex: number) => void;
+  onProfileExpand: (id: string) => void;
 }) {
   const prefersReducedMotion = useReducedMotion();
 
+  // Avoid CSS `filter` on the panel — it creates a containing block that
+  // breaks shared-layout morph measurements for the lightbox.
   const contentMotion = prefersReducedMotion
     ? {
         initial: { opacity: 0 },
@@ -755,9 +794,9 @@ function PreviewPanelSlot({
         exit: { opacity: 0 },
       }
     : {
-        initial: { opacity: 0, filter: `blur(${previewBlur})` },
-        animate: { opacity: 1, filter: "blur(0px)" },
-        exit: { opacity: 0, filter: `blur(${previewBlur})` },
+        initial: { opacity: 0, y: 6 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: 6 },
       };
 
   return (
@@ -796,6 +835,9 @@ function PreviewPanelSlot({
                   onSelectProfile={onSelectProfile}
                   onCopyEmail={onCopyEmail}
                   pressedArrowKey={pressedArrowKey}
+                  lightbox={lightbox}
+                  onMediaExpand={onMediaExpand}
+                  onProfileExpand={onProfileExpand}
                 />
               </motion.div>
             )}
@@ -816,6 +858,9 @@ export default function Home() {
   const [hoveredListItemId, setHoveredListItemId] = useState<string | null>(null);
   const [highlightVisible, setHighlightVisible] = useState(true);
   const [slotPanel, setSlotPanel] = useState<PanelContent | null>(null);
+  const [lightbox, setLightbox] = useState<LightboxState>(null);
+  const [lightboxMediaIndex, setLightboxMediaIndex] = useState(0);
+  const [lightboxRender, setLightboxRender] = useState<LightboxState>(null);
   const highlightExitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activePanelRef = useRef<PanelContent | null>(null);
 
@@ -824,10 +869,17 @@ export default function Home() {
     : hoveredListItemId ?? getListHighlightId(previewPanel.panel);
   const highlightId = highlightVisible ? activeHighlightId : null;
   const displayedPanel = previewPanel.panel ?? slotPanel;
+  const isLightboxOpen = lightbox !== null;
 
-  useEffect(() => {
-    activePanelRef.current = previewPanel.panel;
-  }, [previewPanel.panel]);
+  function guardedStartDeselectTimer() {
+    if (isLightboxOpen) return;
+    previewPanel.startDeselectTimer();
+  }
+
+  function guardedDismissListInteraction() {
+    if (isLightboxOpen) return;
+    dismissListInteraction();
+  }
 
   function clearHighlightExitTimer() {
     if (highlightExitTimer.current) {
@@ -849,6 +901,15 @@ export default function Home() {
     highlightExitTimer.current = setTimeout(() => {
       setHighlightVisible(false);
     }, HIGHLIGHT_EXIT_DELAY_MS);
+  }
+
+  function isMovingToLightbox(relatedTarget: EventTarget | null) {
+    return (
+      relatedTarget instanceof Element &&
+      relatedTarget.closest(
+        '[data-slot="dialog-overlay"], [data-slot="dialog-portal"], [data-slot="dialog-content"]'
+      ) !== null
+    );
   }
 
   function handleListItemHover(id: string, activate: () => void) {
@@ -874,7 +935,8 @@ export default function Home() {
     if (
       relatedTarget instanceof Node &&
       (listSectionRef.current?.contains(relatedTarget) ||
-        isMovingToPreview(relatedTarget))
+        isMovingToPreview(relatedTarget) ||
+        isMovingToLightbox(relatedTarget))
     ) {
       return;
     }
@@ -885,7 +947,7 @@ export default function Home() {
       event.currentTarget.blur();
     }
 
-    dismissListInteraction();
+    guardedDismissListInteraction();
   }
 
   function handleListGapEnter() {
@@ -901,6 +963,27 @@ export default function Home() {
     if (!workSectionRef.current?.contains(event.relatedTarget as Node | null)) {
       setIsWorkSectionEngaged(false);
     }
+  }
+
+  function handleMediaExpand(workIndex: number, mediaIndex = previewPanel.mediaIndex) {
+    previewPanel.clearDeselectTimer();
+    clearHighlightExitTimer();
+    setLightboxMediaIndex(mediaIndex);
+    const next = { type: "media" as const, workIndex };
+    setLightboxRender(next);
+    setLightbox(next);
+  }
+
+  function handleProfileExpand(id: string) {
+    previewPanel.clearDeselectTimer();
+    clearHighlightExitTimer();
+    const next = { type: "profile" as const, id };
+    setLightboxRender(next);
+    setLightbox(next);
+  }
+
+  function handleLightboxOpenChange(open: boolean) {
+    if (!open) setLightbox(null);
   }
 
   function handlePreviewCardSelect(profile: ProfileStackItem) {
@@ -958,13 +1041,19 @@ export default function Home() {
     setHoveredListItemId(null);
     blurActiveListItem();
 
-    if (isMovingToPreview(event.relatedTarget)) {
+    if (isMovingToPreview(event.relatedTarget) || isMovingToLightbox(event.relatedTarget)) {
       clearHighlightExitTimer();
       return;
     }
 
-    dismissListInteraction();
+    guardedDismissListInteraction();
   }
+
+  useEffect(() => {
+    if (previewPanel.panel) {
+      activePanelRef.current = previewPanel.panel;
+    }
+  }, [previewPanel.panel]);
 
   useEffect(() => {
     return () => clearHighlightExitTimer();
@@ -1062,7 +1151,7 @@ export default function Home() {
             onMouseLeave={handleListSectionLeave}
           >
             <LayoutGroup id="home-list">
-              <div className={cn("relative", listSectionClassName)}>
+              <div className={cn("relative hidden lg:block", listSectionClassName)}>
                 <div
                   ref={workSectionRef}
                   onMouseEnter={() => setIsWorkSectionEngaged(true)}
@@ -1203,9 +1292,33 @@ export default function Home() {
                 </HomeEnterSection>
               </div>
             </LayoutGroup>
+
+            <div className="lg:hidden flex flex-col">
+              <HomeEnterSection index={3}>
+                <div className="pb-2">
+                  <h2
+                    id="work-mobile"
+                    className="text-balance font-medium text-muted-foreground"
+                  >
+                    Work
+                  </h2>
+                </div>
+              </HomeEnterSection>
+
+              <HomeEnterSection index={4}>
+                <MobilePreviewAccordion
+                  workEntries={workEntries}
+                  contactProfiles={contactProfiles}
+                  onMediaExpand={handleMediaExpand}
+                  onProfileExpand={handleProfileExpand}
+                  lightbox={lightbox}
+                />
+              </HomeEnterSection>
+            </div>
           </div>
         </div>
 
+        <LayoutGroup id="home-preview">
         {displayedPanel && (
           <PreviewPanelSlot
             panel={displayedPanel}
@@ -1215,11 +1328,14 @@ export default function Home() {
             onActiveVideoEnded={previewPanel.advanceToNextMedia}
             onPreviewHoverChange={previewPanel.setIsPreviewHovered}
             panelRef={previewPanel.carouselRef}
-            startDeselectTimer={previewPanel.startDeselectTimer}
+            startDeselectTimer={guardedStartDeselectTimer}
             onPreviewEnter={handlePreviewEnter}
             onSelectProfile={handlePreviewCardSelect}
             onCopyEmail={handlePreviewCopyEmail}
             pressedArrowKey={previewPanel.pressedArrowKey}
+            lightbox={lightbox}
+            onMediaExpand={handleMediaExpand}
+            onProfileExpand={handleProfileExpand}
             onContentExitComplete={() => {
               if (!activePanelRef.current) {
                 setSlotPanel(null);
@@ -1227,6 +1343,61 @@ export default function Home() {
             }}
           />
         )}
+
+        <PreviewLightbox
+          open={lightbox !== null}
+          onOpenChange={handleLightboxOpenChange}
+          title={
+            lightboxRender?.type === "media"
+              ? `${workEntries[lightboxRender.workIndex]?.company ?? "Work"} preview`
+              : lightboxRender?.type === "profile"
+                ? `${contactProfiles[lightboxRender.id as keyof typeof contactProfiles]?.name ?? "Profile"} preview`
+                : "Preview"
+          }
+        >
+          {lightboxRender?.type === "media" && (
+            <MediaCarousel
+              media={workEntries[lightboxRender.workIndex]?.media ?? []}
+              activeIndex={lightboxMediaIndex}
+              onIndexChange={setLightboxMediaIndex}
+              layoutId={getPreviewMediaLayoutId(lightboxRender.workIndex)}
+              isLightboxDestination
+              enableSwipe
+            />
+          )}
+          {lightboxRender?.type === "profile" && (() => {
+            const profile =
+              contactProfiles[lightboxRender.id as keyof typeof contactProfiles];
+
+            return (
+              <div className="flex flex-col gap-4">
+                <motion.div
+                  layoutId={getPreviewProfileLayoutId(lightboxRender.id)}
+                  transition={previewLayoutTransition}
+                  className="w-full"
+                >
+                  <ProfileCard {...profile} />
+                </motion.div>
+                {profile.platform === "email" ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => handlePreviewCopyEmail(profile.handle)}
+                  >
+                    Copy email
+                  </Button>
+                ) : profile.href ? (
+                  <Button
+                    variant="outline"
+                    render={<a href={profile.href} target="_blank" />}
+                  >
+                    Open profile
+                  </Button>
+                ) : null}
+              </div>
+            );
+          })()}
+        </PreviewLightbox>
+        </LayoutGroup>
       </div>
     </PreviewPanelContext.Provider>
   );

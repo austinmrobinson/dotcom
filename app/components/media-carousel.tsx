@@ -9,9 +9,11 @@ import {
   useState,
 } from "react";
 import { flushSync } from "react-dom";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/app/lib/utils";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/react";
+import { previewLayoutTransition } from "@/app/components/preview-lightbox";
 
 export function Kbd({
   children,
@@ -52,10 +54,19 @@ interface MediaCarouselProps {
   onActiveVideoEnded?: () => void;
   companyName?: string;
   pressedArrowKey?: string | null;
+  layoutId?: string;
+  onViewportClick?: () => void;
+  /** Source carousel: hide while lightbox owns the shared layoutId */
+  isLightboxOpen?: boolean;
+  /** Destination carousel: strip ambient blur; keep layoutId for morph */
+  isLightboxDestination?: boolean;
+  showControls?: boolean;
+  enableSwipe?: boolean;
 }
 
-const carouselImageSizes = "(min-width: 1024px) 60vw, 0vw";
+const carouselImageSizes = "(min-width: 1024px) 60vw, 100vw";
 const SLIDE_FADE_MS = 600;
+const SWIPE_THRESHOLD_PX = 50;
 
 function getAdvanceLeadSeconds(video: HTMLVideoElement) {
   const duration = video.duration;
@@ -67,6 +78,8 @@ function getAdvanceLeadSeconds(video: HTMLVideoElement) {
 }
 
 function hasCachedPreview(item: MediaItem) {
+  if (typeof window === "undefined") return false;
+
   const previewSrc = item.poster ?? (item.type === "image" ? item.src : undefined);
   if (!previewSrc) return false;
 
@@ -263,11 +276,13 @@ function MediaSlide({
   isActive,
   isNext,
   onActiveVideoEnded,
+  hideAmbientBlur,
 }: {
   item: MediaItem;
   isActive: boolean;
   isNext?: boolean;
   onActiveVideoEnded?: () => void;
+  hideAmbientBlur?: boolean;
 }) {
   const [isReady, setIsReady] = useState(() => hasCachedPreview(item));
   const blurSrc = item.poster ?? (item.type === "image" ? item.src : undefined);
@@ -275,7 +290,7 @@ function MediaSlide({
 
   return (
     <>
-      {blurSrc ? (
+      {!hideAmbientBlur && blurSrc ? (
         <MediaBlur
           src={blurSrc}
           unoptimized={Boolean(item.poster)}
@@ -297,7 +312,7 @@ function MediaSlide({
           fill
           quality={100}
           sizes={carouselImageSizes}
-          className="object-cover"
+          className={cn("object-cover", hideAmbientBlur && "[filter:none]")}
           priority={isActive}
           onLoad={markReady}
         />
@@ -319,8 +334,27 @@ export function MediaCarousel({
   onIndexChange,
   onActiveVideoEnded,
   pressedArrowKey,
+  layoutId,
+  onViewportClick,
+  isLightboxOpen,
+  isLightboxDestination,
+  showControls = true,
+  enableSwipe = false,
 }: MediaCarouselProps) {
   const loadedIndicesRef = useRef(new Set<number>([activeIndex]));
+  const touchStartX = useRef<number | null>(null);
+  const didSwipe = useRef(false);
+  const prefersReducedMotion = useReducedMotion();
+  const isExpandable = !!onViewportClick;
+  const hideAmbientBlur = !!isLightboxDestination;
+  // Source yields layoutId while lightbox is open; destination keeps it for the morph.
+  const sharedLayoutId =
+    !prefersReducedMotion &&
+    layoutId &&
+    !isLightboxOpen
+      ? layoutId
+      : undefined;
+
   loadedIndicesRef.current.add(activeIndex);
   if (media.length > 1) {
     loadedIndicesRef.current.add((activeIndex + 1) % media.length);
@@ -378,6 +412,36 @@ export function MediaCarousel({
     onActiveVideoEnded?.();
   }
 
+  function handleTouchStart(event: React.TouchEvent) {
+    if (!enableSwipe || media.length <= 1) return;
+    touchStartX.current = event.touches[0].clientX;
+    didSwipe.current = false;
+  }
+
+  function handleTouchEnd(event: React.TouchEvent) {
+    if (!enableSwipe || media.length <= 1 || touchStartX.current === null) {
+      touchStartX.current = null;
+      return;
+    }
+
+    const deltaX = event.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX) return;
+
+    didSwipe.current = true;
+    if (deltaX > 0) goToPrevious();
+    else goToNext();
+  }
+
+  function handleViewportClick() {
+    if (didSwipe.current) {
+      didSwipe.current = false;
+      return;
+    }
+    onViewportClick?.();
+  }
+
   if (media.length === 0) {
     return (
       <div
@@ -389,79 +453,133 @@ export function MediaCarousel({
     );
   }
 
-  return (
-    <div className="flex w-full flex-col gap-3" data-preview-target>
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle">
-        {media.map((item, index) => {
-          const isActive = index === activeIndex;
-          const isNext =
-            media.length > 1 && index === (activeIndex + 1) % media.length;
-          const shouldLoad = loadedIndicesRef.current.has(index);
+  const viewportClassName = cn(
+    "relative aspect-video w-full overflow-hidden rounded-xl border border-border-light bg-overlay-subtle",
+    isExpandable && "cursor-zoom-in"
+  );
 
-          return (
-            <div
-              key={item.src}
-              className={cn(
-                "absolute inset-0 transition-opacity ease-in-out",
-                isActive ? "opacity-100 z-10" : "opacity-0 z-0"
-              )}
-              style={{ transitionDuration: `${SLIDE_FADE_MS}ms` }}
-            >
-              {shouldLoad ? (
-                <MediaSlide
-                  item={item}
-                  isActive={isActive}
-                  isNext={isNext}
-                  onActiveVideoEnded={
-                    isActive ? handleActiveVideoEnded : undefined
-                  }
-                />
-              ) : null}
-            </div>
-          );
-        })}
+  const touchHandlers =
+    enableSwipe && media.length > 1
+      ? {
+          onTouchStart: handleTouchStart,
+          onTouchEnd: handleTouchEnd,
+        }
+      : {};
+
+  const slides = media.map((item, index) => {
+    const isActive = index === activeIndex;
+    const isNext =
+      media.length > 1 && index === (activeIndex + 1) % media.length;
+    const shouldLoad = loadedIndicesRef.current.has(index);
+
+    return (
+      <div
+        key={item.src}
+        className={cn(
+          "absolute inset-0 transition-opacity ease-in-out",
+          isActive ? "opacity-100 z-10" : "opacity-0 z-0"
+        )}
+        style={{ transitionDuration: `${SLIDE_FADE_MS}ms` }}
+      >
+        {shouldLoad ? (
+          <MediaSlide
+            item={item}
+            isActive={isActive}
+            isNext={isNext}
+            hideAmbientBlur={hideAmbientBlur}
+            onActiveVideoEnded={
+              isActive ? handleActiveVideoEnded : undefined
+            }
+          />
+        ) : null}
       </div>
+    );
+  });
 
-      {media.length > 1 && (
-        <div className="flex items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={goToPrevious}
-            aria-label="Previous image"
-            className="cursor-pointer"
-          >
-            <Kbd pressed={pressedArrowKey === "ArrowLeft"}>
-              <RiArrowLeftSLine />
-            </Kbd>
-          </button>
-          <div className="flex items-center justify-center gap-1.5">
-            {media.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => onIndexChange(index)}
-                className={cn(
-                  "size-1.5 rounded-full transition-all duration-200 cursor-pointer",
-                  index === activeIndex
-                    ? "bg-foreground/60"
-                    : "bg-foreground/15 hover:bg-foreground/30"
-                )}
-                aria-label={`View image ${index + 1} of ${media.length}`}
-              />
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={goToNext}
-            aria-label="Next image"
-            className="cursor-pointer"
-          >
-            <Kbd pressed={pressedArrowKey === "ArrowRight"}>
-              <RiArrowRightSLine />
-            </Kbd>
-          </button>
+  const viewport = isExpandable ? (
+    <button
+      type="button"
+      onClick={handleViewportClick}
+      aria-label="Expand preview"
+      className={cn(viewportClassName, "block w-full text-left")}
+      {...touchHandlers}
+    >
+      {slides}
+    </button>
+  ) : (
+    <div className={viewportClassName} {...touchHandlers}>
+      {slides}
+    </div>
+  );
+
+  const controls =
+    showControls && media.length > 1 ? (
+      <div className="flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={goToPrevious}
+          aria-label="Previous image"
+          className="hidden cursor-pointer lg:block"
+        >
+          <Kbd pressed={pressedArrowKey === "ArrowLeft"}>
+            <RiArrowLeftSLine />
+          </Kbd>
+        </button>
+        <div className="flex items-center justify-center gap-1.5">
+          {media.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => onIndexChange(index)}
+              className={cn(
+                "size-1.5 rounded-full transition-all duration-200 cursor-pointer",
+                index === activeIndex
+                  ? "bg-foreground/60"
+                  : "bg-foreground/15 hover:bg-foreground/30"
+              )}
+              aria-label={`View image ${index + 1} of ${media.length}`}
+            />
+          ))}
         </div>
-      )}
+        <button
+          type="button"
+          onClick={goToNext}
+          aria-label="Next image"
+          className="hidden cursor-pointer lg:block"
+        >
+          <Kbd pressed={pressedArrowKey === "ArrowRight"}>
+            <RiArrowRightSLine />
+          </Kbd>
+        </button>
+      </div>
+    ) : null;
+
+  const shellClassName = cn(
+    "flex w-full flex-col gap-3",
+    isLightboxOpen && "invisible pointer-events-none"
+  );
+
+  // Keep a motion shell whenever this carousel participates in shared layout,
+  // even while yielding the layoutId to the lightbox destination.
+  if (layoutId && !prefersReducedMotion) {
+    return (
+      <motion.div
+        layoutId={sharedLayoutId}
+        transition={previewLayoutTransition}
+        className={shellClassName}
+        data-preview-target
+        style={{ borderRadius: 12 }}
+      >
+        {viewport}
+        {controls}
+      </motion.div>
+    );
+  }
+
+  return (
+    <div className={shellClassName} data-preview-target>
+      {viewport}
+      {controls}
     </div>
   );
 }
